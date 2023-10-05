@@ -8,3 +8,6 @@ clean:
 
 test:
 	echo "No tests"
+
+lint:
+	golangci-lint run
