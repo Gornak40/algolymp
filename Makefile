@@ -1,10 +1,8 @@
-UTILS = $(shell ls ./cmd)
-
 build:
-	go build -v ./...
+	go build ./cmd/ejik
 
 clean:
-	rm ${UTILS}
+	rm ejik
 
 test:
 	echo "No tests"
