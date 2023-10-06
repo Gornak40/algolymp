@@ -13,3 +13,9 @@ linters:
     - ifshort
     - deadcode
     - golint
+    - depguard
+    - wsl
+    - wrapcheck
+    - nlreturn
+    - goerr113
+    - exhaustruct
