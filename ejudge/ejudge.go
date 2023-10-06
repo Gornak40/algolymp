@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/sirupsen/logrus"
@@ -88,15 +89,18 @@ func (ej *Ejudge) Logout(sid string) error {
 	return nil
 }
 
-func (ej *Ejudge) CheckContest(sid, cid string) error {
+func (ej *Ejudge) CheckContest(sid string, cid int, verbose bool) error {
 	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("check contest settings, wait please")
 	_, doc, err := ej.postRequest("serve-control", url.Values{
-		"contest_id": {cid},
+		"contest_id": {strconv.FormatInt(int64(cid), 10)},
 		"SID":        {sid},
 		"action":     {"262"},
 	})
 	if err != nil {
 		return err
+	}
+	if verbose {
+		logrus.Info(doc.Find("font").Text())
 	}
 	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", doc.Find("h2").Text())
 	return nil
