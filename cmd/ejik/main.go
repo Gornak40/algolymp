@@ -11,6 +11,7 @@ import (
 
 func main() {
 	verboseFlag := flag.Bool("v", false, "show full output of check contest settings")
+	configFlag := flag.String("c", "config/config.json", "json config path")
 	flag.Parse()
 	if flag.NArg() == 0 {
 		logrus.Fatal("position argument cid required")
@@ -20,7 +21,7 @@ func main() {
 		logrus.WithField("cid", cid).Fatal("cid should be int")
 	}
 
-	cfg := config.NewConfig("config/config.json")
+	cfg := config.NewConfig(*configFlag)
 	ejClient := ejudge.NewEjudge(&cfg.Ejudge)
 
 	sid, err := ejClient.Login()
