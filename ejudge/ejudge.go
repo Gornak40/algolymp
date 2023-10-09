@@ -89,6 +89,29 @@ func (ej *Ejudge) Logout(sid string) error {
 	return nil
 }
 
+func (ej *Ejudge) Commit(sid string, cid int) error {
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("lock contest for editing")
+	_, _, err := ej.postRequest("serve-control", url.Values{
+		"contest_id": {strconv.FormatInt(int64(cid), 10)},
+		"SID":        {sid},
+		"action":     {"276"},
+	})
+	if err != nil {
+		return err
+	}
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("commit changes")
+	_, doc, err := ej.postRequest("serve-control", url.Values{
+		"SID":    {sid},
+		"action": {"303"},
+	})
+	if err != nil {
+		return err
+	}
+	status := doc.Find("h2").First().Text()
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", status)
+	return nil
+}
+
 func (ej *Ejudge) CheckContest(sid string, cid int, verbose bool) error {
 	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("check contest settings, wait please")
 	_, doc, err := ej.postRequest("serve-control", url.Values{
@@ -102,6 +125,29 @@ func (ej *Ejudge) CheckContest(sid string, cid int, verbose bool) error {
 	if verbose {
 		logrus.Info(doc.Find("font").Text())
 	}
-	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", doc.Find("h2").Text())
+	status := doc.Find("h2").First().Text()
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", status)
+	return nil
+}
+
+func (ej *Ejudge) ReloadConfig(sid string, cid int) error {
+	req, _, err := ej.postRequest("new-master", url.Values{
+		"contest_id": {strconv.FormatInt(int64(cid), 10)},
+		"SID":        {sid},
+		"action":     {"3"},
+	})
+	if err != nil {
+		return err
+	}
+	csid := req.URL.Query().Get("SID")
+	logrus.WithFields(logrus.Fields{"CID": cid, "CSID": csid, "SID": sid}).Info("success master login")
+	_, _, err = ej.postRequest("new-master", url.Values{
+		"SID":    {csid},
+		"action": {"62"},
+	})
+	if err != nil {
+		return err
+	}
+	logrus.WithFields(logrus.Fields{"CID": cid, "CSID": csid, "SID": sid}).Info("success reload config")
 	return nil
 }

@@ -29,8 +29,16 @@ func main() {
 		logrus.WithError(err).Fatal("login failed")
 	}
 
+	if err := ejClient.Commit(sid, cid); err != nil {
+		logrus.WithError(err).Fatal("commit failed")
+	}
+
 	if err := ejClient.CheckContest(sid, cid, *verboseFlag); err != nil {
 		logrus.WithError(err).Fatal("check failed")
+	}
+
+	if err := ejClient.ReloadConfig(sid, cid); err != nil {
+		logrus.WithError(err).Fatal("reload config failed")
 	}
 
 	if err := ejClient.Logout(sid); err != nil {
