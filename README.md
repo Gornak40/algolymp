@@ -32,3 +32,7 @@ Useful after running `polygon-to-ejudge`.
 ## Flags
 - `-c` - path to config file (requires: `ejudge`)
 - `-v` - extended output from Ejudge responses.
+
+## Examples
+* `ejik -c config.json -v 47103`
+* `ejik 40507`
