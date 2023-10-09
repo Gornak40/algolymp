@@ -107,7 +107,8 @@ func (ej *Ejudge) Commit(sid string, cid int) error {
 	if err != nil {
 		return err
 	}
-	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", doc.Find("h2").First().Text())
+	status := doc.Find("h2").First().Text()
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", status)
 	return nil
 }
 
@@ -124,12 +125,12 @@ func (ej *Ejudge) CheckContest(sid string, cid int, verbose bool) error {
 	if verbose {
 		logrus.Info(doc.Find("font").Text())
 	}
-	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", doc.Find("h2").First().Text())
+	status := doc.Find("h2").First().Text()
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", status)
 	return nil
 }
 
 func (ej *Ejudge) ReloadConfig(sid string, cid int) error {
-	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("reload config")
 	req, _, err := ej.postRequest("new-master", url.Values{
 		"contest_id": {strconv.FormatInt(int64(cid), 10)},
 		"SID":        {sid},
