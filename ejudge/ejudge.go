@@ -20,19 +20,14 @@ type Config struct {
 }
 
 type Ejudge struct {
-	url      string
-	login    string
-	password string
-
+	cfg    *Config
 	client *http.Client
 }
 
 func NewEjudge(cfg *Config) *Ejudge {
 	jar, _ := cookiejar.New(nil)
 	return &Ejudge{
-		url:      cfg.URL,
-		login:    cfg.Login,
-		password: cfg.Password,
+		cfg: cfg,
 		client: &http.Client{
 			Jar: jar,
 		},
@@ -40,12 +35,12 @@ func NewEjudge(cfg *Config) *Ejudge {
 }
 
 func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, *goquery.Document, error) {
-	url, err := url.JoinPath(ej.url, method)
+	url, err := url.JoinPath(ej.cfg.URL, method)
 	if err != nil {
 		return nil, nil, err
 	}
 	logrus.WithField("url", url).Debug("post query")
-	resp, err := ej.client.PostForm(url, params) //nolint:noctx  // don't need context here
+	resp, err := ej.client.PostForm(url, params) //nolint:noctx  // don't need context here.
 	if err != nil {
 		return nil, nil, err
 	}
@@ -62,8 +57,8 @@ func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, 
 
 func (ej *Ejudge) Login() (string, error) {
 	req, _, err := ej.postRequest("serve-control", url.Values{
-		"login":    {ej.login},
-		"password": {ej.password},
+		"login":    {ej.cfg.Login},
+		"password": {ej.cfg.Password},
 	})
 	if err != nil {
 		return BadSID, err

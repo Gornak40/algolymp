@@ -8,6 +8,9 @@ make build
 ```
 
 ## Config
+
+Put your config file in `~/.config/algolymp/config.json`.
+
 ```json
 {
 	"ejudge": {
@@ -30,9 +33,11 @@ make build
 Useful after running `polygon-to-ejudge`.
 
 ## Flags
-- `-c` - path to config file (requires: `ejudge`)
+- `-i` - contest id (required)
+- `-c` - path to config file (sections: `ejudge`)
 - `-v` - extended output from Ejudge responses.
 
 ## Examples
-* `ejik -c config.json -v 47103`
-* `ejik 40507`
+* `ejik --help`
+* `ejik -c config.json -v -i 47103`
+* `ejik -i 40507`
