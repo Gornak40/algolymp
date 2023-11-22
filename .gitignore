@@ -19,6 +19,5 @@
 
 # Go workspace file
 go.work
-ejik
-config/config.json
-valeria
+/ejik
+/valeria
