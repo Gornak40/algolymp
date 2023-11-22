@@ -2,17 +2,22 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/Gornak40/algolymp/ejudge"
+	"github.com/Gornak40/algolymp/polygon"
 	"github.com/sirupsen/logrus"
 )
 
 type Config struct {
-	Ejudge ejudge.Config `json:"ejudge"`
+	Ejudge  ejudge.Config  `json:"ejudge"`
+	Polygon polygon.Config `json:"polygon"`
 }
 
-func NewConfig(path string) *Config {
+func NewConfig() *Config {
+	confDir, _ := os.UserHomeDir()
+	path := fmt.Sprintf("%s/.config/algolymp/config.json", confDir)
 	data, err := os.ReadFile(path)
 	if err != nil {
 		logrus.WithError(err).Fatal("failed to read config")
