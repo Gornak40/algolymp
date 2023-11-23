@@ -22,7 +22,7 @@ func main() {
 	cfg := config.NewConfig()
 	pClient := polygon.NewPolygon(&cfg.Polygon)
 
-	if err := pClient.GetValuer(*pID); err != nil {
+	if err := pClient.InformaticsValuer(*pID); err != nil {
 		logrus.WithError(err).Fatal("failed get groups")
 	}
 }

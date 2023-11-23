@@ -17,6 +17,11 @@ Put your config file in `~/.config/algolymp/config.json`.
 		"url": "https://ejudge.algocourses.ru",
 		"login": "<login>",
 		"password": "<password>"
+	},
+	"polygon": {
+		"url": "https://polygon.codeforces.com",
+		"apiKey": "<key>",
+		"apiSecret": "<secret>"
 	}
 }
 ```
@@ -34,10 +39,9 @@ Useful after running `polygon-to-ejudge`.
 
 ## Flags
 - `-i` - contest id (required)
-- `-c` - path to config file (sections: `ejudge`)
 - `-v` - extended output from Ejudge responses.
 
 ## Examples
 * `ejik --help`
-* `ejik -c config.json -v -i 47103`
+* `ejik -v -i 47103`
 * `ejik -i 40507`

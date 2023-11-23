@@ -1,6 +1,7 @@
 package polygon
 
 import (
+	"context"
 	"crypto/sha512"
 	"encoding/hex"
 	"encoding/json"
@@ -9,7 +10,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -26,34 +26,53 @@ type Config struct {
 }
 
 type Polygon struct {
-	cfg *Config
+	cfg    *Config
+	client *http.Client
 }
 
 func NewPolygon(cfg *Config) *Polygon {
 	return &Polygon{
-		cfg: cfg,
+		cfg:    cfg,
+		client: http.DefaultClient,
 	}
 }
 
-func (p *Polygon) makeQuery(method string, params url.Values) ([]byte, error) {
+func (p *Polygon) getQuery(url string) ([]byte, error) {
+	req, _ := http.NewRequestWithContext(context.TODO(), http.MethodGet, url, nil)
+	resp, err := p.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	return io.ReadAll(resp.Body)
+}
+
+func (p *Polygon) postQuery(url string) error {
+	req, _ := http.NewRequestWithContext(context.TODO(), http.MethodPost, url, nil)
+	resp, err := p.client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	data, _ := io.ReadAll(resp.Body)
+	logrus.Info(string(data))
+	return nil
+}
+
+func (p *Polygon) buildURL(method string, params url.Values) string {
 	url, _ := url.JoinPath(p.cfg.URL, "api", method)
 	logrus.WithFields(logrus.Fields{"params": params.Encode()}).Info(method)
 
 	params["apiKey"] = []string{p.cfg.APIKey}
 	params["time"] = []string{fmt.Sprint(time.Now().Unix())}
 	sig := fmt.Sprintf("%s/%s?%s#%s", sixSecretSymbols, method, params.Encode(), p.cfg.APISecret)
+	logrus.Info(sig)
 
 	b := sha512.Sum512([]byte(sig))
 	hsh := hex.EncodeToString(b[:])
 	params["apiSig"] = []string{sixSecretSymbols + hsh}
 
-	url = fmt.Sprintf("%s?%s", url, params.Encode())
-	resp, err := http.Get(url) //nolint:gosec,noctx // it's just get query, relax
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	return io.ReadAll(resp.Body)
+	return fmt.Sprintf("%s?%s", url, params.Encode())
 }
 
 type TestAnswer struct {
@@ -67,7 +86,6 @@ type GroupAnswer struct {
 	PointsPolicy   string   `json:"pointsPolicy"`
 	FeedbackPolicy string   `json:"feedbackPolicy"`
 	Dependencies   []string `json:"dependencies"`
-	Tests          int      `json:"tests"`
 }
 
 type Answer struct {
@@ -77,10 +95,10 @@ type Answer struct {
 }
 
 func (p *Polygon) getGroups(pID int) ([]GroupAnswer, error) {
-	data, err := p.makeQuery("problem.viewTestGroup", url.Values{
+	data, err := p.getQuery(p.buildURL("problem.viewTestGroup", url.Values{
 		"problemId": []string{fmt.Sprint(pID)},
 		"testset":   []string{"tests"},
-	})
+	}))
 	if err != nil {
 		return nil, err
 	}
@@ -97,10 +115,10 @@ func (p *Polygon) getGroups(pID int) ([]GroupAnswer, error) {
 }
 
 func (p *Polygon) getTests(pID int) ([]TestAnswer, error) {
-	data, err := p.makeQuery("problem.tests", url.Values{
+	data, err := p.getQuery(p.buildURL("problem.tests", url.Values{
 		"problemId": []string{fmt.Sprint(pID)},
 		"testset":   []string{"tests"},
-	})
+	}))
 	if err != nil {
 		return nil, err
 	}
@@ -114,54 +132,4 @@ func (p *Polygon) getTests(pID int) ([]TestAnswer, error) {
 	var tests []TestAnswer
 	_ = json.Unmarshal(ansT.Result, &tests)
 	return tests, nil
-}
-
-func (p *Polygon) GetValuer(pID int) error {
-	groups, err := p.getGroups(pID)
-	if err != nil {
-		return err
-	}
-
-	tests, err := p.getTests(pID)
-	if err != nil {
-		return err
-	}
-
-	score := map[string]int{}
-	count := map[string]int{}
-	first := map[string]int{}
-	last := map[string]int{}
-
-	for _, t := range tests {
-		score[t.Group] += int(t.Points) // TODO: ensure ejudge doesn't support float points
-		count[t.Group]++
-		if val, ok := first[t.Group]; !ok || val > t.Index {
-			first[t.Group] = t.Index
-		}
-		if val, ok := last[t.Group]; !ok || val < t.Index {
-			last[t.Group] = t.Index
-		}
-	}
-
-	res := []string{}
-	for _, g := range groups {
-		if g.PointsPolicy != "COMPLETE_GROUP" {
-			return errors.New("test_score not supported yet")
-		}
-		if last[g.Name]-first[g.Name]+1 != count[g.Name] {
-			return errors.New("bad tests order, fix in polygon required")
-		}
-		cur := fmt.Sprintf("group %s {\n\ttests %d-%d;\n\tscore %d;\n",
-			g.Name, first[g.Name], last[g.Name], score[g.Name])
-		if len(g.Dependencies) != 0 {
-			cur += fmt.Sprintf("\trequires %s;\n", strings.Join(g.Dependencies, ","))
-		}
-		cur += "}\n"
-		res = append(res, cur)
-	}
-
-	valuer := strings.Join(res, "\n")
-	logrus.Info(valuer)
-
-	return nil
 }
