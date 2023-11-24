@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	parser := argparse.NewParser("valeria", "Polygon valuer builder")
+	parser := argparse.NewParser("valeria", "Build valuer + scorer using Polygon API.")
 	pID := parser.Int("i", "problem_id", &argparse.Options{
 		Required: true,
 		Help:     "Polygon problem ID",

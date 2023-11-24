@@ -45,3 +45,21 @@ Useful after running `polygon-to-ejudge`.
 * `ejik --help`
 * `ejik -v -i 47103`
 * `ejik -i 40507`
+
+# valeria
+*Build valuer + scorer using Polygon API.*
+
+## About
+
+1. Get problem tests and groups;
+2. Build and commit `valuer.cfg` (in Ejudge format);
+3. Build `scoring.tex` (in Moscow summer olympiad school format).
+
+Not very fast now, waiting for `absentInput` parameter in Polygon API.
+
+## Flags
+- `-i` - problem id (required)
+
+## Examples
+* `valeria --help`
+* `valeria -i 318511`

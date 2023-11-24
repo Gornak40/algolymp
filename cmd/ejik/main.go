@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	parser := argparse.NewParser("ejik", "Ejudge contest config reloader")
+	parser := argparse.NewParser("ejik", "Refresh Ejudge contest by id.")
 	cIDArg := parser.Int("i", "cid", &argparse.Options{
 		Required: true,
 		Help:     "Ejudge contest ID",
