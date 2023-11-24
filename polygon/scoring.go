@@ -103,7 +103,7 @@ func (p *Polygon) InformaticsValuer(pID int) error {
 		return err
 	}
 	valuer := s.buildValuer()
-	logrus.Info(valuer)
+	logrus.Info("valuer:\n" + valuer)
 
 	link := p.buildURL("problem.saveFile", url.Values{
 		"problemId": []string{fmt.Sprint(pID)},
@@ -116,7 +116,7 @@ func (p *Polygon) InformaticsValuer(pID int) error {
 	}
 
 	scoring := s.buildScoring()
-	logrus.Info(scoring)
+	logrus.Info("scoring:\n" + scoring)
 
 	link = p.buildURL("problem.saveStatement", url.Values{
 		"problemId": []string{fmt.Sprint(pID)},

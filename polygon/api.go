@@ -10,6 +10,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -59,14 +61,24 @@ func (p *Polygon) postQuery(url string) error {
 	return nil
 }
 
+func (p *Polygon) skipEscape(params url.Values) string {
+	pairs := []string{}
+	for k, vals := range params {
+		for _, v := range vals {
+			pairs = append(pairs, fmt.Sprintf("%s=%s", k, v))
+		}
+	}
+	sort.Strings(pairs)
+	return strings.Join(pairs, "&")
+}
+
 func (p *Polygon) buildURL(method string, params url.Values) string {
 	url, _ := url.JoinPath(p.cfg.URL, "api", method)
-	logrus.WithFields(logrus.Fields{"params": params.Encode()}).Info(method)
+	logrus.Info(method)
 
 	params["apiKey"] = []string{p.cfg.APIKey}
 	params["time"] = []string{fmt.Sprint(time.Now().Unix())}
-	sig := fmt.Sprintf("%s/%s?%s#%s", sixSecretSymbols, method, params.Encode(), p.cfg.APISecret)
-	logrus.Info(sig)
+	sig := fmt.Sprintf("%s/%s?%s#%s", sixSecretSymbols, method, p.skipEscape(params), p.cfg.APISecret)
 
 	b := sha512.Sum512([]byte(sig))
 	hsh := hex.EncodeToString(b[:])
