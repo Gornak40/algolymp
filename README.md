@@ -26,10 +26,10 @@ Put your config file in `~/.config/algolymp/config.json`.
 }
 ```
 
-# ejik
+## ejik
 *Refresh Ejudge contest by id.*
 
-## About
+### About
 
 1. Commit changes;
 2. Check contest settings;
@@ -37,19 +37,19 @@ Put your config file in `~/.config/algolymp/config.json`.
 
 Useful after running `polygon-to-ejudge`.
 
-## Flags
+### Flags
 - `-i` - contest id (required)
 - `-v` - extended output from Ejudge responses.
 
-## Examples
+### Examples
 * `ejik --help`
 * `ejik -v -i 47103`
 * `ejik -i 40507`
 
-# valeria
+## valeria
 *Build valuer + scorer using Polygon API.*
 
-## About
+### About
 
 1. Get problem tests and groups;
 2. Build and commit `valuer.cfg` (in Ejudge format);
@@ -57,9 +57,9 @@ Useful after running `polygon-to-ejudge`.
 
 Not very fast now, waiting for `absentInput` parameter in Polygon API.
 
-## Flags
+### Flags
 - `-i` - problem id (required)
 
-## Examples
+### Examples
 * `valeria --help`
 * `valeria -i 318511`
