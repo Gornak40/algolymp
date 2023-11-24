@@ -39,26 +39,25 @@ func NewPolygon(cfg *Config) *Polygon {
 	}
 }
 
-func (p *Polygon) getQuery(url string) ([]byte, error) {
-	req, _ := http.NewRequestWithContext(context.TODO(), http.MethodGet, url, nil)
+func (p *Polygon) makeQuery(method string, link string) (*Answer, error) {
+	req, _ := http.NewRequestWithContext(context.TODO(), method, link, nil)
 	resp, err := p.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	return io.ReadAll(resp.Body)
-}
-
-func (p *Polygon) postQuery(url string) error {
-	req, _ := http.NewRequestWithContext(context.TODO(), http.MethodPost, url, nil)
-	resp, err := p.client.Do(req)
+	data, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	defer resp.Body.Close()
-	data, _ := io.ReadAll(resp.Body)
-	logrus.Info(string(data))
-	return nil
+	var ans Answer
+	if err := json.Unmarshal(data, &ans); err != nil {
+		return nil, err
+	}
+	if ans.Status != "OK" {
+		return nil, errors.New(ans.Comment)
+	}
+	return &ans, nil
 }
 
 func (p *Polygon) skipEscape(params url.Values) string {
@@ -107,19 +106,13 @@ type Answer struct {
 }
 
 func (p *Polygon) getGroups(pID int) ([]GroupAnswer, error) {
-	data, err := p.getQuery(p.buildURL("problem.viewTestGroup", url.Values{
+	link := p.buildURL("problem.viewTestGroup", url.Values{
 		"problemId": []string{fmt.Sprint(pID)},
 		"testset":   []string{"tests"},
-	}))
+	})
+	ansG, err := p.makeQuery(http.MethodGet, link)
 	if err != nil {
 		return nil, err
-	}
-	var ansG Answer
-	if err := json.Unmarshal(data, &ansG); err != nil {
-		return nil, err
-	}
-	if ansG.Status != "OK" {
-		return nil, errors.New(ansG.Comment)
 	}
 	var groups []GroupAnswer
 	_ = json.Unmarshal(ansG.Result, &groups)
@@ -127,19 +120,13 @@ func (p *Polygon) getGroups(pID int) ([]GroupAnswer, error) {
 }
 
 func (p *Polygon) getTests(pID int) ([]TestAnswer, error) {
-	data, err := p.getQuery(p.buildURL("problem.tests", url.Values{
+	link := p.buildURL("problem.tests", url.Values{
 		"problemId": []string{fmt.Sprint(pID)},
 		"testset":   []string{"tests"},
-	}))
+	})
+	ansT, err := p.makeQuery(http.MethodGet, link)
 	if err != nil {
 		return nil, err
-	}
-	var ansT Answer
-	if err := json.Unmarshal(data, &ansT); err != nil {
-		return nil, err
-	}
-	if ansT.Status != "OK" {
-		return nil, errors.New(ansT.Comment)
 	}
 	var tests []TestAnswer
 	_ = json.Unmarshal(ansT.Result, &tests)

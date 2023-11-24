@@ -3,6 +3,7 @@ package polygon
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strings"
 
@@ -111,11 +112,11 @@ func (p *Polygon) InformaticsValuer(pID int) error {
 		"name":      []string{"valuer.cfg"},
 		"file":      []string{valuer},
 	})
-	if err := p.postQuery(link); err != nil {
+	if _, err := p.makeQuery(http.MethodPost, link); err != nil {
 		return err
 	}
 
 	scoring := s.buildScoring()
-	fmt.Println(scoring)
+	fmt.Println(scoring) //nolint:forbidigo // Basic functionality.
 	return nil
 }

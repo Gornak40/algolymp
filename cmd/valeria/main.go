@@ -23,6 +23,6 @@ func main() {
 	pClient := polygon.NewPolygon(&cfg.Polygon)
 
 	if err := pClient.InformaticsValuer(*pID); err != nil {
-		logrus.WithError(err).Fatal("failed get groups")
+		logrus.WithError(err).Fatal("failed get scoring")
 	}
 }
