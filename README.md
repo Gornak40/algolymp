@@ -53,7 +53,7 @@ Useful after running `polygon-to-ejudge`.
 
 1. Get problem tests and groups;
 2. Build and commit `valuer.cfg` (in Ejudge format);
-3. Build `scoring.tex` (in Moscow summer olympiad school format).
+3. Build and print `scoring.tex` (in Moscow summer olympiad school format).
 
 Not very fast now, waiting for `absentInput` parameter in Polygon API.
 
@@ -62,4 +62,6 @@ Not very fast now, waiting for `absentInput` parameter in Polygon API.
 
 ### Examples
 * `valeria --help`
-* `valeria -i 318511`
+* `valeria -i 288808`
+* `valeria -i 318511 > scoring.tex`
+* `valeria -i 318882 | bat -l tex`

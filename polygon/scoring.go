@@ -116,12 +116,6 @@ func (p *Polygon) InformaticsValuer(pID int) error {
 	}
 
 	scoring := s.buildScoring()
-	logrus.Info("scoring:\n" + scoring)
-
-	link = p.buildURL("problem.saveStatement", url.Values{
-		"problemId": []string{fmt.Sprint(pID)},
-		"lang":      []string{"russian"},
-		"scoring":   []string{scoring},
-	})
-	return p.postQuery(link)
+	fmt.Println(scoring)
+	return nil
 }
