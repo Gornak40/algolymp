@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/Gornak40/algolymp/config"
@@ -11,7 +10,7 @@ import (
 )
 
 func main() {
-	parser := argparse.NewParser("algolymp", "Algolymp contest manager")
+	parser := argparse.NewParser("ejik", "Refresh Ejudge contest by id.")
 	cIDArg := parser.Int("i", "cid", &argparse.Options{
 		Required: true,
 		Help:     "Ejudge contest ID",
@@ -20,17 +19,11 @@ func main() {
 		Required: false,
 		Help:     "Show full output of check contest settings",
 	})
-	confDir, _ := os.UserHomeDir()
-	configArg := parser.String("c", "config", &argparse.Options{
-		Required: false,
-		Help:     "JSON config path",
-		Default:  fmt.Sprintf("%s/.config/algolymp/config.json", confDir),
-	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
 	}
 
-	cfg := config.NewConfig(*configArg)
+	cfg := config.NewConfig()
 	ejClient := ejudge.NewEjudge(&cfg.Ejudge)
 
 	sid, err := ejClient.Login()

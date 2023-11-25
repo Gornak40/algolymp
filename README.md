@@ -17,14 +17,19 @@ Put your config file in `~/.config/algolymp/config.json`.
 		"url": "https://ejudge.algocourses.ru",
 		"login": "<login>",
 		"password": "<password>"
+	},
+	"polygon": {
+		"url": "https://polygon.codeforces.com",
+		"apiKey": "<key>",
+		"apiSecret": "<secret>"
 	}
 }
 ```
 
-# ejik
+## ejik
 *Refresh Ejudge contest by id.*
 
-## About
+### About
 
 1. Commit changes;
 2. Check contest settings;
@@ -32,12 +37,31 @@ Put your config file in `~/.config/algolymp/config.json`.
 
 Useful after running `polygon-to-ejudge`.
 
-## Flags
+### Flags
 - `-i` - contest id (required)
-- `-c` - path to config file (sections: `ejudge`)
 - `-v` - extended output from Ejudge responses.
 
-## Examples
+### Examples
 * `ejik --help`
-* `ejik -c config.json -v -i 47103`
+* `ejik -v -i 47103`
 * `ejik -i 40507`
+
+## valeria
+*Build valuer + scorer using Polygon API.*
+
+### About
+
+1. Get problem tests and groups;
+2. Build and commit `valuer.cfg` (in Ejudge format);
+3. Build and print `scoring.tex` (in Moscow summer olympiad school format).
+
+Not very fast now, waiting for `absentInput` parameter in Polygon API.
+
+### Flags
+- `-i` - problem id (required)
+
+### Examples
+* `valeria --help`
+* `valeria -i 288808`
+* `valeria -i 318511 > scoring.tex`
+* `valeria -i 318882 | bat -l tex`
