@@ -11,11 +11,11 @@ import (
 
 func main() {
 	parser := argparse.NewParser("ejik", "Refresh Ejudge contest by id.")
-	cIDArg := parser.Int("i", "cid", &argparse.Options{
+	cID := parser.Int("i", "cid", &argparse.Options{
 		Required: true,
 		Help:     "Ejudge contest ID",
 	})
-	verboseArg := parser.Flag("v", "verbose", &argparse.Options{
+	verbose := parser.Flag("v", "verbose", &argparse.Options{
 		Required: false,
 		Help:     "Show full output of check contest settings",
 	})
@@ -31,7 +31,7 @@ func main() {
 		logrus.WithError(err).Fatal("login failed")
 	}
 
-	if err := ejClient.Lock(sid, *cIDArg); err != nil {
+	if err := ejClient.Lock(sid, *cID); err != nil {
 		logrus.WithError(err).Fatal("lock contest failed")
 	}
 
@@ -39,11 +39,11 @@ func main() {
 		logrus.WithError(err).Fatal("commit failed")
 	}
 
-	if err := ejClient.CheckContest(sid, *cIDArg, *verboseArg); err != nil {
+	if err := ejClient.CheckContest(sid, *cID, *verbose); err != nil {
 		logrus.WithError(err).Fatal("check failed")
 	}
 
-	if err := ejClient.ReloadConfig(sid, *cIDArg); err != nil {
+	if err := ejClient.ReloadConfig(sid, *cID); err != nil {
 		logrus.WithError(err).Fatal("reload config failed")
 	}
 

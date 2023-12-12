@@ -16,12 +16,16 @@ Put your config file in `~/.config/algolymp/config.json`.
 	"ejudge": {
 		"url": "https://ejudge.algocourses.ru",
 		"login": "<login>",
-		"password": "<password>"
+		"password": "<password>",
+		"judgesDir": "/home/judges"
 	},
 	"polygon": {
 		"url": "https://polygon.codeforces.com",
 		"apiKey": "<key>",
 		"apiSecret": "<secret>"
+	},
+	"system": {
+		"editor": "nano"
 	}
 }
 ```
@@ -40,15 +44,18 @@ Useful before running `polygon-to-ejudge`.
 ### Flags
 - `-i` - new contest id (required)
 - `-t` - template contest id (required)
+- `-e` - open contest xml config
 
 ### Config
 - `ejudge.url`
 - `ejudge.login`
 - `ejudge.password`
+- `ejudge.judgesDir` (optional)
+- `system.editor` (optional)
 
 ### Examples
 * `blanka -i 51011 -t 51000`
-
+* `blanka -i 51013 -t 51000 -e`
 
 ## ejik
 *Refresh Ejudge contest by id.*

@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"net/url"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -76,7 +77,7 @@ func (p *Polygon) buildURL(method string, params url.Values) string {
 	logrus.Info(method)
 
 	params["apiKey"] = []string{p.cfg.APIKey}
-	params["time"] = []string{fmt.Sprint(time.Now().Unix())}
+	params["time"] = []string{strconv.FormatInt(time.Now().Unix(), 10)}
 	sig := fmt.Sprintf("%s/%s?%s#%s", sixSecretSymbols, method, p.skipEscape(params), p.cfg.APISecret)
 
 	b := sha512.Sum512([]byte(sig))
@@ -107,7 +108,7 @@ type Answer struct {
 
 func (p *Polygon) getGroups(pID int) ([]GroupAnswer, error) {
 	link := p.buildURL("problem.viewTestGroup", url.Values{
-		"problemId": []string{fmt.Sprint(pID)},
+		"problemId": []string{strconv.Itoa(pID)},
 		"testset":   []string{"tests"},
 	})
 	ansG, err := p.makeQuery(http.MethodGet, link)
@@ -121,7 +122,7 @@ func (p *Polygon) getGroups(pID int) ([]GroupAnswer, error) {
 
 func (p *Polygon) getTests(pID int) ([]TestAnswer, error) {
 	link := p.buildURL("problem.tests", url.Values{
-		"problemId": []string{fmt.Sprint(pID)},
+		"problemId": []string{strconv.Itoa(pID)},
 		"testset":   []string{"tests"},
 	})
 	ansT, err := p.makeQuery(http.MethodGet, link)

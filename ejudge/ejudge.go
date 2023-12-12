@@ -14,9 +14,10 @@ import (
 const BadSID = "0000000000000000"
 
 type Config struct {
-	URL      string `json:"url"`
-	Login    string `json:"login"`
-	Password string `json:"password"`
+	URL       string `json:"url"`
+	Login     string `json:"login"`
+	Password  string `json:"password"`
+	JudgesDir string `json:"judgesDir"`
 }
 
 type Ejudge struct {
