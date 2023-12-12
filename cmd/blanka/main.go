@@ -10,14 +10,14 @@ import (
 )
 
 func main() {
-	parser := argparse.NewParser("ejik", "Refresh Ejudge contest by id.")
+	parser := argparse.NewParser("blanka", "Create Ejudge contest from template.")
 	cIDArg := parser.Int("i", "cid", &argparse.Options{
 		Required: true,
-		Help:     "Ejudge contest ID",
+		Help:     "Ejudge new contest ID",
 	})
-	verboseArg := parser.Flag("v", "verbose", &argparse.Options{
-		Required: false,
-		Help:     "Show full output of check contest settings",
+	tIDArg := parser.Int("t", "tid", &argparse.Options{
+		Required: true,
+		Help:     "Ejudge template ID",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
@@ -31,20 +31,12 @@ func main() {
 		logrus.WithError(err).Fatal("login failed")
 	}
 
-	if err := ejClient.Lock(sid, *cIDArg); err != nil {
-		logrus.WithError(err).Fatal("lock contest failed")
+	if err := ejClient.CreateContest(sid, *cIDArg, *tIDArg); err != nil {
+		logrus.WithError(err).Fatal("create contest failed")
 	}
 
 	if err := ejClient.Commit(sid); err != nil {
 		logrus.WithError(err).Fatal("commit failed")
-	}
-
-	if err := ejClient.CheckContest(sid, *cIDArg, *verboseArg); err != nil {
-		logrus.WithError(err).Fatal("check failed")
-	}
-
-	if err := ejClient.ReloadConfig(sid, *cIDArg); err != nil {
-		logrus.WithError(err).Fatal("reload config failed")
 	}
 
 	if err := ejClient.Logout(sid); err != nil {
