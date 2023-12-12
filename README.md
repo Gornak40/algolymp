@@ -16,15 +16,46 @@ Put your config file in `~/.config/algolymp/config.json`.
 	"ejudge": {
 		"url": "https://ejudge.algocourses.ru",
 		"login": "<login>",
-		"password": "<password>"
+		"password": "<password>",
+		"judgesDir": "/home/judges"
 	},
 	"polygon": {
 		"url": "https://polygon.codeforces.com",
 		"apiKey": "<key>",
 		"apiSecret": "<secret>"
+	},
+	"system": {
+		"editor": "nano"
 	}
 }
 ```
+
+## blanka
+*Create Ejuge contest from template.*
+
+### About
+
+1. Create contest with id from template;
+2. Commit changes;
+3. *(Optional)* Open contest xml config for editing.
+
+Useful before running `polygon-to-ejudge`.
+
+### Flags
+- `-i` - new contest id (required)
+- `-t` - template contest id (required)
+- `-e` - open contest xml config
+
+### Config
+- `ejudge.url`
+- `ejudge.login`
+- `ejudge.password`
+- `ejudge.judgesDir` (optional)
+- `system.editor` (optional)
+
+### Examples
+* `blanka -i 51011 -t 51000`
+* `blanka -i 51013 -t 51000 -e`
 
 ## ejik
 *Refresh Ejudge contest by id.*
@@ -41,10 +72,16 @@ Useful after running `polygon-to-ejudge`.
 - `-i` - contest id (required)
 - `-v` - extended output from Ejudge responses.
 
+### Config
+- `ejudge.url`
+- `ejudge.login`
+- `ejudge.password`
+
 ### Examples
 * `ejik --help`
 * `ejik -v -i 47103`
 * `ejik -i 40507`
+
 
 ## valeria
 *Build valuer + scorer using Polygon API.*
@@ -59,6 +96,11 @@ Not very fast now, waiting for `absentInput` parameter in Polygon API.
 
 ### Flags
 - `-i` - problem id (required)
+
+### Config
+- `polygon.url`
+- `polygon.apiKey`
+- `polygon.apiSecret`
 
 ### Examples
 * `valeria --help`

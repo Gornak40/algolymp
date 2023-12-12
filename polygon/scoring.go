@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -107,7 +108,7 @@ func (p *Polygon) InformaticsValuer(pID int) error {
 	logrus.Info("valuer:\n" + valuer)
 
 	link := p.buildURL("problem.saveFile", url.Values{
-		"problemId": []string{fmt.Sprint(pID)},
+		"problemId": []string{strconv.Itoa(pID)},
 		"type":      []string{"resource"},
 		"name":      []string{"valuer.cfg"},
 		"file":      []string{valuer},

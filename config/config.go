@@ -10,9 +10,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type System struct {
+	Editor string `json:"editor"`
+}
+
 type Config struct {
 	Ejudge  ejudge.Config  `json:"ejudge"`
 	Polygon polygon.Config `json:"polygon"`
+	System  System         `json:"system"`
 }
 
 func NewConfig() *Config {

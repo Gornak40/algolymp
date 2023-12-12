@@ -14,9 +14,10 @@ import (
 const BadSID = "0000000000000000"
 
 type Config struct {
-	URL      string `json:"url"`
-	Login    string `json:"login"`
-	Password string `json:"password"`
+	URL       string `json:"url"`
+	Login     string `json:"login"`
+	Password  string `json:"password"`
+	JudgesDir string `json:"judgesDir"`
 }
 
 type Ejudge struct {
@@ -84,17 +85,18 @@ func (ej *Ejudge) Logout(sid string) error {
 	return nil
 }
 
-func (ej *Ejudge) Commit(sid string, cid int) error {
+func (ej *Ejudge) Lock(sid string, cid int) error {
 	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("lock contest for editing")
 	_, _, err := ej.postRequest("serve-control", url.Values{
 		"contest_id": {strconv.FormatInt(int64(cid), 10)},
 		"SID":        {sid},
 		"action":     {"276"},
 	})
-	if err != nil {
-		return err
-	}
-	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("commit changes")
+	return err
+}
+
+func (ej *Ejudge) Commit(sid string) error {
+	logrus.WithFields(logrus.Fields{"SID": sid}).Info("commit changes")
 	_, doc, err := ej.postRequest("serve-control", url.Values{
 		"SID":    {sid},
 		"action": {"303"},
@@ -103,7 +105,7 @@ func (ej *Ejudge) Commit(sid string, cid int) error {
 		return err
 	}
 	status := doc.Find("h2").First().Text()
-	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", status)
+	logrus.WithFields(logrus.Fields{"SID": sid}).Infof("ejudge answer %q", status)
 	return nil
 }
 
@@ -144,5 +146,26 @@ func (ej *Ejudge) ReloadConfig(sid string, cid int) error {
 		return err
 	}
 	logrus.WithFields(logrus.Fields{"CID": cid, "CSID": csid, "SID": sid}).Info("success reload config")
+	return nil
+}
+
+func (ej *Ejudge) CreateContest(sid string, cid int, tid int) error {
+	logrus.WithFields(logrus.Fields{"CID": cid, "TID": tid, "SID": sid}).Info("create contest")
+	_, doc, err := ej.postRequest("serve-control", url.Values{
+		"contest_id": {strconv.FormatInt(int64(cid), 10)},
+		"SID":        {sid},
+		"num_mode":   {"1"},
+		"action":     {"259"},
+		"templ_mode": {"1"},
+		"templ_id":   {strconv.FormatInt(int64(tid), 10)},
+	})
+	if err != nil {
+		return err
+	}
+	status := doc.Find("h2").First().Text()
+	if status == "" {
+		status = "OK"
+	}
+	logrus.WithFields(logrus.Fields{"CID": cid, "TID": tid, "SID": sid}).Infof("ejudge answer %q", status)
 	return nil
 }
