@@ -13,6 +13,10 @@ import (
 
 const BadSID = "0000000000000000"
 
+var (
+	ErrParseMasterSID = fmt.Errorf("can't parse master SID")
+)
+
 type Config struct {
 	URL       string `json:"url"`
 	Login     string `json:"login"`
@@ -137,6 +141,9 @@ func (ej *Ejudge) ReloadConfig(sid string, cid int) error {
 		return err
 	}
 	csid := req.URL.Query().Get("SID")
+	if csid == "" {
+		return ErrParseMasterSID
+	}
 	logrus.WithFields(logrus.Fields{"CID": cid, "CSID": csid, "SID": sid}).Info("success master login")
 	_, _, err = ej.postRequest("new-master", url.Values{
 		"SID":    {csid},
