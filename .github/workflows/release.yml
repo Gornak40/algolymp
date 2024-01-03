@@ -1,16 +1,16 @@
-name: Release
 on:
   push:
-    branches:
-      - master
-
+    branches: [master]
 jobs:
-  release:
+  versioning:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@master
-      - name: Release
-        uses: codfish/semantic-release-action@v2.0.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: calculate version
+        id: calculate-version
+        uses: bitshifted/git-auto-semver@v1.1.0
+        with:
+          main_branch: master
+          create_tag: true
+          tag_prefix: 'tags'
+      - name: Use version
+        run: 'echo "Calculated version: ${{ steps.calculate-version.outputs.version-string }}"'
