@@ -40,4 +40,8 @@ func main() {
 	if err != nil {
 		logrus.WithError(err).Fatal("change visible status failed")
 	}
+
+	if err := ejClient.Logout(sid); err != nil {
+		logrus.WithError(err).Fatal("logout failed")
+	}
 }
