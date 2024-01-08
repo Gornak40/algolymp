@@ -60,6 +60,8 @@ blanka -i 51011 -t 51000
 blanka -i 51013 -t 51000 -e
 ```
 
+![blanka logo](https://algolymp.ru/static/img/blanka.png)
+
 ## casper
 *Change Ejudge contest visibility by id.*
 
@@ -86,6 +88,8 @@ casper -i 41014
 casper -i 41014 -s
 for i in {41014..41023}; do casper -i $i; done
 ```
+
+![casper logo](https://algolymp.ru/static/img/casper.png)
 
 ## ejik
 *Refresh Ejudge contest by id.*
@@ -114,6 +118,8 @@ ejik -v -i 47103
 ejik -i 40507
 ```
 
+![ejik logo](https://algolymp.ru/static/img/ejik.png)
+
 ## valeria
 *Build valuer + scorer using Polygon API.*
 
@@ -140,3 +146,5 @@ valeria -i 288808
 valeria -i 318511 > scoring.tex
 valeria -i 318882 | bat -l tex
 ```
+
+![valeria logo](https://algolymp.ru/static/img/valeria.png)
