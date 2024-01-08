@@ -34,6 +34,7 @@ type Polygon struct {
 }
 
 func NewPolygon(cfg *Config) *Polygon {
+	logrus.WithField("url", cfg.URL).Info("init polygon engine")
 	return &Polygon{
 		cfg:    cfg,
 		client: http.DefaultClient,

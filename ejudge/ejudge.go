@@ -30,6 +30,7 @@ type Ejudge struct {
 }
 
 func NewEjudge(cfg *Config) *Ejudge {
+	logrus.WithField("url", cfg.URL).Info("init ejudge engine")
 	jar, _ := cookiejar.New(nil)
 	return &Ejudge{
 		cfg: cfg,
@@ -175,4 +176,24 @@ func (ej *Ejudge) CreateContest(sid string, cid int, tid int) error {
 	}
 	logrus.WithFields(logrus.Fields{"CID": cid, "TID": tid, "SID": sid}).Infof("ejudge answer %q", status)
 	return nil
+}
+
+func (ej *Ejudge) MakeInvisible(sid string, cid int) error {
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("make invisible")
+	_, _, err := ej.postRequest("serve-control", url.Values{
+		"contest_id": {strconv.FormatInt(int64(cid), 10)},
+		"SID":        {sid},
+		"action":     {"6"},
+	})
+	return err
+}
+
+func (ej *Ejudge) MakeVisible(sid string, cid int) error {
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("make visible")
+	_, _, err := ej.postRequest("serve-control", url.Values{
+		"contest_id": {strconv.FormatInt(int64(cid), 10)},
+		"SID":        {sid},
+		"action":     {"7"},
+	})
+	return err
 }
