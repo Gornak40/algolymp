@@ -54,8 +54,38 @@ Useful before running `polygon-to-ejudge`.
 - `system.editor` (optional)
 
 ### Examples
-* `blanka -i 51011 -t 51000`
-* `blanka -i 51013 -t 51000 -e`
+```bash
+blanka --help
+blanka -i 51011 -t 51000
+blanka -i 51013 -t 51000 -e
+```
+
+## casper
+*Change Ejudge contest visibility by id.*
+
+### About
+
+- Make contest visible;
+- Make contest invisible.
+
+Useful with bash `for` loop after the end of the year.
+
+### Flags
+- `-i` - contest id (required)
+- `-s` - make contest visible (invisible if not set)
+
+### Config
+- `ejudge.url`
+- `ejudge.login`
+- `ejudge.password`
+
+### Examples
+```bash
+casper --help
+casper -i 41014
+casper -i 41014 -s
+for i in {41014..41023}; do casper -i $i; done
+```
 
 ## ejik
 *Refresh Ejudge contest by id.*
@@ -78,10 +108,11 @@ Useful after running `polygon-to-ejudge`.
 - `ejudge.password`
 
 ### Examples
-* `ejik --help`
-* `ejik -v -i 47103`
-* `ejik -i 40507`
-
+```bash
+ejik --help
+ejik -v -i 47103
+ejik -i 40507
+```
 
 ## valeria
 *Build valuer + scorer using Polygon API.*
@@ -103,7 +134,9 @@ Not very fast now, waiting for `absentInput` parameter in Polygon API.
 - `polygon.apiSecret`
 
 ### Examples
-* `valeria --help`
-* `valeria -i 288808`
-* `valeria -i 318511 > scoring.tex`
-* `valeria -i 318882 | bat -l tex`
+```bash
+valeria --help
+valeria -i 288808
+valeria -i 318511 > scoring.tex
+valeria -i 318882 | bat -l tex
+```
