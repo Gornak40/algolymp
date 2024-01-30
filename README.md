@@ -129,7 +129,9 @@ ejik -i 40507
 2. Build and commit `valuer.cfg` (in Ejudge format);
 3. Build and print `scoring.tex` (in Moscow summer olympiad school format).
 
-Not very fast now, waiting for `absentInput` parameter in Polygon API.
+~~Not very fast now, waiting for `absentInput` parameter in Polygon API.~~
+
+Thanks to Mike, it's been working fast since 30.01.2024.
 
 ### Flags
 - `-i` - problem id (required)
