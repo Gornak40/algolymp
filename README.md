@@ -104,7 +104,7 @@ Useful after running `polygon-to-ejudge`.
 
 ### Flags
 - `-i` - contest id (required)
-- `-v` - extended output from Ejudge responses.
+- `-v` - extended output from Ejudge responses
 
 ### Config
 - `ejudge.url`
@@ -119,6 +119,36 @@ ejik -i 40507
 ```
 
 ![ejik logo](https://algolymp.ru/static/img/ejik.png)
+
+## scalp
+*Set incremental problem scoring using Polygon API.*
+
+### About
+
+1. Enable problem points;
+2. Enable problem groups;
+3. Load tests metainfo;
+4. Store incremental scoring (0 0 5 5 ... 5 6 6 ... 6) with sum of 100.
+
+Very useful for dump problems, prepared in ICPC style.
+
+### Flags
+- `-i` - problem id (required)
+- `-s` - mark samples as scored tests (put samples in group 0 with 0 score if not set)
+
+### Config
+- `polygon.url`
+- `polygon.apiKey`
+- `polygon.apiSecret`
+
+### Examples
+```bash
+scalp --help
+scalp -i 330352
+scalp -i 330328 -s
+```
+
+![scalp logo](https://algolymp.ru/static/img/scalp.png)
 
 ## valeria
 *Build valuer + scorer using Polygon API.*
