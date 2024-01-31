@@ -20,6 +20,7 @@ import (
 
 const (
 	sixSecretSymbols = "gorill"
+	defaultTestset   = "tests"
 )
 
 type Config struct {
@@ -75,7 +76,7 @@ func (p *Polygon) skipEscape(params url.Values) string {
 
 func (p *Polygon) buildURL(method string, params url.Values) string {
 	url, _ := url.JoinPath(p.cfg.URL, "api", method)
-	logrus.Info(method)
+	logrus.WithField("method", method).Info("preparing the request")
 
 	params["apiKey"] = []string{p.cfg.APIKey}
 	params["time"] = []string{strconv.FormatInt(time.Now().Unix(), 10)}
@@ -89,9 +90,10 @@ func (p *Polygon) buildURL(method string, params url.Values) string {
 }
 
 type TestAnswer struct {
-	Index  int     `json:"index"`
-	Group  string  `json:"group"`
-	Points float32 `json:"points"`
+	Index           int     `json:"index"`
+	Group           string  `json:"group"`
+	Points          float32 `json:"points"`
+	UseInStatements bool    `json:"useInStatements"`
 }
 
 type GroupAnswer struct {
@@ -107,10 +109,10 @@ type Answer struct {
 	Result  json.RawMessage `json:"result"`
 }
 
-func (p *Polygon) getGroups(pID int) ([]GroupAnswer, error) {
+func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 	link := p.buildURL("problem.viewTestGroup", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
-		"testset":   []string{"tests"},
+		"testset":   []string{defaultTestset},
 	})
 	ansG, err := p.makeQuery(http.MethodGet, link)
 	if err != nil {
@@ -121,10 +123,10 @@ func (p *Polygon) getGroups(pID int) ([]GroupAnswer, error) {
 	return groups, nil
 }
 
-func (p *Polygon) getTests(pID int) ([]TestAnswer, error) {
+func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
 	link := p.buildURL("problem.tests", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
-		"testset":   []string{"tests"},
+		"testset":   []string{defaultTestset},
 		"noInputs":  []string{"true"},
 	})
 	ansT, err := p.makeQuery(http.MethodGet, link)
@@ -134,4 +136,49 @@ func (p *Polygon) getTests(pID int) ([]TestAnswer, error) {
 	var tests []TestAnswer
 	_ = json.Unmarshal(ansT.Result, &tests)
 	return tests, nil
+}
+
+func (p *Polygon) EnableGroups(pID int) error {
+	link := p.buildURL("problem.enableGroups", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testset":   []string{defaultTestset},
+		"enable":    []string{"true"},
+	})
+	_, err := p.makeQuery(http.MethodPost, link)
+	return err
+}
+
+func (p *Polygon) EnablePoints(pID int) error {
+	link := p.buildURL("problem.enablePoints", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"enable":    []string{"true"},
+	})
+	_, err := p.makeQuery(http.MethodPost, link)
+	return err
+}
+
+type TestRequest url.Values
+
+func NewTestRequest(pID int, index int) TestRequest {
+	return TestRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testIndex": []string{strconv.Itoa(index)},
+		"testset":   []string{defaultTestset},
+	}
+}
+
+func (tr TestRequest) Group(group string) TestRequest {
+	tr["testGroup"] = []string{group}
+	return tr
+}
+
+func (tr TestRequest) Points(points float32) TestRequest {
+	tr["testPoints"] = []string{fmt.Sprint(points)}
+	return tr
+}
+
+func (p *Polygon) SaveTest(tReq TestRequest) error {
+	link := p.buildURL("problem.saveTest", url.Values(tReq))
+	_, err := p.makeQuery(http.MethodPost, link)
+	return err
 }

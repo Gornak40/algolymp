@@ -11,6 +11,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	FullProblemScore = 100
+)
+
+var (
+	ErrAllTestsAreSamples = fmt.Errorf("all tests are samples, try -s flag")
+)
+
 type Scoring struct {
 	score        map[string]int
 	count        map[string]int
@@ -40,7 +48,7 @@ func NewScoring(tests []TestAnswer, groups []GroupAnswer) (*Scoring, error) {
 	}
 	for _, g := range groups {
 		if g.PointsPolicy != "COMPLETE_GROUP" {
-			return nil, errors.New("test_score not supported yet")
+			return nil, errors.New("test_score is not supported yet")
 		}
 		if s.last[g.Name]-s.first[g.Name]+1 != s.count[g.Name] {
 			return nil, errors.New("bad tests order, fix in polygon required")
@@ -91,11 +99,11 @@ func (s *Scoring) buildScoring() string {
 }
 
 func (p *Polygon) InformaticsValuer(pID int) error {
-	groups, err := p.getGroups(pID)
+	groups, err := p.GetGroups(pID)
 	if err != nil {
 		return err
 	}
-	tests, err := p.getTests(pID)
+	tests, err := p.GetTests(pID)
 	if err != nil {
 		return err
 	}
@@ -119,5 +127,59 @@ func (p *Polygon) InformaticsValuer(pID int) error {
 
 	scoring := s.buildScoring()
 	fmt.Println(scoring) //nolint:forbidigo // Basic functionality.
+	return nil
+}
+
+func (p *Polygon) IncrementalScoring(pID int, samples bool) error {
+	if err := p.EnablePoints(pID); err != nil {
+		return err
+	}
+	if err := p.EnableGroups(pID); err != nil {
+		return err
+	}
+	tests, err := p.GetTests(pID)
+	if err != nil {
+		return err
+	}
+	tc := 0
+	for _, t := range tests {
+		if t.UseInStatements && !samples {
+			continue
+		}
+		tc++
+	}
+	if tc == 0 {
+		return ErrAllTestsAreSamples
+	}
+	small := FullProblemScore / tc
+	smallCnt := tc - (FullProblemScore - small*tc)
+	logrus.WithFields(logrus.Fields{
+		"zeroCount":  len(tests) - tc,
+		"smallScore": small,
+		"smallCount": smallCnt,
+		"bigScore":   small + 1,
+		"bigCount":   tc - smallCnt,
+	}).Info("points statistics")
+	for _, t := range tests {
+		var gr string
+		var pt int
+		if smallCnt == 0 { //nolint:gocritic // It's smart piece of code.
+			gr = "2"
+			pt = small + 1
+		} else if !t.UseInStatements || samples {
+			gr = "1"
+			pt = small
+			smallCnt--
+		} else {
+			gr = "0"
+			pt = 0
+		}
+		rt := NewTestRequest(pID, t.Index).
+			Group(gr).
+			Points(float32(pt))
+		if err := p.SaveTest(rt); err != nil {
+			return err
+		}
+	}
 	return nil
 }
