@@ -19,10 +19,5 @@
 
 # Go workspace file
 go.work
-/ejik
-/valeria
+/bin
 /scoring.tex
-/blanka
-/casper
-/hideme.sh
-/scalp

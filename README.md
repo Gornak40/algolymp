@@ -5,6 +5,7 @@
 ```bash
 sudo apt install go
 make build
+export PATH=$(pwd)/bin:$PATH
 ```
 
 ## Config

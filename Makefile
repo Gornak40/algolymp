@@ -1,10 +1,16 @@
-UTILS = $(shell ls ./cmd)
+BIN_DIR := bin
+TOOLS := $(notdir $(wildcard cmd/*))
+TOOL_TARGETS := $(addprefix $(BIN_DIR)/, $(TOOLS))
 
-build:
-	$(foreach util, ${UTILS}, go build ./cmd/${util};)
+all: $(TOOL_TARGETS)
+
+$(BIN_DIR)/%: cmd/%/main.go
+	@mkdir -p $(BIN_DIR)
+	go build -o $@ $<
 
 clean:
-	rm ${UTILS}
+	rm -f $(BIN_DIR)/*
+	@rmdir $(BIN_DIR)
 
 test:
 	echo "No tests"
