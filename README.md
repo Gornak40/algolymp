@@ -166,6 +166,7 @@ Thanks to Mike, it's been working fast since 30.01.2024.
 
 ### Flags
 - `-i` - problem id (required)
+- `-v` - print valuer.cfg in stderr
 
 ### Config
 - `polygon.url`
@@ -175,7 +176,7 @@ Thanks to Mike, it's been working fast since 30.01.2024.
 ### Examples
 ```bash
 valeria --help
-valeria -i 288808
+valeria -i 288808 -v
 valeria -i 318511 > scoring.tex
 valeria -i 318882 | bat -l tex
 ```

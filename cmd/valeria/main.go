@@ -17,7 +17,7 @@ func main() {
 	})
 	verbose := parser.Flag("v", "verbose", &argparse.Options{
 		Required: false,
-		Help:     "Show valuer in stderr",
+		Help:     "Print valuer.cfg in stderr",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
