@@ -15,6 +15,10 @@ func main() {
 		Required: true,
 		Help:     "Polygon problem ID",
 	})
+	verbose := parser.Flag("v", "verbose", &argparse.Options{
+		Required: false,
+		Help:     "Print valuer.cfg in stderr",
+	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
 	}
@@ -22,7 +26,7 @@ func main() {
 	cfg := config.NewConfig()
 	pClient := polygon.NewPolygon(&cfg.Polygon)
 
-	if err := pClient.InformaticsValuer(*pID); err != nil {
+	if err := pClient.InformaticsValuer(*pID, *verbose); err != nil {
 		logrus.WithError(err).Fatal("failed get scoring")
 	}
 }

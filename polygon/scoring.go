@@ -98,7 +98,7 @@ func (s *Scoring) buildScoring() string {
 	return strings.Join(ans, "\n")
 }
 
-func (p *Polygon) InformaticsValuer(pID int) error {
+func (p *Polygon) InformaticsValuer(pID int, verbose bool) error {
 	groups, err := p.GetGroups(pID)
 	if err != nil {
 		return err
@@ -113,7 +113,9 @@ func (p *Polygon) InformaticsValuer(pID int) error {
 		return err
 	}
 	valuer := s.buildValuer()
-	logrus.Info("valuer:\n" + valuer)
+	if verbose {
+		logrus.Info("valuer.cfg\n" + valuer)
+	}
 
 	link := p.buildURL("problem.saveFile", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
