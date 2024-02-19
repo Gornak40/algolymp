@@ -4,7 +4,7 @@
 ## Build
 ```bash
 sudo apt install go
-make build
+make
 export PATH=$(pwd)/bin:$PATH
 ```
 
