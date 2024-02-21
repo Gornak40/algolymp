@@ -2,7 +2,6 @@ linters:
   enable-all: true
   disable:
     - gofumpt
-    - interfacer
     - varcheck
     - nosnakecase
     - interfacer
@@ -16,9 +15,10 @@ linters:
     - depguard
     - wsl
     - wrapcheck
-    - nlreturn
     - goerr113
     - exhaustruct
     - godox
-    - varnamelen
-    - cyclop
+
+linters-settings:
+  cyclop:
+    max-complexity: 15

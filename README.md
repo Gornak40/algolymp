@@ -63,6 +63,33 @@ blanka -i 51013 -t 51000 -e
 
 ![blanka logo](https://algolymp.ru/static/img/blanka.png)
 
+## boban
+*Filter Ejudge runs.*
+
+### Abount
+
+Filter and print Ejudge runs IDs in specified contest.
+
+### Flags
+- `-i` - contest id (required)
+- `-f` - filter expression (default: empty)
+- `-c` - last runs count (default: 20)
+
+### Config
+- `ejudge.url`
+- `ejudge.login`
+- `ejudge.password`
+
+### Examples
+```bash
+boban --help
+boban -i 47106 -f "prob == 'A'" > runs.txt
+boban -i 50014 -f "status == PR" -c 1000
+boban -i 50014 -c 10000 2> /dev/null | wc -l
+```
+
+![boban logo](https://algolymp.ru/static/img/boban.png)
+
 ## casper
 *Change Ejudge contest visibility by id.*
 

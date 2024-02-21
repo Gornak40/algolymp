@@ -16,7 +16,9 @@ const (
 )
 
 var (
-	ErrAllTestsAreSamples = fmt.Errorf("all tests are samples, try -s flag")
+	ErrAllTestsAreSamples = errors.New("all tests are samples, try -s flag")
+	ErrNoTestScore        = errors.New("test_score is not supported yet")
+	ErrBadTestsOrder      = errors.New("bad tests order, fix in polygon required")
 )
 
 type Scoring struct {
@@ -29,34 +31,35 @@ type Scoring struct {
 }
 
 func NewScoring(tests []TestAnswer, groups []GroupAnswer) (*Scoring, error) {
-	s := Scoring{
+	scorer := Scoring{
 		score:        map[string]int{},
 		count:        map[string]int{},
 		first:        map[string]int{},
 		last:         map[string]int{},
 		dependencies: map[string][]string{},
 	}
-	for _, t := range tests {
-		s.score[t.Group] += int(t.Points) // TODO: ensure ejudge doesn't support float points
-		s.count[t.Group]++
-		if val, ok := s.first[t.Group]; !ok || val > t.Index {
-			s.first[t.Group] = t.Index
+	for _, test := range tests {
+		scorer.score[test.Group] += int(test.Points) // TODO: ensure ejudge doesn't support float points
+		scorer.count[test.Group]++
+		if val, ok := scorer.first[test.Group]; !ok || val > test.Index {
+			scorer.first[test.Group] = test.Index
 		}
-		if val, ok := s.last[t.Group]; !ok || val < t.Index {
-			s.last[t.Group] = t.Index
+		if val, ok := scorer.last[test.Group]; !ok || val < test.Index {
+			scorer.last[test.Group] = test.Index
 		}
 	}
-	for _, g := range groups {
-		if g.PointsPolicy != "COMPLETE_GROUP" {
-			return nil, errors.New("test_score is not supported yet")
+	for _, group := range groups {
+		if group.PointsPolicy != "COMPLETE_GROUP" {
+			return nil, ErrNoTestScore
 		}
-		if s.last[g.Name]-s.first[g.Name]+1 != s.count[g.Name] {
-			return nil, errors.New("bad tests order, fix in polygon required")
+		if scorer.last[group.Name]-scorer.first[group.Name]+1 != scorer.count[group.Name] {
+			return nil, ErrBadTestsOrder
 		}
-		s.dependencies[g.Name] = g.Dependencies
-		s.groups = append(s.groups, g.Name)
+		scorer.dependencies[group.Name] = group.Dependencies
+		scorer.groups = append(scorer.groups, group.Name)
 	}
-	return &s, nil
+
+	return &scorer, nil
 }
 
 func (s *Scoring) buildValuer() string {
@@ -70,6 +73,7 @@ func (s *Scoring) buildValuer() string {
 		cur += "}\n"
 		res = append(res, cur)
 	}
+
 	return strings.Join(res, "\n")
 }
 
@@ -84,7 +88,7 @@ func (s *Scoring) buildScoring() string {
 		"\\textbf{Необходимые подзадачи}",
 		"\\\\ \\hline",
 	}
-	for i, g := range s.groups {
+	for i, group := range s.groups {
 		var info string
 		if i == 0 {
 			info = "тесты из условия"
@@ -92,9 +96,10 @@ func (s *Scoring) buildScoring() string {
 			info = "---"
 		}
 		ans = append(ans, fmt.Sprintf("%s & %d & %s & %s \\\\ \\hline",
-			g, s.score[g], info, strings.Join(s.dependencies[g], ", ")))
+			group, s.score[group], info, strings.Join(s.dependencies[group], ", ")))
 	}
 	ans = append(ans, "\\end{tabular}", "\\end{center}")
+
 	return strings.Join(ans, "\n")
 }
 
@@ -108,11 +113,11 @@ func (p *Polygon) InformaticsValuer(pID int, verbose bool) error {
 		return err
 	}
 
-	s, err := NewScoring(tests, groups)
+	scorer, err := NewScoring(tests, groups)
 	if err != nil {
 		return err
 	}
-	valuer := s.buildValuer()
+	valuer := scorer.buildValuer()
 	if verbose {
 		logrus.Info("valuer.cfg\n" + valuer)
 	}
@@ -127,8 +132,9 @@ func (p *Polygon) InformaticsValuer(pID int, verbose bool) error {
 		return err
 	}
 
-	scoring := s.buildScoring()
+	scoring := scorer.buildScoring()
 	fmt.Println(scoring) //nolint:forbidigo // Basic functionality.
+
 	return nil
 }
 
@@ -143,45 +149,46 @@ func (p *Polygon) IncrementalScoring(pID int, samples bool) error {
 	if err != nil {
 		return err
 	}
-	tc := 0
+	testsCount := 0
 	for _, t := range tests {
 		if t.UseInStatements && !samples {
 			continue
 		}
-		tc++
+		testsCount++
 	}
-	if tc == 0 {
+	if testsCount == 0 {
 		return ErrAllTestsAreSamples
 	}
-	small := FullProblemScore / tc
-	smallCnt := tc - (FullProblemScore - small*tc)
+	small := FullProblemScore / testsCount
+	smallCnt := testsCount - (FullProblemScore - small*testsCount)
 	logrus.WithFields(logrus.Fields{
-		"zeroCount":  len(tests) - tc,
+		"zeroCount":  len(tests) - testsCount,
 		"smallScore": small,
 		"smallCount": smallCnt,
 		"bigScore":   small + 1,
-		"bigCount":   tc - smallCnt,
+		"bigCount":   testsCount - smallCnt,
 	}).Info("points statistics")
-	for _, t := range tests {
-		var gr string
-		var pt int
+	for _, test := range tests {
+		var group string
+		var points int
 		if smallCnt == 0 { //nolint:gocritic // It's smart piece of code.
-			gr = "2"
-			pt = small + 1
-		} else if !t.UseInStatements || samples {
-			gr = "1"
-			pt = small
+			group = "2"
+			points = small + 1
+		} else if !test.UseInStatements || samples {
+			group = "1"
+			points = small
 			smallCnt--
 		} else {
-			gr = "0"
-			pt = 0
+			group = "0"
+			points = 0
 		}
-		rt := NewTestRequest(pID, t.Index).
-			Group(gr).
-			Points(float32(pt))
+		rt := NewTestRequest(pID, test.Index).
+			Group(group).
+			Points(float32(points))
 		if err := p.SaveTest(rt); err != nil {
 			return err
 		}
 	}
+
 	return nil
 }

@@ -36,6 +36,7 @@ type Polygon struct {
 
 func NewPolygon(cfg *Config) *Polygon {
 	logrus.WithField("url", cfg.URL).Info("init polygon engine")
+
 	return &Polygon{
 		cfg:    cfg,
 		client: http.DefaultClient,
@@ -60,6 +61,7 @@ func (p *Polygon) makeQuery(method string, link string) (*Answer, error) {
 	if ans.Status != "OK" {
 		return nil, errors.New(ans.Comment)
 	}
+
 	return &ans, nil
 }
 
@@ -71,6 +73,7 @@ func (p *Polygon) skipEscape(params url.Values) string {
 		}
 	}
 	sort.Strings(pairs)
+
 	return strings.Join(pairs, "&")
 }
 
@@ -120,6 +123,7 @@ func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 	}
 	var groups []GroupAnswer
 	_ = json.Unmarshal(ansG.Result, &groups)
+
 	return groups, nil
 }
 
@@ -135,6 +139,7 @@ func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
 	}
 	var tests []TestAnswer
 	_ = json.Unmarshal(ansT.Result, &tests)
+
 	return tests, nil
 }
 
@@ -145,6 +150,7 @@ func (p *Polygon) EnableGroups(pID int) error {
 		"enable":    []string{"true"},
 	})
 	_, err := p.makeQuery(http.MethodPost, link)
+
 	return err
 }
 
@@ -154,6 +160,7 @@ func (p *Polygon) EnablePoints(pID int) error {
 		"enable":    []string{"true"},
 	})
 	_, err := p.makeQuery(http.MethodPost, link)
+
 	return err
 }
 
@@ -169,16 +176,19 @@ func NewTestRequest(pID int, index int) TestRequest {
 
 func (tr TestRequest) Group(group string) TestRequest {
 	tr["testGroup"] = []string{group}
+
 	return tr
 }
 
 func (tr TestRequest) Points(points float32) TestRequest {
 	tr["testPoints"] = []string{fmt.Sprint(points)}
+
 	return tr
 }
 
 func (p *Polygon) SaveTest(tReq TestRequest) error {
 	link := p.buildURL("problem.saveTest", url.Values(tReq))
 	_, err := p.makeQuery(http.MethodPost, link)
+
 	return err
 }

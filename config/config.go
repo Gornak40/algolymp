@@ -31,5 +31,6 @@ func NewConfig() *Config {
 	if err := json.Unmarshal(data, &cfg); err != nil {
 		logrus.WithError(err).Fatal("failed to unmarshal config")
 	}
+
 	return &cfg
 }
