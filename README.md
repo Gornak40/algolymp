@@ -1,6 +1,23 @@
 # algolymp
 *A collection of useful CLI tools for managing Polygon and Ejudge.*
 
+## Workflow
+
+| Tool | Description | Ejudge | Polygon | Status |
+| --- | --- | :---: | :---: | :---: |
+| [blanka](#blanka) | create contest | 🦍 | | ✅ |
+| [boban](#boban) | filter runs | 🦍 | | ✅ |
+| [casper](#casper) | change visibility | 🦍 | | ✅ |
+| [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
+| [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
+| [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
+| 👻 | change runs status | 🦍 | | 🧑‍💻 |
+| 👻 | list/commit problems | | 🦍 | 🧑‍💻 |
+| 👻 | regexp problem upload | | 🦍 | 🤔 |
+| 👻 | download/upload package | | 🦍 | 🤔 |
+| 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
+| 👻 | autogen static problem | 🦍 | | 🤔 |
+
 ## Build
 ```bash
 sudo apt install go

@@ -16,7 +16,7 @@ while read -r commit_msg; do
     else
         ((patch++))
     fi
-    >&2 echo "[$major.$minor.$patch] $commit_msg"
+    >&2 echo "[v$major.$minor.$patch] $commit_msg"
 done <<< $commits
 
-echo "$major.$minor.$patch"
+echo "v$major.$minor.$patch"
