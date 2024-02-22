@@ -15,7 +15,6 @@ linters:
     - depguard
     - wsl
     - wrapcheck
-    - goerr113
     - exhaustruct
     - godox
 

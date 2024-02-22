@@ -1,8 +1,11 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"os"
+	"sort"
 
 	"github.com/Gornak40/algolymp/config"
 	"github.com/Gornak40/algolymp/ejudge"
@@ -10,24 +13,21 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	DefaultRunsCount = 20
-)
-
 func main() {
-	parser := argparse.NewParser("boban", "Filter Ejudge runs.")
+	verdicts := make([]string, 0, len(ejudge.Verdicts))
+	for v := range ejudge.Verdicts {
+		verdicts = append(verdicts, v)
+	}
+	sort.Strings(verdicts)
+
+	parser := argparse.NewParser("ripper", "Change Ejudge runs status (stdin input).")
 	cID := parser.Int("i", "cid", &argparse.Options{
 		Required: true,
 		Help:     "Ejudge contest ID",
 	})
-	filter := parser.String("f", "filter", &argparse.Options{
-		Required: false,
-		Help:     "Filter expression",
-	})
-	count := parser.Int("c", "count", &argparse.Options{
-		Required: false,
-		Help:     "Last runs count",
-		Default:  DefaultRunsCount,
+	status := parser.Selector("s", "status", verdicts, &argparse.Options{
+		Required: true,
+		Help:     "New runs status",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
@@ -46,12 +46,19 @@ func main() {
 		logrus.WithError(err).Fatal("master login failed")
 	}
 
-	runs, err := ejClient.FilterRuns(csid, *filter, *count)
-	if err != nil {
-		logrus.WithError(err).Fatal("filter runs failed")
-	}
-	for _, run := range runs {
-		fmt.Println(run) //nolint:forbidigo // Basic functionality.
+	logrus.Info("waiting for run ids input...")
+	for {
+		var runID int
+		_, err := fmt.Scanf("%d", &runID)
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			logrus.WithError(err).Fatal("invalid run id")
+		}
+		if err := ejClient.ChangeRunStatus(csid, runID, *status); err != nil {
+			logrus.WithError(err).Fatal("failed change run status")
+		}
 	}
 
 	if err := ejClient.Logout(sid); err != nil {

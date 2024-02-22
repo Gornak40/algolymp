@@ -9,14 +9,22 @@
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
+| [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
-| 👻 | change runs status | 🦍 | | 🧑‍💻 |
 | 👻 | list/commit problems | | 🦍 | 🧑‍💻 |
 | 👻 | regexp problem upload | | 🦍 | 🤔 |
 | 👻 | download/upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
+
+### Icons
+
+- ✅ Done
+- 🧑‍💻 In progress
+- 🤔 To do
+- 👻 Name placeholder
+- 🦍 Engines usage
 
 ## Build
 ```bash
@@ -57,7 +65,7 @@ Put your config file in `~/.config/algolymp/config.json`.
 2. Commit changes;
 3. *(Optional)* Open contest xml config for editing.
 
-Useful before running `polygon-to-ejudge`.
+Useful before running [polygon-to-ejudge](https://github.com/grphil/polygon-to-ejudge).
 
 ### Flags
 - `-i` - new contest id (required)
@@ -85,7 +93,7 @@ blanka -i 51013 -t 51000 -e
 
 ### Abount
 
-Filter and print Ejudge runs IDs in specified contest.
+Filter and print Ejudge runs ids.
 
 ### Flags
 - `-i` - contest id (required)
@@ -115,7 +123,7 @@ boban -i 50014 -c 10000 2> /dev/null | wc -l
 - Make contest visible;
 - Make contest invisible.
 
-Useful with bash `for` loop after the end of the year.
+Useful with bash `for` loop at the end of the year.
 
 ### Flags
 - `-i` - contest id (required)
@@ -145,7 +153,9 @@ for i in {41014..41023}; do casper -i $i; done
 2. Check contest settings;
 3. Reload config files.
 
-Useful after running `polygon-to-ejudge`.
+Useful after running [polygon-to-ejudge](https://github.com/grphil/polygon-to-ejudge).
+
+Feel free to use it after every change
 
 ### Flags
 - `-i` - contest id (required)
@@ -164,6 +174,39 @@ ejik -i 40507
 ```
 
 ![ejik logo](https://algolymp.ru/static/img/ejik.png)
+
+## ripper
+*Change Ejudge runs status.*
+
+### About
+
+Change runs status. Designed to work with [boban](#boban) or with raw ids from `stdin`.
+
+**Be careful** using it, double check the [parameters](https://ejudge.ru/wiki/index.php/%D0%92%D0%B5%D1%80%D0%B4%D0%B8%D0%BA%D1%82%D1%8B_%D1%82%D0%B5%D1%81%D1%82%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F).
+
+`RJ` is reject, not rejudge. Use `rejudge` status for rejudge.
+
+### Flags
+- `-i` - contest id (required)
+- `-s` - new status (required, `DQ|IG|OK|PR|RJ|SM|SV|rejudge`)
+
+### Config
+- `ejudge.url`
+- `ejudge.login`
+- `ejudge.password`
+
+### Examples
+
+```bash
+ripper --help
+ripper -i 51023 -s RJ # read from stdin
+cat banlist.txt | ripper -i 47110 -s DQ # ban submits with list
+boban -i 52010 -f "prob == 'D' && score >= 50" -c 10000 | ripper -i 52010 -s rejudge # rejudge incorrect group
+boban -i 50014 -f "login == 'barmaley' && status == OK" | ripper -i 50014 -s SM # torture a participant
+boban -i 48001 -f "status == PR" -c 2000 | ripper -i 48001 -s OK # smart code-review
+```
+
+![ripper logo](https://algolymp.ru/static/img/ripper.png)
 
 ## scalp
 *Set incremental problem scoring using Polygon API.*
