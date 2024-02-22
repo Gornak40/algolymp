@@ -7,29 +7,31 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"regexp"
-	"slices"
 	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	BadSID           = "0000000000000000"
-	DefaultRunStatus = 99 // rejudge
-)
+const BadSID = "0000000000000000"
 
 var (
-	ErrParseMasterSID   = errors.New("can't parse master SID")
-	ErrBadStatusCode    = errors.New("bad status code")
-	ErrUnknownRunStatus = errors.New("unknown run status")
-	ErrBadFilter        = errors.New("bad filter expression")
+	ErrParseMasterSID = errors.New("can't parse master SID")
+	ErrBadStatusCode  = errors.New("bad status code")
+	ErrBadFilter      = errors.New("bad filter expression")
+	ErrUnknownVerdict = errors.New("unknown verdict")
 )
 
-//nolint:gochecknoglobals // Ejudge constants
-var Verdicts = []string{
-	"OK", "CE", "RT", "TL", "PE", "WA", "CF", "PT", "AC", "IG",
-	"DQ", "PD", "ML", "SE", "SV", "WT", "PR", "RJ", "SM",
+//nolint:gochecknoglobals,gomnd // ejudge constants
+var Verdicts = map[string]int{
+	"OK":      0,
+	"IG":      9,
+	"DQ":      10,
+	"SV":      14,
+	"PR":      16,
+	"RJ":      17,
+	"SM":      23,
+	"rejudge": 99,
 }
 
 type Config struct {
@@ -137,12 +139,9 @@ func (ej *Ejudge) Commit(sid string) error {
 }
 
 func (ej *Ejudge) ChangeRunStatus(csid string, runID int, status string) error {
-	idx := DefaultRunStatus
-	if status != "" {
-		idx = slices.Index(Verdicts, status)
-		if idx == -1 {
-			return fmt.Errorf("%w: %s", ErrUnknownRunStatus, status)
-		}
+	idx, ok := Verdicts[status]
+	if !ok {
+		return fmt.Errorf("%w: %s", ErrUnknownVerdict, status)
 	}
 	_, _, err := ej.postRequest("new-master", url.Values{
 		"SID":    {csid},

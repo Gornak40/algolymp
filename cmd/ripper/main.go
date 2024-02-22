@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 
 	"github.com/Gornak40/algolymp/config"
 	"github.com/Gornak40/algolymp/ejudge"
@@ -13,14 +14,20 @@ import (
 )
 
 func main() {
-	parser := argparse.NewParser("ripper", "Change Ejudge runs status.")
+	verdicts := make([]string, 0, len(ejudge.Verdicts))
+	for v := range ejudge.Verdicts {
+		verdicts = append(verdicts, v)
+	}
+	sort.Strings(verdicts)
+
+	parser := argparse.NewParser("ripper", "Change Ejudge runs status (stdin input).")
 	cID := parser.Int("i", "cid", &argparse.Options{
 		Required: true,
 		Help:     "Ejudge contest ID",
 	})
-	status := parser.Selector("s", "status", ejudge.Verdicts, &argparse.Options{
-		Required: false,
-		Help:     "New runs status (rejudge if not set)",
+	status := parser.Selector("s", "status", verdicts, &argparse.Options{
+		Required: true,
+		Help:     "New runs status",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
