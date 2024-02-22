@@ -18,6 +18,14 @@
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
 
+### Icons
+
+- ✅ Done
+- 🧑‍💻 In progress
+- 🤔 To do
+- 👻 Name placeholder
+- 🦍 Engines usage
+
 ## Build
 ```bash
 sudo apt install go
@@ -85,7 +93,7 @@ blanka -i 51013 -t 51000 -e
 
 ### Abount
 
-Filter and print Ejudge runs IDs in specified contest.
+Filter and print Ejudge runs ids.
 
 ### Flags
 - `-i` - contest id (required)
@@ -164,6 +172,35 @@ ejik -i 40507
 ```
 
 ![ejik logo](https://algolymp.ru/static/img/ejik.png)
+
+## ripper
+*Change Ejudge runs status.*
+
+### About
+
+Change runs status. Designed to work with [boban](#boban) or with raw ids from `stdin`.
+
+### Flags
+- `-i` - contest id (required)
+- `-s` - new status (default: rejudge)
+
+### Config
+- `ejudge.url`
+- `ejudge.login`
+- `ejudge.password`
+
+### Examples
+
+```bash
+ripper --help
+ripper -i 51023 -s RJ
+cat banlist.txt | ripper -i 47110 -s DQ
+boban -i 52010 -f "prob == 'D' && score >= 50" -c 10000 | ripper -i 52010
+boban -i 50014 -f "login == 'barmaley' && status == PR" | ripper -i 50014 -s SM
+boban -i 48001 -f "status == PR" -c 2000 | ripper -i 48001 -s OK
+```
+
+![ripper logo](https://algolymp.ru/static/img/ripper.png)
 
 ## scalp
 *Set incremental problem scoring using Polygon API.*

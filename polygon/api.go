@@ -23,6 +23,10 @@ const (
 	defaultTestset   = "tests"
 )
 
+var (
+	ErrBadPolygonStatus = errors.New("bad polygon status")
+)
+
 type Config struct {
 	URL       string `json:"url"`
 	APIKey    string `json:"apiKey"`
@@ -59,7 +63,7 @@ func (p *Polygon) makeQuery(method string, link string) (*Answer, error) {
 		return nil, err
 	}
 	if ans.Status != "OK" {
-		return nil, errors.New(ans.Comment)
+		return nil, fmt.Errorf("%w: %s", ErrBadPolygonStatus, ans.Comment)
 	}
 
 	return &ans, nil

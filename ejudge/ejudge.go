@@ -7,17 +7,30 @@ import (
 	"net/http/cookiejar"
 	"net/url"
 	"regexp"
+	"slices"
 	"strconv"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/sirupsen/logrus"
 )
 
-const BadSID = "0000000000000000"
+const (
+	BadSID           = "0000000000000000"
+	DefaultRunStatus = 99 // rejudge
+)
 
 var (
-	ErrParseMasterSID = fmt.Errorf("can't parse master SID")
+	ErrParseMasterSID   = errors.New("can't parse master SID")
+	ErrBadStatusCode    = errors.New("bad status code")
+	ErrUnknownRunStatus = errors.New("unknown run status")
+	ErrBadFilter        = errors.New("bad filter expression")
 )
+
+//nolint:gochecknoglobals // Ejudge constants
+var Verdicts = []string{
+	"OK", "CE", "RT", "TL", "PE", "WA", "CF", "PT", "AC", "IG",
+	"DQ", "PD", "ML", "SE", "SV", "WT", "PR", "RJ", "SM",
+}
 
 type Config struct {
 	URL       string `json:"url"`
@@ -55,7 +68,7 @@ func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, 
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return nil, nil, fmt.Errorf("bad status code %d", resp.StatusCode)
+		return nil, nil, fmt.Errorf("%w: %d", ErrBadStatusCode, resp.StatusCode)
 	}
 	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
@@ -97,7 +110,8 @@ func (ej *Ejudge) Logout(sid string) error {
 }
 
 func (ej *Ejudge) Lock(sid string, cid int) error {
-	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("lock contest for editing")
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).
+		Info("lock contest for editing")
 	_, _, err := ej.postRequest("serve-control", url.Values{
 		"contest_id": {strconv.Itoa(cid)},
 		"SID":        {sid},
@@ -122,8 +136,32 @@ func (ej *Ejudge) Commit(sid string) error {
 	return nil
 }
 
+func (ej *Ejudge) ChangeRunStatus(csid string, runID int, status string) error {
+	idx := DefaultRunStatus
+	if status != "" {
+		idx = slices.Index(Verdicts, status)
+		if idx == -1 {
+			return fmt.Errorf("%w: %s", ErrUnknownRunStatus, status)
+		}
+	}
+	_, _, err := ej.postRequest("new-master", url.Values{
+		"SID":    {csid},
+		"action": {"67"},
+		"run_id": {strconv.Itoa(runID)},
+		"status": {strconv.Itoa(idx)},
+	})
+	if err != nil {
+		return err
+	}
+	logrus.WithFields(logrus.Fields{"CSID": csid, "run": runID, "status": idx}).
+		Info("success set status")
+
+	return nil
+}
+
 func (ej *Ejudge) CheckContest(sid string, cid int, verbose bool) error {
-	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("check contest settings, wait please")
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).
+		Info("check contest settings, wait please")
 	_, doc, err := ej.postRequest("serve-control", url.Values{
 		"contest_id": {strconv.Itoa(cid)},
 		"SID":        {sid},
@@ -136,7 +174,8 @@ func (ej *Ejudge) CheckContest(sid string, cid int, verbose bool) error {
 		logrus.Info(doc.Find("font").Text())
 	}
 	status := doc.Find("h2").First().Text()
-	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Infof("ejudge answer %q", status)
+	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).
+		Infof("ejudge answer %q", status)
 
 	return nil
 }
@@ -154,7 +193,8 @@ func (ej *Ejudge) MasterLogin(sid string, cid int) (string, error) {
 	if csid == "" {
 		return "", ErrParseMasterSID
 	}
-	logrus.WithFields(logrus.Fields{"CID": cid, "CSID": csid, "SID": sid}).Info("success master login")
+	logrus.WithFields(logrus.Fields{"CID": cid, "CSID": csid, "SID": sid}).
+		Info("success master login")
 
 	return csid, nil
 }
@@ -172,7 +212,7 @@ func (ej *Ejudge) FilterRuns(csid string, filter string, count int) ([]int, erro
 	}
 	ejErr := doc.Find("#container > pre")
 	if ejErr.Text() != "" {
-		return nil, errors.New(ejErr.Text())
+		return nil, fmt.Errorf("%w: %s", ErrBadFilter, ejErr.Text())
 	}
 	res := doc.Find("#container > table:nth-child(18) > tbody > tr > td:nth-child(1)")
 	digits := regexp.MustCompile("[^0-9]+")
@@ -187,6 +227,8 @@ func (ej *Ejudge) FilterRuns(csid string, filter string, count int) ([]int, erro
 		}
 		runs = append(runs, run)
 	}
+	logrus.WithFields(logrus.Fields{"CSID": csid, "count": len(runs)}).
+		Info("success filter runs")
 
 	return runs, nil
 }
@@ -221,7 +263,8 @@ func (ej *Ejudge) CreateContest(sid string, cid int, tid int) error {
 	if status == "" {
 		status = "OK"
 	}
-	logrus.WithFields(logrus.Fields{"CID": cid, "TID": tid, "SID": sid}).Infof("ejudge answer %q", status)
+	logrus.WithFields(logrus.Fields{"CID": cid, "TID": tid, "SID": sid}).
+		Infof("ejudge answer %q", status)
 
 	return nil
 }
