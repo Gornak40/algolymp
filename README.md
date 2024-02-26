@@ -283,7 +283,7 @@ valeria -i 318882 | bat -l tex
 
 ### About
 
-**Now this is a proof of concept. Many more mods will be supported in the future.**
+**Now this is a proof of concept. Many more modes will be supported in the future.**
 
 Match all files in directory with config regexp patterns. Upload recognized files to Polygon.
 

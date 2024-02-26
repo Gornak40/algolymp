@@ -25,11 +25,11 @@ func main() {
 	})
 	mode := parser.Selector("m", "mode", woodaKeys, &argparse.Options{
 		Required: true,
-		Help:     "Local storage mode",
+		Help:     "Problem mode (from config)",
 	})
 	pDir := parser.String("d", "directory", &argparse.Options{
 		Required: true,
-		Help:     "Local storage directory",
+		Help:     "Problem directory",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
