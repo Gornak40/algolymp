@@ -25,12 +25,19 @@ const (
 
 var (
 	ErrBadPolygonStatus = errors.New("bad polygon status")
+	ErrInvalidMethod    = errors.New("invalid method")
 )
 
 type Config struct {
-	URL       string `json:"url"`
-	APIKey    string `json:"apiKey"`
-	APISecret string `json:"apiSecret"`
+	URL       string                 `json:"url"`
+	APIKey    string                 `json:"apiKey"`
+	APISecret string                 `json:"apiSecret"`
+	Wooda     map[string]WoodaConfig `json:"wooda"`
+}
+
+type WoodaConfig struct {
+	Ignore string `json:"ignore"`
+	Test   string `json:"test"`
 }
 
 type Polygon struct {
@@ -47,8 +54,36 @@ func NewPolygon(cfg *Config) *Polygon {
 	}
 }
 
-func (p *Polygon) makeQuery(method string, link string) (*Answer, error) {
-	req, _ := http.NewRequestWithContext(context.TODO(), method, link, nil)
+func buildRequest(method, link string, params url.Values) (*http.Request, error) {
+	logrus.WithFields(logrus.Fields{
+		"method": method,
+		"url":    link,
+	}).Info("build request")
+
+	switch method {
+	case http.MethodGet:
+		link = fmt.Sprintf("%s?%s", link, params.Encode())
+
+		return http.NewRequestWithContext(context.TODO(), method, link, nil)
+	case http.MethodPost:
+		buf := strings.NewReader(params.Encode())
+		req, err := http.NewRequestWithContext(context.TODO(), method, link, buf)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+		return req, nil
+	default:
+		return nil, ErrInvalidMethod
+	}
+}
+
+func (p *Polygon) makeQuery(method, link string, params url.Values) (*Answer, error) {
+	req, err := buildRequest(method, link, params)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := p.client.Do(req)
 	if err != nil {
 		return nil, err
@@ -81,9 +116,8 @@ func (p *Polygon) skipEscape(params url.Values) string {
 	return strings.Join(pairs, "&")
 }
 
-func (p *Polygon) buildURL(method string, params url.Values) string {
+func (p *Polygon) buildURL(method string, params url.Values) (string, url.Values) {
 	url, _ := url.JoinPath(p.cfg.URL, "api", method)
-	logrus.WithField("method", method).Info("preparing the request")
 
 	params["apiKey"] = []string{p.cfg.APIKey}
 	params["time"] = []string{strconv.FormatInt(time.Now().Unix(), 10)}
@@ -93,35 +127,15 @@ func (p *Polygon) buildURL(method string, params url.Values) string {
 	hsh := hex.EncodeToString(b[:])
 	params["apiSig"] = []string{sixSecretSymbols + hsh}
 
-	return fmt.Sprintf("%s?%s", url, params.Encode())
-}
-
-type TestAnswer struct {
-	Index           int     `json:"index"`
-	Group           string  `json:"group"`
-	Points          float32 `json:"points"`
-	UseInStatements bool    `json:"useInStatements"`
-}
-
-type GroupAnswer struct {
-	Name           string   `json:"name"`
-	PointsPolicy   string   `json:"pointsPolicy"`
-	FeedbackPolicy string   `json:"feedbackPolicy"`
-	Dependencies   []string `json:"dependencies"`
-}
-
-type Answer struct {
-	Status  string          `json:"status"`
-	Comment string          `json:"comment"`
-	Result  json.RawMessage `json:"result"`
+	return url, params
 }
 
 func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
-	link := p.buildURL("problem.viewTestGroup", url.Values{
+	link, params := p.buildURL("problem.viewTestGroup", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
 		"testset":   []string{defaultTestset},
 	})
-	ansG, err := p.makeQuery(http.MethodGet, link)
+	ansG, err := p.makeQuery(http.MethodGet, link, params)
 	if err != nil {
 		return nil, err
 	}
@@ -132,12 +146,12 @@ func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 }
 
 func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
-	link := p.buildURL("problem.tests", url.Values{
+	link, params := p.buildURL("problem.tests", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
 		"testset":   []string{defaultTestset},
 		"noInputs":  []string{"true"},
 	})
-	ansT, err := p.makeQuery(http.MethodGet, link)
+	ansT, err := p.makeQuery(http.MethodGet, link, params)
 	if err != nil {
 		return nil, err
 	}
@@ -148,51 +162,41 @@ func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
 }
 
 func (p *Polygon) EnableGroups(pID int) error {
-	link := p.buildURL("problem.enableGroups", url.Values{
+	link, params := p.buildURL("problem.enableGroups", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
 		"testset":   []string{defaultTestset},
 		"enable":    []string{"true"},
 	})
-	_, err := p.makeQuery(http.MethodPost, link)
+	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err
 }
 
 func (p *Polygon) EnablePoints(pID int) error {
-	link := p.buildURL("problem.enablePoints", url.Values{
+	link, params := p.buildURL("problem.enablePoints", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
 		"enable":    []string{"true"},
 	})
-	_, err := p.makeQuery(http.MethodPost, link)
+	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err
 }
 
-type TestRequest url.Values
-
-func NewTestRequest(pID int, index int) TestRequest {
-	return TestRequest{
+func (p *Polygon) SaveResource(pID int, name, content string) error {
+	link, params := p.buildURL("problem.saveFile", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
-		"testIndex": []string{strconv.Itoa(index)},
-		"testset":   []string{defaultTestset},
-	}
-}
+		"type":      []string{"resource"},
+		"name":      []string{name},
+		"file":      []string{content},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
 
-func (tr TestRequest) Group(group string) TestRequest {
-	tr["testGroup"] = []string{group}
-
-	return tr
-}
-
-func (tr TestRequest) Points(points float32) TestRequest {
-	tr["testPoints"] = []string{fmt.Sprint(points)}
-
-	return tr
+	return err
 }
 
 func (p *Polygon) SaveTest(tReq TestRequest) error {
-	link := p.buildURL("problem.saveTest", url.Values(tReq))
-	_, err := p.makeQuery(http.MethodPost, link)
+	link, params := p.buildURL("problem.saveTest", url.Values(tReq))
+	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err
 }
