@@ -28,9 +28,12 @@ func NewWooda(pClient *polygon.Polygon, pID int, wCfg *polygon.WoodaConfig) *Woo
 }
 
 func pathMatch(pattern, path string) bool {
+	if pattern == "" {
+		return false
+	}
 	res, err := regexp.MatchString(pattern, path)
 	if err != nil {
-		logrus.WithError(err).Error("failed match filepath")
+		logrus.WithError(err).Error("failed to match filepath")
 
 		return false
 	}
@@ -87,6 +90,8 @@ func (w *Wooda) DirWalker(path string, info fs.FileInfo, err error) error {
 	if info.IsDir() {
 		return nil
 	}
-
-	return w.matcher(path)
+	if err := w.matcher(path); err != nil {
+		logrus.WithError(err).WithField("path", path).Errorf("failed to resolve")
+	}
+	return nil
 }

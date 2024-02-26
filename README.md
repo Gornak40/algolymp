@@ -301,7 +301,7 @@ Supported modes:
 - `polygon.url`
 - `polygon.apiKey`
 - `polygon.apiSecret`
-- `wooda`
+- `polygon.wooda`
 
 ### Examples
 
