@@ -42,16 +42,3 @@ func main() {
 		logrus.WithError(err).Fatal("failed wooda matching")
 	}
 }
-
-/*
-"wooda": {
-	"polygon": {
-		"ignore": ["tests/*\.a"],
-		"test": ["tests/*"],
-		"validator": "files/val*\.cpp",
-		"checker": "checker\.cpp",
-		"solution": ["solutions/*\.cpp"],
-		"generator": ["files/gen*\.cpp"]
-	}
-}
-*/
