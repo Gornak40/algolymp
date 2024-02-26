@@ -3,9 +3,6 @@ package polygon
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"net/url"
-	"strconv"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -121,14 +118,7 @@ func (p *Polygon) InformaticsValuer(pID int, verbose bool) error {
 	if verbose {
 		logrus.Info("valuer.cfg\n" + valuer)
 	}
-
-	link := p.buildURL("problem.saveFile", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"type":      []string{"resource"},
-		"name":      []string{"valuer.cfg"},
-		"file":      []string{valuer},
-	})
-	if _, err := p.makeQuery(http.MethodPost, link); err != nil {
+	if err := p.SaveResource(pID, "valuer.cfg", valuer); err != nil {
 		return err
 	}
 

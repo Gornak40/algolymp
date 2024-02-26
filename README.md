@@ -12,8 +12,9 @@
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
-| 👻 | list/commit problems | | 🦍 | 🧑‍💻 |
-| 👻 | regexp problem upload | | 🦍 | 🤔 |
+| [wooda](#wooda) | regexp problem upload | | 🦍 | 🧑‍💻 |
+| ⚙️ | move json config to ini | | | 🧑‍💻 |
+| 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | download/upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
@@ -24,6 +25,7 @@
 - 🧑‍💻 In progress
 - 🤔 To do
 - 👻 Name placeholder
+- ⚙️ Refactor task
 - 🦍 Engines usage
 
 ## Build
@@ -48,7 +50,13 @@ Put your config file in `~/.config/algolymp/config.json`.
 	"polygon": {
 		"url": "https://polygon.codeforces.com",
 		"apiKey": "<key>",
-		"apiSecret": "<secret>"
+		"apiSecret": "<secret>",
+		"wooda": {
+			"polygon": {
+				"ignore": ".*\\.a$",
+				"test": "^tests/\\d+$"
+			}
+		}
 	},
 	"system": {
 		"editor": "nano"
@@ -269,3 +277,37 @@ valeria -i 318882 | bat -l tex
 ```
 
 ![valeria logo](https://algolymp.ru/static/img/valeria.png)
+
+## wooda
+*Upload problem files filtered by regexp to Polygon using API.*
+
+### About
+
+**Now this is a proof of concept. Many more mods will be supported in the future.**
+
+Match all files in directory with config regexp patterns. Upload recognized files to Polygon.
+
+Supported modes:
+
+- `ignore`
+- `test`
+
+### Flags
+- `-i` - problem id (required)
+- `-m` - mode from config (required)
+- `-d` - problem directory (required)
+
+### Config
+- `polygon.url`
+- `polygon.apiKey`
+- `polygon.apiSecret`
+- `wooda`
+
+### Examples
+
+```bash
+wooda --help
+wooda -i 337320 -m polygon -d .
+```
+
+![wooda logo](https://algolymp.ru/static/img/wooda.png)
