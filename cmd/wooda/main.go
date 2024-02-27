@@ -15,6 +15,7 @@ func main() {
 	woodaModes := []string{
 		wooda.ModeTest,
 		wooda.ModeTags,
+		wooda.ModeValidator,
 	}
 
 	parser := argparse.NewParser("wooda", "Upload problem files filtered by glob to Polygon.")

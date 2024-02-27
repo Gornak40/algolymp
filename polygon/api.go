@@ -23,6 +23,14 @@ const (
 	defaultTestset   = "tests"
 )
 
+type FileType string
+
+const (
+	TypeSource   FileType = "source"
+	TypeResource FileType = "resource"
+	TypeAUX      FileType = "aux"
+)
+
 var (
 	ErrBadPolygonStatus = errors.New("bad polygon status")
 	ErrInvalidMethod    = errors.New("invalid method")
@@ -176,13 +184,8 @@ func (p *Polygon) EnablePoints(pID int) error {
 	return err
 }
 
-func (p *Polygon) SaveResource(pID int, name, content string) error {
-	link, params := p.buildURL("problem.saveFile", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"type":      []string{"resource"},
-		"name":      []string{name},
-		"file":      []string{content},
-	})
+func (p *Polygon) SaveFile(fReq FileRequest) error {
+	link, params := p.buildURL("problem.saveFile", url.Values(fReq))
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err
@@ -199,6 +202,16 @@ func (p *Polygon) SaveTags(pID int, tags string) error {
 	link, params := p.buildURL("problem.saveTags", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
 		"tags":      []string{tags},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SetValidator(pID int, validator string) error {
+	link, params := p.buildURL("problem.setValidator", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"validator": []string{validator},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 

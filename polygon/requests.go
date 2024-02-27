@@ -39,3 +39,29 @@ func (tr TestRequest) Description(description string) TestRequest {
 
 	return tr
 }
+
+type FileRequest url.Values
+
+func NewFileRequest(pID int, typ FileType, name, file string) FileRequest {
+	return FileRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"type":      []string{string(typ)},
+		"name":      []string{name},
+		"file":      []string{file},
+	}
+}
+
+// TODO: fix it.
+func (fr FileRequest) CheckExisting(f bool) FileRequest {
+	fr["checkExisting"] = []string{strconv.FormatBool(f)}
+
+	return fr
+}
+
+func (fr FileRequest) SourceType(typ string) FileRequest {
+	fr["sourceType"] = []string{typ}
+
+	return fr
+}
+
+// TODO: add other options
