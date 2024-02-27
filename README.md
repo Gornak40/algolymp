@@ -12,7 +12,7 @@
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
-| [wooda](#wooda) | regexp problem upload | | 🦍 | 🧑‍💻 |
+| [wooda](#wooda) | glob problem files upload | | 🦍 | 🧑‍💻 |
 | ⚙️ | move json config to ini | | | 🧑‍💻 |
 | 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | download/upload package | | 🦍 | 🤔 |
@@ -50,13 +50,7 @@ Put your config file in `~/.config/algolymp/config.json`.
 	"polygon": {
 		"url": "https://polygon.codeforces.com",
 		"apiKey": "<key>",
-		"apiSecret": "<secret>",
-		"wooda": {
-			"polygon": {
-				"ignore": ".*\\.a$",
-				"test": "^tests/\\d+$"
-			}
-		}
+		"apiSecret": "<secret>"
 	},
 	"system": {
 		"editor": "nano"
@@ -279,35 +273,35 @@ valeria -i 318882 | bat -l tex
 ![valeria logo](https://algolymp.ru/static/img/valeria.png)
 
 ## wooda
-*Upload problem files filtered by regexp to Polygon using API.*
+*Upload problem files filtered by glob to Polygon using API.*
 
 ### About
 
 **Now this is a proof of concept. Many more modes will be supported in the future.**
 
-Match all files in directory with config regexp patterns. Upload recognized files to Polygon.
+Match all files in directory with glob pattern. Upload recognized files to Polygon.
 
 Supported modes:
 
-- `ignore`
 - `test`
 
 ### Flags
 - `-i` - problem id (required)
-- `-m` - mode from config (required)
-- `-d` - problem directory (required)
+- `-m` - uploading mode (required)
+- `-g` - problem files glob (required)
+
+You should know your shell and probably pass `-g "<glob>"`, not `-g <glob>`
 
 ### Config
 - `polygon.url`
 - `polygon.apiKey`
 - `polygon.apiSecret`
-- `polygon.wooda`
 
 ### Examples
 
 ```bash
 wooda --help
-wooda -i 337320 -m polygon -d .
+wooda -i 337320 -m test -g "tests/*[^.a]"
 ```
 
 ![wooda logo](https://algolymp.ru/static/img/wooda.png)
