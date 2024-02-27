@@ -284,6 +284,7 @@ Match all files in directory with glob pattern. Upload recognized files to Polyg
 Supported modes:
 
 - `test`
+- `tags`
 
 ### Flags
 - `-i` - problem id (required)
@@ -302,6 +303,7 @@ You should know your shell and probably pass `-g "<glob>"`, not `-g <glob>`
 ```bash
 wooda --help
 wooda -i 337320 -m test -g "tests/*[^.a]"
+wooda -i 337320 -m tags -g tags
 ```
 
 ![wooda logo](https://algolymp.ru/static/img/wooda.png)
