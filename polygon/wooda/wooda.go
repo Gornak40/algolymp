@@ -1,59 +1,58 @@
 package wooda
 
 import (
+	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
-	"regexp"
+	"strings"
 
 	"github.com/Gornak40/algolymp/polygon"
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	ModeTest = "test"
+	ModeTags = "tags"
+)
+
+var (
+	ErrUnknownMode = errors.New("unknown wooda mode")
+)
+
 type Wooda struct {
 	client    *polygon.Polygon
 	pID       int
-	config    *polygon.WoodaConfig
+	mode      string
 	testIndex int
 }
 
-func NewWooda(pClient *polygon.Polygon, pID int, wCfg *polygon.WoodaConfig) *Wooda {
+func NewWooda(pClient *polygon.Polygon, pID int, mode string) *Wooda {
 	return &Wooda{
 		client:    pClient,
 		pID:       pID,
-		config:    wCfg,
+		mode:      mode,
 		testIndex: 1,
 	}
 }
 
-func pathMatch(pattern, path string) bool {
-	res, err := regexp.MatchString(pattern, path)
-	if err != nil {
-		logrus.WithError(err).Error("failed match filepath")
-
-		return false
-	}
-
-	return res
-}
-
-func getData(mode, path string) (string, error) {
-	logrus.WithFields(logrus.Fields{"mode": mode, "path": path}).Info("resolve file")
+func (w *Wooda) Resolve(path string) error {
+	logrus.WithFields(logrus.Fields{"mode": w.mode, "path": path}).Info("resolve file")
 	data, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-
-	return string(data), nil
-}
-
-func (w *Wooda) resolveTest(path string) error {
-	data, err := getData("test", path)
 	if err != nil {
 		return err
 	}
+	switch w.mode {
+	case ModeTest:
+		return w.resolveTest(path, string(data))
+	case ModeTags:
+		return w.resolveTags(string(data))
+	default:
+		return fmt.Errorf("%w: %s", ErrUnknownMode, w.mode)
+	}
+}
 
+func (w *Wooda) resolveTest(path, data string) error {
 	tr := polygon.NewTestRequest(w.pID, w.testIndex).
 		Input(data).
 		Description(fmt.Sprintf("File \"%s\"", filepath.Base(path)))
@@ -65,28 +64,8 @@ func (w *Wooda) resolveTest(path string) error {
 	return nil
 }
 
-func (w *Wooda) matcher(path string) error {
-	switch {
-	case pathMatch(w.config.Ignore, path): // silent ignore is the best practice
-		break
-	case pathMatch(w.config.Test, path):
-		if err := w.resolveTest(path); err != nil {
-			return err
-		}
-	default:
-		logrus.WithField("path", path).Warn("no valid matching")
-	}
+func (w *Wooda) resolveTags(data string) error {
+	tags := strings.Join(strings.Split(data, "\n"), ",")
 
-	return nil
-}
-
-func (w *Wooda) DirWalker(path string, info fs.FileInfo, err error) error {
-	if err != nil {
-		return err
-	}
-	if info.IsDir() {
-		return nil
-	}
-
-	return w.matcher(path)
+	return w.client.SaveTags(w.pID, tags)
 }

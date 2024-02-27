@@ -29,15 +29,9 @@ var (
 )
 
 type Config struct {
-	URL       string                 `json:"url"`
-	APIKey    string                 `json:"apiKey"`
-	APISecret string                 `json:"apiSecret"`
-	Wooda     map[string]WoodaConfig `json:"wooda"`
-}
-
-type WoodaConfig struct {
-	Ignore string `json:"ignore"`
-	Test   string `json:"test"`
+	URL       string `json:"url"`
+	APIKey    string `json:"apiKey"`
+	APISecret string `json:"apiSecret"`
 }
 
 type Polygon struct {
@@ -196,6 +190,16 @@ func (p *Polygon) SaveResource(pID int, name, content string) error {
 
 func (p *Polygon) SaveTest(tReq TestRequest) error {
 	link, params := p.buildURL("problem.saveTest", url.Values(tReq))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveTags(pID int, tags string) error {
+	link, params := p.buildURL("problem.saveTags", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"tags":      []string{tags},
+	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err

@@ -12,33 +12,55 @@ import (
 )
 
 func main() {
-	cfg := config.NewConfig()
-	woodaKeys := make([]string, 0, len(cfg.Polygon.Wooda))
-	for k := range cfg.Polygon.Wooda {
-		woodaKeys = append(woodaKeys, k)
+	woodaModes := []string{
+		wooda.ModeTest,
+		wooda.ModeTags,
 	}
 
-	parser := argparse.NewParser("wooda", "Upload problem files filtered by regexp to Polygon.")
+	parser := argparse.NewParser("wooda", "Upload problem files filtered by glob to Polygon.")
 	pID := parser.Int("i", "pid", &argparse.Options{
 		Required: true,
 		Help:     "Polygon problem ID",
 	})
-	mode := parser.Selector("m", "mode", woodaKeys, &argparse.Options{
+	mode := parser.Selector("m", "mode", woodaModes, &argparse.Options{
 		Required: true,
-		Help:     "Problem mode (from config)",
+		Help:     "Uploading mode",
 	})
-	pDir := parser.String("d", "directory", &argparse.Options{
+	glob := parser.String("g", "glob", &argparse.Options{
 		Required: true,
-		Help:     "Problem directory",
+		Help:     "Problem files glob",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
 	}
 
+	cfg := config.NewConfig()
 	pClient := polygon.NewPolygon(&cfg.Polygon)
-	woodaCfg := cfg.Polygon.Wooda[*mode] // mode is good argparse.Selector
-	wooda := wooda.NewWooda(pClient, *pID, &woodaCfg)
-	if err := filepath.Walk(*pDir, wooda.DirWalker); err != nil {
-		logrus.WithError(err).Fatal("failed wooda matching")
+	wooda := wooda.NewWooda(pClient, *pID, *mode)
+
+	files, err := filepath.Glob(*glob)
+	if err != nil {
+		logrus.WithError(err).Fatal("failed to match glob")
+	}
+	if len(files) == 0 {
+		logrus.WithField("glob", *glob).Warn("no files matched glob")
+
+		return
+	}
+	logrus.WithFields(logrus.Fields{"glob": *glob, "count": len(files)}).
+		Info("glob match result")
+
+	errCount := 0
+	for _, path := range files {
+		if err := wooda.Resolve(path); err != nil {
+			errCount++
+			logrus.WithError(err).WithField("path", path).Error("failed to resolve")
+		}
+	}
+
+	if errCount == 0 {
+		logrus.Info("success resolve all files")
+	} else {
+		logrus.WithField("count", errCount).Warn("some errors happened")
 	}
 }
