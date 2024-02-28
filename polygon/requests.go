@@ -40,6 +40,50 @@ func (tr TestRequest) Description(description string) TestRequest {
 	return tr
 }
 
+func (tr TestRequest) UseInStatements(f bool) TestRequest {
+	tr["testUseInStatements"] = []string{strconv.FormatBool(f)}
+
+	return tr
+}
+
+type ProblemRequest url.Values
+
+func NewProblemRequest(pID int) ProblemRequest {
+	return ProblemRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+	}
+}
+
+func (pr ProblemRequest) InputFile(name string) ProblemRequest {
+	pr["inputFile"] = []string{name}
+
+	return pr
+}
+
+func (pr ProblemRequest) OutputFile(name string) ProblemRequest {
+	pr["outputFile"] = []string{name}
+
+	return pr
+}
+
+func (pr ProblemRequest) Interactive(f bool) ProblemRequest {
+	pr["interactive"] = []string{strconv.FormatBool(f)}
+
+	return pr
+}
+
+func (pr ProblemRequest) TimeLimit(tl int) ProblemRequest {
+	pr["timeLimit"] = []string{strconv.Itoa(tl)}
+
+	return pr
+}
+
+func (pr ProblemRequest) MemoryLimit(ml int) ProblemRequest {
+	pr["memoryLimit"] = []string{strconv.Itoa(ml)}
+
+	return pr
+}
+
 type FileRequest url.Values
 
 func NewFileRequest(pID int, typ FileType, name, file string) FileRequest {

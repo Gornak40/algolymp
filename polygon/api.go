@@ -23,6 +23,14 @@ const (
 	defaultTestset   = "tests"
 )
 
+type SolutionTag string
+
+const (
+	TagMain      SolutionTag = "MA"
+	TagCorrect   SolutionTag = "OK"
+	TagIncorrect SolutionTag = "RJ"
+)
+
 type FileType string
 
 const (
@@ -212,6 +220,45 @@ func (p *Polygon) SetValidator(pID int, validator string) error {
 	link, params := p.buildURL("problem.setValidator", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
 		"validator": []string{validator},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SetChecker(pID int, checker string) error {
+	link, params := p.buildURL("problem.setChecker", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"checker":   []string{checker},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) UpdateInfo(pr ProblemRequest) error {
+	link, params := p.buildURL("problem.updateInfo", url.Values(pr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SetInteractor(pID int, interactor string) error {
+	link, params := p.buildURL("problem.setInteractor", url.Values{
+		"problemId":  []string{strconv.Itoa(pID)},
+		"interactor": []string{interactor},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveSolution(pID int, name, data string, tag SolutionTag) error {
+	link, params := p.buildURL("problem.saveSolution", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"name":      []string{name},
+		"file":      []string{data},
+		"tag":       []string{string(tag)},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
