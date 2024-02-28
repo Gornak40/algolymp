@@ -1,5 +1,5 @@
 # algolymp
-*A collection of useful CLI tools for managing Polygon and Ejudge.*
+*Awesome collection of useful CLI tools for managing Polygon and Ejudge.*
 
 ## Workflow
 
@@ -15,6 +15,8 @@
 | [wooda](#wooda) | glob problem files upload | | 🦍 | 🧑‍💻 |
 | ⚙️ | move json config to ini | | | 🧑‍💻 |
 | 👻 | list/commit problems | | 🦍 | 🤔 |
+| 👻 | set good random group scores | | 🦍 | 🤔 |
+| 👻 | algolymp config manager | | | 🤔 |
 | 👻 | download/upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
@@ -281,17 +283,24 @@ valeria -i 318882 | bat -l tex
 
 Match all files in directory with glob pattern. Upload recognized files to Polygon.
 
-Supported modes:
+#### Supported modes
 
-- `test`
-- `tags`
+- `t` - test
+- `tags` - tags (each tag is on a new line)
+- `v` - validator
+- `c` - checker
+- `i` - interactor
+- `ma` - main solution
+- `ok` - correct solution
+- `rj` - incorrect solution
+- `s` - sample
 
 ### Flags
 - `-i` - problem id (required)
 - `-m` - uploading mode (required)
 - `-g` - problem files glob (required)
 
-You should know your shell and probably pass `-g "<glob>"`, not `-g <glob>`
+You should know your shell and probably use `-g "<glob>"`, not `-g <glob>`
 
 ### Config
 - `polygon.url`
@@ -302,8 +311,15 @@ You should know your shell and probably pass `-g "<glob>"`, not `-g <glob>`
 
 ```bash
 wooda --help
-wooda -i 337320 -m test -g "tests/*[^.a]"
+wooda -i 337320 -m t -g "tests/*[^.a]" # exclude output
 wooda -i 337320 -m tags -g tags
+wooda -i 337320 -m v -g files/val*.cpp
+wooda -i 337320 -m c -g check.cpp
+wooda -i 337320 -m i -g interactor.cpp
+wooda -i 337320 -m ma -g solutions/main.cpp # Main solution
+wooda -i 337320 -m ok -g solutions/sol_apachee.cpp # OK solution
+wooda -i 337320 -m rj -g solutions/brute.py # TL solution
+wooda -i 337320 -m s -g "statements/russian/example.[0-9][0-9]"
 ```
 
 ![wooda logo](https://algolymp.ru/static/img/wooda.png)

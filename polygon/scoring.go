@@ -118,7 +118,8 @@ func (p *Polygon) InformaticsValuer(pID int, verbose bool) error {
 	if verbose {
 		logrus.Info("valuer.cfg\n" + valuer)
 	}
-	if err := p.SaveResource(pID, "valuer.cfg", valuer); err != nil {
+	fr := NewFileRequest(pID, TypeResource, "valuer.cfg", valuer)
+	if err := p.SaveFile(fr); err != nil {
 		return err
 	}
 
