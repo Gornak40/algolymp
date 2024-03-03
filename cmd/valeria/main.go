@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/Gornak40/algolymp/config"
 	"github.com/Gornak40/algolymp/polygon"
+	"github.com/Gornak40/algolymp/polygon/valeria"
 	"github.com/akamensky/argparse"
 	"github.com/sirupsen/logrus"
 )
@@ -25,8 +27,12 @@ func main() {
 
 	cfg := config.NewConfig()
 	pClient := polygon.NewPolygon(&cfg.Polygon)
+	val := valeria.NewValeria(pClient)
 
-	if err := pClient.InformaticsValuer(*pID, *verbose); err != nil {
+	table := valeria.UniversalTable{}
+	if err := val.InformaticsValuer(*pID, &table, *verbose); err != nil {
 		logrus.WithError(err).Fatal("failed get scoring")
 	}
+
+	fmt.Println(table.String()) //nolint:forbidigo // Basic functionality.
 }
