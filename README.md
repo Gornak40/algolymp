@@ -16,6 +16,7 @@
 | ⚙️ | move json config to ini | | | 🧑‍💻 |
 | 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
+| 👻 | generate hasher solution for `.a` | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
 | 👻 | download/upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
