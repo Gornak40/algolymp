@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Gornak40/algolymp/polygon"
+	"github.com/Gornak40/algolymp/polygon/valeria/textables"
 	"github.com/sirupsen/logrus"
 )
 
@@ -22,20 +23,6 @@ func NewValeria(client *polygon.Polygon) *Valeria {
 	return &Valeria{
 		client: client,
 	}
-}
-
-type groupInfo struct {
-	group        string
-	score        int
-	dependencies []string
-}
-
-type TexTable interface {
-	addGroup0(info groupInfo)
-	addGroup(info groupInfo)
-	addLastGroup(info groupInfo)
-
-	String() string
 }
 
 type scoring struct {
@@ -94,25 +81,25 @@ func (s *scoring) buildValuer() string {
 	return strings.Join(res, "\n")
 }
 
-func (s *scoring) buildScoring(table TexTable) {
+func (s *scoring) buildScoring(table textables.Table) {
 	for index, group := range s.groups {
-		info := groupInfo{
-			group:        group,
-			score:        s.score[group],
-			dependencies: s.dependencies[group],
+		info := textables.GroupInfo{
+			Group:        group,
+			Score:        s.score[group],
+			Dependencies: s.dependencies[group],
 		}
 		switch index {
 		case 0:
-			table.addGroup0(info)
+			table.AddGroup0(info)
 		case len(s.groups) - 1:
-			table.addLastGroup(info)
+			table.AddLastGroup(info)
 		default:
-			table.addGroup(info)
+			table.AddGroup(info)
 		}
 	}
 }
 
-func (v *Valeria) InformaticsValuer(pID int, table TexTable, verbose bool) error {
+func (v *Valeria) InformaticsValuer(pID int, table textables.Table, verbose bool) error {
 	groups, err := v.client.GetGroups(pID)
 	if err != nil {
 		return err

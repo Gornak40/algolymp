@@ -1,8 +1,12 @@
-package valeria
+package textables
 
 import (
 	"fmt"
 	"strings"
+)
+
+const (
+	UniversalTag = "universal"
 )
 
 // Works both in HTML and PDF render.
@@ -10,27 +14,27 @@ type UniversalTable struct {
 	groups []string
 }
 
-var _ TexTable = &UniversalTable{}
+var _ Table = &UniversalTable{}
 
-func (t *UniversalTable) addGroupRow(info groupInfo, comment string) {
+func (t *UniversalTable) addGroupRow(info GroupInfo, comment string) {
 	row := fmt.Sprintf("%s & %d & %s & %s \\\\ \\hline",
-		info.group,
-		info.score,
+		info.Group,
+		info.Score,
 		comment,
-		strings.Join(info.dependencies, ", "),
+		strings.Join(info.Dependencies, ", "),
 	)
 	t.groups = append(t.groups, row)
 }
 
-func (t *UniversalTable) addGroup0(info groupInfo) {
+func (t *UniversalTable) AddGroup0(info GroupInfo) {
 	t.addGroupRow(info, "тесты из условия")
 }
 
-func (t *UniversalTable) addGroup(info groupInfo) {
+func (t *UniversalTable) AddGroup(info GroupInfo) {
 	t.addGroupRow(info, "")
 }
 
-func (t *UniversalTable) addLastGroup(info groupInfo) {
+func (t *UniversalTable) AddLastGroup(info GroupInfo) {
 	t.addGroupRow(info, "---")
 }
 
