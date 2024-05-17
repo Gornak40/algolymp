@@ -289,3 +289,14 @@ func (ej *Ejudge) MakeVisible(sid string, cid int) error {
 
 	return err
 }
+
+func (ej *Ejudge) RegisterUser(csid, login string) error {
+	logrus.WithFields(logrus.Fields{"CSID": csid, "login": login}).Info("register user")
+	_, _, err := ej.postRequest("new-master", url.Values{
+		"SID":       {csid},
+		"action":    {"20"},
+		"add_login": {login},
+	})
+
+	return err
+}
