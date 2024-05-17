@@ -5,6 +5,7 @@
 
 | Tool | Description | Ejudge | Polygon | Status |
 | --- | --- | :---: | :---: | :---: |
+| [baron](#baron) | register users to contest | 🦍 | | ✅ |
 | [blanka](#blanka) | create contest | 🦍 | | ✅ |
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
@@ -59,6 +60,32 @@ Put your config file in `~/.config/algolymp/config.json`.
 	}
 }
 ```
+
+## baron
+*Register users to Ejudge contest (Pending status).*
+
+### About
+
+Read user logins from `stdin` and register them to Ejudge contest.
+
+Don't forget to set `OK` status manually!
+
+### Flags
+- `-i` - contest id (required)
+
+### Config
+- `ejudge.url`
+- `ejudge.login`
+- `ejudge.password`
+
+### Examples
+```bash
+baron --help
+baron -i 48501 # read from stdin
+cat users.csv | baron -i 48600 # read from file
+```
+
+![baron logo](https://algolymp.ru/static/img/baron.png)
 
 ## blanka
 *Create Ejuge contest from template.*
