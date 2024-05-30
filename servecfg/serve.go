@@ -127,6 +127,7 @@ Example queries:
 	@problem.ignore_prev_ac
 	@problem:1.time_limit
 	@problem.use_ac_not_ok,ignore_prev_ac
+	@problem:3;4;5.time_limit,id
 */
 func (c *Config) Query(queries ...string) []Field {
 	var result []Field
@@ -135,7 +136,7 @@ func (c *Config) Query(queries ...string) []Field {
 		var pattern struct {
 			keys       []string
 			section    string
-			sectionIdx int
+			sectionIDs []int
 		}
 		if s := regexp.MustCompile(`\.[\w,]+$`).FindString(query); s != "" {
 			pattern.keys = strings.Split(s[1:], ",")
@@ -143,14 +144,18 @@ func (c *Config) Query(queries ...string) []Field {
 		if s := regexp.MustCompile(`^@\w+`).FindString(query); s != "" {
 			pattern.section = s[1:]
 		}
-		if s := regexp.MustCompile(`:\d+`).FindString(query); s != "" {
-			pattern.sectionIdx, _ = strconv.Atoi(s[1:])
+		if s := regexp.MustCompile(`:[\d,]+`).FindString(query); s != "" {
+			for _, sn := range strings.Split(s[1:], ",") {
+				if idx, err := strconv.Atoi(sn); err == nil {
+					pattern.sectionIDs = append(pattern.sectionIDs, idx)
+				}
+			}
 		}
 
 		logrus.WithFields(logrus.Fields{
 			"fields":     pattern.keys,
 			"section":    pattern.section,
-			"sectionIdx": pattern.sectionIdx,
+			"sectionIds": pattern.sectionIDs,
 		}).Infof("parse query \"%s\"", query)
 		for _, field := range c.Fields {
 			if len(pattern.keys) != 0 && !slices.Contains(pattern.keys, field.Key) {
@@ -159,7 +164,7 @@ func (c *Config) Query(queries ...string) []Field {
 			if pattern.section != field.Section {
 				continue
 			}
-			if pattern.sectionIdx != 0 && field.SectionIdx != pattern.sectionIdx {
+			if len(pattern.sectionIDs) != 0 && !slices.Contains(pattern.sectionIDs, field.SectionIdx) {
 				continue
 			}
 			result = append(result, field)
