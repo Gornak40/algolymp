@@ -14,6 +14,7 @@
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | 🧑‍💻 |
 | ⚙️ | move json config to ini | | | 🧑‍💻 |
+| 👻 | jq alternative for serve.cfg | 🦍 | | 🤔 |
 | 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | generate hasher solution for `.a` | | 🦍 | 🤔 |
@@ -259,6 +260,8 @@ Thanks to Mike, it's been working fast since 30.01.2024.
 ### Flags
 - `-i` - problem id (required)
 - `-v` - print valuer.cfg in stderr
+- `-t` - textable type (universal | moscow, default: universal)
+- `-c` - depvars count, useful for some textables (default: 0)
 
 ### Config
 - `polygon.url`
@@ -271,6 +274,7 @@ valeria --help
 valeria -i 288808 -v
 valeria -i 318511 > scoring.tex
 valeria -i 318882 | bat -l tex
+valeria -i 285375 -t moscow
 ```
 
 ![valeria logo](https://algolymp.ru/static/img/valeria.png)

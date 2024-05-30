@@ -13,6 +13,11 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	universalTag = "universal"
+	moscowTag    = "moscow"
+)
+
 var (
 	ErrUnknownTexTable = errors.New("unknown textable")
 )
@@ -27,12 +32,13 @@ func main() {
 		Required: false,
 		Help:     "Print valuer.cfg in stderr",
 	})
-	tableTyp := parser.Selector("t", "table-type", []string{
-		textables.UniversalTag,
+	tableTyp := parser.Selector("t", "textable-type", []string{
+		universalTag,
+		moscowTag,
 	}, &argparse.Options{
 		Required: false,
-		Default:  textables.UniversalTag,
-		Help:     "Tex table type",
+		Default:  universalTag,
+		Help:     "Textable type",
 	})
 	cntVars := parser.Int("c", "count-depvars", &argparse.Options{
 		Required: false,
@@ -47,7 +53,14 @@ func main() {
 	pClient := polygon.NewPolygon(&cfg.Polygon)
 	val := valeria.NewValeria(pClient)
 
-	table := textables.GetTexTable(*tableTyp, *cntVars)
+	logrus.WithFields(logrus.Fields{"type": *tableTyp, "vars": *cntVars}).Info("select textable")
+	var table textables.Table
+	switch *tableTyp {
+	case universalTag:
+		table = new(textables.UniversalTable)
+	case moscowTag:
+		table = textables.NewMoscowTable(*cntVars)
+	}
 	if table == nil {
 		logrus.WithError(ErrUnknownTexTable).Fatal("failed to get textable")
 	}

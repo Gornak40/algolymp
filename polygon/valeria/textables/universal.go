@@ -5,10 +5,6 @@ import (
 	"strings"
 )
 
-const (
-	UniversalTag = "universal"
-)
-
 // Works both in HTML and PDF render.
 type UniversalTable struct {
 	groups []string
@@ -16,26 +12,22 @@ type UniversalTable struct {
 
 var _ Table = &UniversalTable{}
 
-func (t *UniversalTable) addGroupRow(info GroupInfo, comment string) {
+func (t *UniversalTable) AddGroup(info GroupInfo) {
+	var limits string
+	switch info.Type {
+	case Group0:
+		limits = "тесты из условия"
+	case GroupLast:
+		limits = "---"
+	case GroupRegular:
+	}
 	row := fmt.Sprintf("%s & %d & %s & %s \\\\ \\hline",
-		info.Group,
+		info.Name,
 		info.Score,
-		comment,
+		limits,
 		strings.Join(info.Dependencies, ", "),
 	)
 	t.groups = append(t.groups, row)
-}
-
-func (t *UniversalTable) AddGroup0(info GroupInfo) {
-	t.addGroupRow(info, "тесты из условия")
-}
-
-func (t *UniversalTable) AddGroup(info GroupInfo) {
-	t.addGroupRow(info, "")
-}
-
-func (t *UniversalTable) AddLastGroup(info GroupInfo) {
-	t.addGroupRow(info, "---")
 }
 
 func (t *UniversalTable) String() string {

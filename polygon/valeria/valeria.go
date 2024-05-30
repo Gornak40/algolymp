@@ -43,7 +43,7 @@ func newScoring(tests []polygon.TestAnswer, groups []polygon.GroupAnswer) (*scor
 		dependencies: map[string][]string{},
 	}
 	for _, test := range tests {
-		scorer.score[test.Group] += int(test.Points) // TODO: ensure ejudge doesn't support float points
+		scorer.score[test.Group] += int(test.Points)
 		scorer.count[test.Group]++
 		if val, ok := scorer.first[test.Group]; !ok || val > test.Index {
 			scorer.first[test.Group] = test.Index
@@ -82,20 +82,21 @@ func (s *scoring) buildValuer() string {
 }
 
 func (s *scoring) buildScoring(table textables.Table) {
-	for index, group := range s.groups {
+	for index, groupName := range s.groups {
 		info := textables.GroupInfo{
-			Group:        group,
-			Score:        s.score[group],
-			Dependencies: s.dependencies[group],
+			Name:         groupName,
+			Score:        s.score[groupName],
+			Dependencies: s.dependencies[groupName],
 		}
 		switch index {
 		case 0:
-			table.AddGroup0(info)
+			info.Type = textables.Group0
 		case len(s.groups) - 1:
-			table.AddLastGroup(info)
+			info.Type = textables.GroupLast
 		default:
-			table.AddGroup(info)
+			info.Type = textables.GroupRegular
 		}
+		table.AddGroup(info)
 	}
 }
 
