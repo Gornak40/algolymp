@@ -46,6 +46,7 @@ func main() {
 		for _, match := range matches {
 			fmt.Println(match.String()) //nolint:forbidigo // Basic functionality.
 		}
+
 		return
 	}
 
