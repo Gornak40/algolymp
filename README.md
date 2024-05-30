@@ -15,8 +15,10 @@
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | 🧑‍💻 |
 | ⚙️ | move json config to ini | | | 🧑‍💻 |
+| 👻 | jq alternative for serve.cfg | 🦍 | | 🤔 |
 | 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
+| 👻 | generate hasher solution for `.a` | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
 | 👻 | download/upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
@@ -270,21 +272,28 @@ scalp -i 330328 -s
 ![scalp logo](https://algolymp.ru/static/img/scalp.png)
 
 ## valeria
-*Build valuer + scorer using Polygon API.*
+*Build valuer + textable using Polygon API.*
 
 ### About
 
 1. Get problem tests and groups;
 2. Build and commit `valuer.cfg` (in Ejudge format);
-3. Build and print `scoring.tex` (in Moscow summer olympiad school format).
+3. Build and print `scoring.tex`.
 
 ~~Not very fast now, waiting for `absentInput` parameter in Polygon API.~~
 
 Thanks to Mike, it's been working fast since 30.01.2024.
 
+Valeria supports several textable types.
+
+- `universal` - Moscow summer olympiad school format. Works both in PDF and HTML.
+- `moscow` - Moscow olympiads format. Works both in PDF and HTML if no variables are passed, otherwise works only in PDF.
+
 ### Flags
 - `-i` - problem id (required)
 - `-v` - print valuer.cfg in stderr
+- `-t` - textable type (universal | moscow, default: universal)
+- `-c` - variables list, useful for some textables (default: nil)
 
 ### Config
 - `polygon.url`
@@ -297,6 +306,8 @@ valeria --help
 valeria -i 288808 -v
 valeria -i 318511 > scoring.tex
 valeria -i 318882 | bat -l tex
+valeria -i 285375 -t moscow
+valeria -i 285375 -t moscow -c n -c m -c k
 ```
 
 ![valeria logo](https://algolymp.ru/static/img/valeria.png)

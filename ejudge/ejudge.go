@@ -22,7 +22,7 @@ var (
 	ErrUnknownVerdict = errors.New("unknown verdict")
 )
 
-//nolint:gochecknoglobals,gomnd // ejudge constants
+//nolint:gochecknoglobals,mnd // ejudge constants
 var Verdicts = map[string]int{
 	"OK":      0,
 	"IG":      9,
