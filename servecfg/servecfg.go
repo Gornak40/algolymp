@@ -174,7 +174,7 @@ func (c *Config) Query(queries ...string) []Field {
 	return result
 }
 
-func (c *Config) Set(value string, matched ...Field) *Config {
+func (c *Config) Update(value string, matched ...Field) *Config {
 	mapa := make(map[Field]struct{})
 	for _, f := range matched {
 		mapa[f] = struct{}{}

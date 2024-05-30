@@ -39,9 +39,9 @@ func main() {
 
 	switch {
 	case *delFlag:
-		cfg.Set(servecfg.Deleter, matches...)
+		cfg.Update(servecfg.Deleter, matches...)
 	case *newVal != "":
-		cfg.Set(*newVal, matches...)
+		cfg.Update(*newVal, matches...)
 	default:
 		for _, match := range matches {
 			fmt.Println(match.String()) //nolint:forbidigo // Basic functionality.
