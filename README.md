@@ -10,12 +10,12 @@
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
+| [fara](#fara) | jq alternative for serve.cfg | 🦍 | | 🧑‍💻 |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | 🧑‍💻 |
 | ⚙️ | move json config to ini | | | 🧑‍💻 |
-| 👻 | jq alternative for serve.cfg | 🦍 | | 🤔 |
 | 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | generate hasher solution for `.a` | | 🦍 | 🤔 |
