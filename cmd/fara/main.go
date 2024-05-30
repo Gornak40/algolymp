@@ -21,9 +21,9 @@ func main() {
 		Required: true,
 		Help:     "Field queries in fara format",
 	})
-	newVal := parser.String("w", "write", &argparse.Options{
+	newVal := parser.String("u", "update", &argparse.Options{
 		Required: false,
-		Help:     "New value for selected fields",
+		Help:     "New value for existing selected fields",
 	})
 	delFlag := parser.Flag("d", "delete", &argparse.Options{
 		Required: false,

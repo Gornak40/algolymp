@@ -10,7 +10,7 @@
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
-| [fara](#fara) | jq alternative for serve.cfg | 🦍 | | 🧑‍💻 |
+| [fara](#fara) | serve.cfg explorer | 🦍 | | 🧑‍💻 |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
@@ -207,6 +207,46 @@ ejik -i 40507
 ```
 
 ![ejik logo](https://algolymp.ru/static/img/ejik.png)
+
+## fara
+*Explorer for serve.cfg with mass modify.*
+
+### About
+
+Fara provides custom select language for `serve.cfg`.
+
+Queries must follow the following structure:
+
+- `.<field>` for the root section;
+- `@<section>:<id>.<field>` for any other section.
+
+The `<field>` parameter is the name of a configuration variable, such as `contest_time` in the global section or `time_limit` in the problem section.
+
+The `<section>` parameter is the name of a section, such as `problem` or `language`.
+
+The `<id>` parameter is the index (starting from 1) of the object in the specified section, e.g. `1` for the first problem or `3` for the third `language`.
+
+Parameters `<field>` and `<id>` are optional. You can also pass multiple fields or ids, separating them with commas.
+
+If you use do not pass `-d`, `-s` or `-u` flags, fara will output the selected fields. Otherwise it will change them and output the resulting `serve.cfg`.
+
+### Flags
+- `-q` - select query (required)
+- `-d` - delete selected fields
+- `-u` - update selected fields, delete if `-` passed
+
+### Config
+
+Configuration variables are not needed.
+
+### Examples
+
+```bash
+fara -f /home/judges/048025/conf/serve.cfg -q .score_system,virtual,contest_time
+fara -f /home/judges/048025/conf/serve.cfg -q @problem.id,short_name,long_name
+fara -f /home/judges/049013/conf/serve.cfg -q @problem.use_stdin,use_stdout -d
+fara -f /home/judges/050016/conf/serve.cfg -q @language:2 -d | fara -q @problem:3,4.time_limit -u 15 | bat -l ini
+```
 
 ## ripper
 *Change Ejudge runs status.*
