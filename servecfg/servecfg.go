@@ -174,13 +174,61 @@ func (c *Config) Query(queries ...string) []Field {
 	return result
 }
 
-func (c *Config) Update(value string, matched ...Field) *Config {
+func getMatchedMapa(matched []Field) map[Field]struct{} {
 	mapa := make(map[Field]struct{})
 	for _, f := range matched {
 		mapa[f] = struct{}{}
 	}
 
-	nwFields := make([]Field, 0, len(c.Fields))
+	return mapa
+}
+
+type sectionMatch struct {
+	name string
+	idx  int
+}
+
+func (c *Config) Set(key, value string, matched []Field) *Config {
+	mapa := getMatchedMapa(matched)
+	secMapa := make(map[sectionMatch]struct{})
+	for f := range mapa {
+		secMapa[sectionMatch{f.Section, f.SectionIdx}] = struct{}{}
+	}
+
+	nwf := make([]Field, 0, len(c.Fields))
+	for i, f := range c.Fields {
+		sec := sectionMatch{f.Section, f.SectionIdx}
+		if _, ok := secMapa[sec]; !ok {
+			nwf = append(nwf, f)
+
+			continue
+		}
+		if f.Key == key {
+			delete(secMapa, sec)
+			f.Value = value
+			nwf = append(nwf, f)
+
+			continue
+		}
+		nwf = append(nwf, f)
+		if i+1 == len(c.Fields) || c.Fields[i+1].Section != f.Section || c.Fields[i+1].SectionIdx != f.SectionIdx {
+			nwf = append(nwf, Field{
+				Key:        key,
+				Value:      value,
+				Section:    f.Section,
+				SectionIdx: f.SectionIdx,
+			})
+		}
+	}
+
+	c.Fields = nwf
+
+	return c
+}
+
+func (c *Config) Update(value string, matched []Field) *Config {
+	mapa := getMatchedMapa(matched)
+	nwf := make([]Field, 0, len(c.Fields))
 	for _, field := range c.Fields {
 		if _, ok := mapa[field]; !ok {
 			goto writeField
@@ -190,9 +238,10 @@ func (c *Config) Update(value string, matched ...Field) *Config {
 		}
 		field.Value = value
 	writeField:
-		nwFields = append(nwFields, field)
+		nwf = append(nwf, field)
 	}
-	c.Fields = nwFields
+
+	c.Fields = nwf
 
 	return c
 }

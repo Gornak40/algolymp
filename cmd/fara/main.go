@@ -25,6 +25,10 @@ func main() {
 		Required: false,
 		Help:     "New value for existing selected fields",
 	})
+	setField := parser.String("s", "set-field", &argparse.Options{
+		Required: false,
+		Help:     "New/overwrite field for selected fields sections",
+	})
 	delFlag := parser.Flag("d", "delete", &argparse.Options{
 		Required: false,
 		Help:     "Delete selected fields",
@@ -39,9 +43,11 @@ func main() {
 
 	switch {
 	case *delFlag:
-		cfg.Update(servecfg.Deleter, matches...)
+		cfg.Update(servecfg.Deleter, matches)
+	case *setField != "":
+		cfg.Set(*setField, *newVal, matches)
 	case *newVal != "":
-		cfg.Update(*newVal, matches...)
+		cfg.Update(*newVal, matches)
 	default:
 		for _, match := range matches {
 			fmt.Println(match.String()) //nolint:forbidigo // Basic functionality.
