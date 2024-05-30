@@ -23,7 +23,7 @@ var (
 )
 
 func main() {
-	parser := argparse.NewParser("valeria", "Build valuer + scorer using Polygon API.")
+	parser := argparse.NewParser("valeria", "Build valuer + textable using Polygon API.")
 	pID := parser.Int("i", "problem_id", &argparse.Options{
 		Required: true,
 		Help:     "Polygon problem ID",
@@ -40,10 +40,10 @@ func main() {
 		Default:  universalTag,
 		Help:     "Textable type",
 	})
-	cntVars := parser.Int("c", "count-depvars", &argparse.Options{
+	vars := parser.StringList("c", "variable", &argparse.Options{
 		Required: false,
-		Default:  0,
-		Help:     "Depvars count (useful for some textables)",
+		Default:  nil,
+		Help:     "Variables list (useful for some textables)",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
@@ -53,13 +53,13 @@ func main() {
 	pClient := polygon.NewPolygon(&cfg.Polygon)
 	val := valeria.NewValeria(pClient)
 
-	logrus.WithFields(logrus.Fields{"type": *tableTyp, "vars": *cntVars}).Info("select textable")
+	logrus.WithFields(logrus.Fields{"type": *tableTyp, "vars": *vars}).Info("select textable")
 	var table textables.Table
 	switch *tableTyp {
 	case universalTag:
 		table = new(textables.UniversalTable)
 	case moscowTag:
-		table = textables.NewMoscowTable(*cntVars)
+		table = textables.NewMoscowTable(*vars)
 	}
 	if table == nil {
 		logrus.WithError(ErrUnknownTexTable).Fatal("failed to get textable")
