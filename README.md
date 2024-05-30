@@ -234,6 +234,7 @@ If you use do not pass `-d`, `-s` or `-u` flags, fara will output the selected f
 - `-q` - select query (required)
 - `-d` - delete selected fields
 - `-u` - update selected fields, delete if `-` passed
+- `-s` - field to init/overwrite with `-u` value in selected objects
 
 ### Config
 
@@ -246,6 +247,7 @@ fara -f /home/judges/048025/conf/serve.cfg -q .score_system,virtual,contest_time
 fara -f /home/judges/048025/conf/serve.cfg -q @problem.id,short_name,long_name
 fara -f /home/judges/049013/conf/serve.cfg -q @problem.use_stdin,use_stdout -d
 fara -f /home/judges/050016/conf/serve.cfg -q @language:2 -d | fara -q @problem:3,4.time_limit -u 15 | bat -l ini
+fara -f /home/judges/051009/conf/serve.cfg -q @problem:1,4,6 -s use_ac_not_ok | fara -q @problem:1,4,6 -s ignore_prev_ac > /home/judges/051009/conf/serve.cfg
 ```
 
 ## ripper
