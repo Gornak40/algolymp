@@ -228,10 +228,10 @@ The `<id>` parameter is the index (starting from 1) of the object in the specifi
 
 Parameters `<field>` and `<id>` are optional. You can also pass multiple fields or ids, separating them with commas.
 
-If you use do not pass `-d`, `-s` or `-u` flags, fara will output the selected fields. Otherwise it will change them and output the resulting `serve.cfg`.
+If you do not pass `-d`, `-s` or `-u` flags, fara will output the selected fields. Otherwise it will change them and output the resulting `serve.cfg`.
 
 ### Flags
-- `-q` - select query (required)
+- `-q` - select queries (required)
 - `-d` - delete selected fields
 - `-u` - update selected fields, delete if `-` passed
 - `-s` - field to init/overwrite with `-u` value in selected objects
@@ -248,7 +248,10 @@ fara -f /home/judges/048025/conf/serve.cfg -q @problem.id,short_name,long_name
 fara -f /home/judges/049013/conf/serve.cfg -q @problem.use_stdin,use_stdout -d
 fara -f /home/judges/050016/conf/serve.cfg -q @language:2 -d | fara -q @problem:3,4.time_limit -u 15 | bat -l ini
 fara -f /home/judges/051009/conf/serve.cfg -q @problem:1,4,6 -s use_ac_not_ok | fara -q @problem:1,4,6 -s ignore_prev_ac > /home/judges/051009/conf/serve.cfg
+fara -f serve.cfg -q @problem.id && fara -f serve.cfg -q @problem.id -s max_vm_size -u 512M | fara -q @problem.id -s max_stack_size -u 512M > serve.cfg
 ```
+
+![fara logo](https://algolymp.ru/static/img/fara.png)
 
 ## ripper
 *Change Ejudge runs status.*
