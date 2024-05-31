@@ -10,7 +10,7 @@
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
-| [fara](#fara) | serve.cfg explorer | 🦍 | | 🧑‍💻 |
+| [fara](#fara) | powerful serve.cfg explorer | 🦍 | | 🧑‍💻 |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
@@ -213,7 +213,7 @@ ejik -i 40507
 
 ### About
 
-Fara provides custom select language for `serve.cfg`.
+Fara provides a custom selection language for `serve.cfg`.
 
 Queries must follow the following structure:
 
@@ -224,11 +224,18 @@ The `<field>` parameter is the name of a configuration variable, such as `contes
 
 The `<section>` parameter is the name of a section, such as `problem` or `language`.
 
-The `<id>` parameter is the index (starting from 1) of the object in the specified section, e.g. `1` for the first problem or `3` for the third `language`.
+The `<id>` parameter is the index (starting from 1) of the object in the specified section, e.g. `1` for the first `problem` or `3` for the third `language`.
 
 Parameters `<field>` and `<id>` are optional. You can also pass multiple fields or ids, separating them with commas.
 
 If you do not pass `-d`, `-s` or `-u` flags, fara will output the selected fields. Otherwise it will change them and output the resulting `serve.cfg`.
+
+Some tips for you:
+- Use `-q` **or** `-q` and `-d` **or** `-q` and `-u` **or** `-q` and `-s` **or** `-q` and `-u` and `-s`;
+- Select sections in `-s` mode, selecting fields may end up with strange result;
+- Check the selected fields with `-q` before changing them;
+- Check out the examples to learn how best to use this tool.
+
 
 ### Flags
 - `-q` - select queries (required)
@@ -238,7 +245,7 @@ If you do not pass `-d`, `-s` or `-u` flags, fara will output the selected field
 
 ### Config
 
-Configuration variables are not needed.
+No config needed.
 
 ### Examples
 

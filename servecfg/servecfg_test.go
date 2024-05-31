@@ -129,3 +129,66 @@ func TestSection(t *testing.T) {
 		{Key: "time_limit", Value: "3", Section: "problem", SectionIdx: 3},
 	}, cfg.Query("@problem:1,3.time_limit,use_stdin,contest_time"))
 }
+
+// TODO: add unit tests for Update, Set and Delete.
+func TestE2E(t *testing.T) {
+	t.Parallel()
+	cfg := servecfg.New(strings.NewReader(config1))
+
+	qu := cfg.Query("@problem.use_stdout")
+	cfg.Update("1", qu)
+
+	qu = cfg.Query("@language")
+	cfg.Update(servecfg.Deleter, qu)
+
+	qu = cfg.Query(".score_system")
+	cfg.Update("kirov", qu)
+
+	qu = cfg.Query(".virtual")
+	cfg.Update(servecfg.Deleter, qu)
+
+	qu = cfg.Query("@problem:1,2.max_vm_size")
+	cfg.Set("max_vm_size", "512M", qu)
+
+	qu = cfg.Query("@problem:2")
+	cfg.Set("long_name", `"gorilla-and-horror-tree"`, qu)
+
+	qu = cfg.Query("@problem", "@problem:2")
+	cfg.Set("use_stdin", "", qu)
+
+	qu = cfg.Query("@problem:1,2,3,4.time_limit")
+	cfg.Update("777", qu)
+
+	qu = cfg.Query("@problem:1")
+	cfg.Set("max_vm_size", "64M", qu)
+
+	require.Equal(t, `# -*- coding: utf-8 -*-
+
+contest_time = 0
+score_system = kirov
+
+
+[problem]
+time_limit = 777
+id = 1
+use_stdin
+short_name = "A"
+use_stdout = 1
+max_vm_size = 64M
+
+[problem]
+short_name = "B"
+id = 2
+max_vm_size = 512M
+time_limit = 777
+long_name = "gorilla-and-horror-tree"
+use_stdin
+
+[problem]
+use_stdin
+id = 3
+time_limit = 777
+short_name = "C"
+use_stdout = 1
+`, cfg.String())
+}
