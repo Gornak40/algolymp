@@ -10,12 +10,12 @@
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
+| [fara](#fara) | powerful serve.cfg explorer | 🦍 | | 🧑‍💻 |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | 🧑‍💻 |
 | ⚙️ | move json config to ini | | | 🧑‍💻 |
-| 👻 | jq alternative for serve.cfg | 🦍 | | 🤔 |
 | 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | generate hasher solution for `.a` | | 🦍 | 🤔 |
@@ -207,6 +207,58 @@ ejik -i 40507
 ```
 
 ![ejik logo](https://algolymp.ru/static/img/ejik.png)
+
+## fara
+*Explorer for serve.cfg with mass modify.*
+
+### About
+
+Fara provides a custom selection language for `serve.cfg`.
+
+Queries must follow the following structure:
+
+- `.<field>` for the root section;
+- `@<section>:<id>.<field>` for any other section.
+
+The `<field>` parameter is the name of a configuration variable, such as `contest_time` in the global section or `time_limit` in the problem section.
+
+The `<section>` parameter is the name of a section, such as `problem` or `language`.
+
+The `<id>` parameter is the index (starting from 1) of the object in the specified section, e.g. `1` for the first `problem` or `3` for the third `language`.
+
+Parameters `<field>` and `<id>` are optional. You can also pass multiple fields or ids, separating them with commas.
+
+If you do not pass `-d`, `-s` or `-u` flags, fara will output the selected fields. Otherwise it will change them and output the resulting `serve.cfg`.
+
+Some tips for you:
+- Use `-q` **or** `-q` and `-d` **or** `-q` and `-u` **or** `-q` and `-s` **or** `-q` and `-u` and `-s`;
+- Select sections in `-s` mode, selecting fields may end up with strange result;
+- Check the selected fields with `-q` before changing them;
+- Check out the examples to learn how best to use this tool.
+
+
+### Flags
+- `-q` - select queries (required)
+- `-d` - delete selected fields
+- `-u` - update selected fields, delete if `-` passed
+- `-s` - field to init/overwrite with `-u` value in selected objects
+
+### Config
+
+No config needed.
+
+### Examples
+
+```bash
+fara -f /home/judges/048025/conf/serve.cfg -q .score_system,virtual,contest_time
+fara -f /home/judges/048025/conf/serve.cfg -q @problem.id,short_name,long_name
+fara -f /home/judges/049013/conf/serve.cfg -q @problem.use_stdin,use_stdout -d
+fara -f /home/judges/050016/conf/serve.cfg -q @language:2 -d | fara -q @problem:3,4.time_limit -u 15 | bat -l ini
+fara -f /home/judges/051009/conf/serve.cfg -q @problem:1,4,6 -s use_ac_not_ok | fara -q @problem:1,4,6 -s ignore_prev_ac > /home/judges/051009/conf/serve.cfg
+fara -f serve.cfg -q @problem.id && fara -f serve.cfg -q @problem.id -s max_vm_size -u 512M | fara -q @problem.id -s max_stack_size -u 512M > serve.cfg
+```
+
+![fara logo](https://algolymp.ru/static/img/fara.png)
 
 ## ripper
 *Change Ejudge runs status.*

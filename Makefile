@@ -9,14 +9,14 @@ $(TOOL_TARGETS): $(GO_FILES)
 
 $(BIN_DIR)/%: cmd/%/main.go
 	@mkdir -p $(BIN_DIR)
-	go build -o $@ $<
+	@go build -o $@ $<
 
 clean:
-	rm -f $(BIN_DIR)/*
+	@rm -f $(BIN_DIR)/*
 	@rmdir $(BIN_DIR)
 
 test:
-	echo "No tests"
+	@go test ./...
 
 lint:
-	golangci-lint run
+	@golangci-lint run
