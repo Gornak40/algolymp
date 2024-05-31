@@ -58,7 +58,7 @@ func New(reader io.Reader) *Config {
 			continue
 		}
 		if line[0] == '[' && line[len(line)-1] == ']' { // section declaration
-			section = line[1 : len(line)-1]
+			section = strings.TrimSpace(line[1 : len(line)-1])
 			counter[section]++
 
 			continue
