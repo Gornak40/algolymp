@@ -1,6 +1,9 @@
 package main
 
 import (
+	"errors"
+	"fmt"
+	"io"
 	"os"
 
 	"github.com/Gornak40/algolymp/config"
@@ -9,15 +12,16 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	makeInvisible = "hide"
+	makeVisible   = "show"
+)
+
 func main() {
-	parser := argparse.NewParser("casper", "Change Ejudge contest visibility.")
-	cID := parser.Int("i", "cid", &argparse.Options{
+	parser := argparse.NewParser("casper", "Change Ejudge contests visibility (stdin input).")
+	mode := parser.Selector("m", "mode", []string{makeInvisible, makeVisible}, &argparse.Options{
 		Required: true,
-		Help:     "Ejudge contest ID",
-	})
-	visible := parser.Flag("s", "show", &argparse.Options{
-		Required: false,
-		Help:     "Make contest visible (invisible if flag is not set)",
+		Help:     "Invisible or visible",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
@@ -31,14 +35,26 @@ func main() {
 		logrus.WithError(err).Fatal("login failed")
 	}
 
-	if *visible {
-		err = ejClient.MakeVisible(sid, *cID)
-	} else {
-		err = ejClient.MakeInvisible(sid, *cID)
+	var casperFunc func(string, int) error
+	switch *mode {
+	case makeVisible:
+		casperFunc = ejClient.MakeVisible
+	case makeInvisible:
+		casperFunc = ejClient.MakeInvisible
+	default:
+		logrus.WithField("mode", *mode).Fatal("unknown mode")
 	}
 
-	if err != nil {
-		logrus.WithError(err).Fatal("change visible status failed")
+	logrus.Info("waiting for contest ids input...")
+	for {
+		var cid int
+		_, err := fmt.Scan(&cid)
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err := casperFunc(sid, cid); err != nil {
+			logrus.WithError(err).Fatal("change visible status failed")
+		}
 	}
 
 	if err := ejClient.Logout(sid); err != nil {
