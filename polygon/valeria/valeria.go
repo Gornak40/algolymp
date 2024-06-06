@@ -11,8 +11,9 @@ import (
 )
 
 var (
-	ErrNoTestScore   = errors.New("test_score is not supported yet")
-	ErrBadTestsOrder = errors.New("bad tests order, fix in polygon required")
+	ErrUnknownPointsPolicy = errors.New("unknown points policy")
+	ErrMissedGroup         = errors.New("missed group, no tests")
+	ErrBadTestScore        = errors.New("different test_score in one group")
 )
 
 type Valeria struct {
@@ -25,42 +26,77 @@ func NewValeria(client *polygon.Polygon) *Valeria {
 	}
 }
 
+type pointsPolicy int
+
+const (
+	policyCompleteGroup pointsPolicy = iota
+	policyEachTest
+)
+
+type group struct {
+	name         string
+	score        int
+	count        int
+	policy       pointsPolicy
+	firstIdx     int
+	lastIdx      int
+	minScore     int
+	maxScore     int
+	dependencies []string
+}
+
 type scoring struct {
-	score        map[string]int
-	count        map[string]int
-	first        map[string]int
-	last         map[string]int
-	dependencies map[string][]string
-	groups       []string
+	groups []group
 }
 
 func newScoring(tests []polygon.TestAnswer, groups []polygon.GroupAnswer) (*scoring, error) {
-	scorer := scoring{
-		score:        map[string]int{},
-		count:        map[string]int{},
-		first:        map[string]int{},
-		last:         map[string]int{},
-		dependencies: map[string][]string{},
-	}
+	grMapa := make(map[string]group)
 	for _, test := range tests {
-		scorer.score[test.Group] += int(test.Points)
-		scorer.count[test.Group]++
-		if val, ok := scorer.first[test.Group]; !ok || val > test.Index {
-			scorer.first[test.Group] = test.Index
+		score := int(test.Points)
+		if g, ok := grMapa[test.Group]; !ok {
+			grMapa[test.Group] = group{
+				name:     test.Group,
+				score:    score,
+				count:    1,
+				firstIdx: test.Index,
+				lastIdx:  test.Index,
+				minScore: score,
+				maxScore: score,
+			}
+		} else {
+			g.score += score
+			g.count++
+			g.firstIdx = min(g.firstIdx, test.Index)
+			g.lastIdx = max(g.lastIdx, test.Index)
+			g.minScore = min(g.minScore, score)
+			g.maxScore = max(g.maxScore, score)
+			grMapa[test.Group] = g
 		}
-		if val, ok := scorer.last[test.Group]; !ok || val < test.Index {
-			scorer.last[test.Group] = test.Index
-		}
+	}
+	scorer := scoring{
+		groups: make([]group, 0, len(groups)),
 	}
 	for _, group := range groups {
-		if group.PointsPolicy != "COMPLETE_GROUP" {
-			return nil, ErrNoTestScore
+		g, ok := grMapa[group.Name]
+		if !ok {
+			return nil, fmt.Errorf("%w: group %s", ErrMissedGroup, group.Name)
 		}
-		if scorer.last[group.Name]-scorer.first[group.Name]+1 != scorer.count[group.Name] {
-			return nil, ErrBadTestsOrder
+		if g.lastIdx-g.firstIdx+1 != g.count {
+			return nil, fmt.Errorf("%w: group %s", polygon.ErrBadTestsOrder, group.Name)
 		}
-		scorer.dependencies[group.Name] = group.Dependencies
-		scorer.groups = append(scorer.groups, group.Name)
+		switch group.PointsPolicy {
+		case "COMPLETE_GROUP":
+			g.policy = policyCompleteGroup
+		case "EACH_TEST":
+			g.policy = policyEachTest
+			if g.minScore != g.maxScore {
+				return nil, fmt.Errorf("%w: group %s", ErrBadTestScore, group.Name)
+			}
+		default:
+			return nil, ErrUnknownPointsPolicy
+		}
+		g.dependencies = group.Dependencies
+		scorer.groups = append(scorer.groups, g)
 	}
 
 	return &scorer, nil
@@ -69,10 +105,16 @@ func newScoring(tests []polygon.TestAnswer, groups []polygon.GroupAnswer) (*scor
 func (s *scoring) buildValuer() string {
 	res := []string{}
 	for _, g := range s.groups {
-		cur := fmt.Sprintf("group %s {\n\ttests %d-%d;\n\tscore %d;\n",
-			g, s.first[g], s.last[g], s.score[g])
-		if len(s.dependencies[g]) != 0 {
-			cur += fmt.Sprintf("\trequires %s;\n", strings.Join(s.dependencies[g], ","))
+		cur := fmt.Sprintf("group %s {\n\ttests %d-%d;\n\t",
+			g.name, g.firstIdx, g.lastIdx)
+		switch g.policy {
+		case policyCompleteGroup:
+			cur += fmt.Sprintf("score %d;\n", g.score)
+		case policyEachTest:
+			cur += fmt.Sprintf("test_score %d;\n", g.minScore)
+		}
+		if len(g.dependencies) != 0 {
+			cur += fmt.Sprintf("\trequires %s;\n", strings.Join(g.dependencies, ","))
 		}
 		cur += "}\n"
 		res = append(res, cur)
@@ -82,11 +124,11 @@ func (s *scoring) buildValuer() string {
 }
 
 func (s *scoring) buildScoring(table textables.Table) {
-	for index, groupName := range s.groups {
+	for index, g := range s.groups {
 		info := textables.GroupInfo{
-			Name:         groupName,
-			Score:        s.score[groupName],
-			Dependencies: s.dependencies[groupName],
+			Name:         g.name,
+			Score:        g.score,
+			Dependencies: g.dependencies,
 		}
 		switch index {
 		case 0:
