@@ -13,7 +13,7 @@ import (
 var (
 	ErrUnknownPointsPolicy = errors.New("unknown points policy")
 	ErrMissedGroup         = errors.New("missed group, no tests")
-	ErrBadTestScore        = errors.New("bad test score, scores different in one group")
+	ErrBadTestScore        = errors.New("different test_score in one group")
 )
 
 type Valeria struct {
