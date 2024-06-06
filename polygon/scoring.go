@@ -12,7 +12,6 @@ const (
 
 var (
 	ErrAllTestsAreSamples = errors.New("all tests are samples, try -s flag")
-	ErrNoTestScore        = errors.New("test_score is not supported yet")
 	ErrBadTestsOrder      = errors.New("bad tests order, fix in polygon required")
 )
 
@@ -49,14 +48,15 @@ func (p *Polygon) IncrementalScoring(pID int, samples bool) error {
 	for _, test := range tests {
 		var group string
 		var points int
-		if smallCnt == 0 { //nolint:gocritic // It's smart piece of code.
+		switch {
+		case smallCnt == 0:
 			group = "2"
 			points = small + 1
-		} else if !test.UseInStatements || samples {
+		case !test.UseInStatements || samples:
 			group = "1"
 			points = small
 			smallCnt--
-		} else {
+		default:
 			group = "0"
 			points = 0
 		}
