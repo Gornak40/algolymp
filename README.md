@@ -124,7 +124,7 @@ blanka -i 51013 -t 51000 -e
 ## boban
 *Filter Ejudge runs.*
 
-### Abount
+### About
 
 Filter and print Ejudge runs ids.
 
@@ -149,18 +149,16 @@ boban -i 50014 -c 10000 2> /dev/null | wc -l
 ![boban logo](https://algolymp.ru/static/img/boban.png)
 
 ## casper
-*Change Ejudge contest visibility by id.*
+*Change Ejudge contest visibility by ids.*
 
 ### About
 
-- Make contest visible;
-- Make contest invisible.
+Read contest ids from `stdin` and make them invisible or visible.
 
-Useful with bash `for` loop at the end of the year.
+Useful with bash `seq`. Logs into Ejuge only once since `v0.14.2`.
 
 ### Flags
-- `-i` - contest id (required)
-- `-s` - make contest visible (invisible if not set)
+- `-m` - invisible or visible (required, `hide|show`)
 
 ### Config
 - `ejudge.url`
@@ -170,9 +168,9 @@ Useful with bash `for` loop at the end of the year.
 ### Examples
 ```bash
 casper --help
-casper -i 41014
-casper -i 41014 -s
-for i in {41014..41023}; do casper -i $i; done
+echo 41014 | casper -m hide
+seq 40301 40315 | casper -m show
+casper -m hide # read from stdin
 ```
 
 ![casper logo](https://algolymp.ru/static/img/casper.png)
@@ -250,6 +248,7 @@ No config needed.
 ### Examples
 
 ```bash
+fara --help
 fara -f /home/judges/048025/conf/serve.cfg -q .score_system,virtual,contest_time
 fara -f /home/judges/048025/conf/serve.cfg -q @problem.id,short_name,long_name
 fara -f /home/judges/049013/conf/serve.cfg -q @problem.use_stdin,use_stdout -d
