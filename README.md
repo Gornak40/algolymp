@@ -10,7 +10,8 @@
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
-| [fara](#fara) | powerful serve.cfg explorer | 🦍 | | 🧑‍💻 |
+| [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
+| [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
@@ -18,7 +19,6 @@
 | ⚙️ | move json config to ini | | | 🧑‍💻 |
 | 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
-| 👻 | generate hasher solution for `.a` | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
 | 👻 | download/upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
@@ -232,6 +232,7 @@ Some tips for you:
 - Use `-q` **or** `-q` and `-d` **or** `-q` and `-u` **or** `-q` and `-s` **or** `-q` and `-u` and `-s`;
 - Select sections in `-s` mode, selecting fields may end up with strange result;
 - Check the selected fields with `-q` before changing them;
+- Do not redirect fara output to the same file as input;
 - Check out the examples to learn how best to use this tool.
 
 
@@ -254,10 +255,13 @@ fara -f /home/judges/048025/conf/serve.cfg -q @problem.id,short_name,long_name
 fara -f /home/judges/049013/conf/serve.cfg -q @problem.use_stdin,use_stdout -d
 fara -f /home/judges/050016/conf/serve.cfg -q @language:2 -d | fara -q @problem:3,4.time_limit -u 15 | bat -l ini
 fara -f /home/judges/051009/conf/serve.cfg -q @problem:1,4,6 -s use_ac_not_ok | fara -q @problem:1,4,6 -s ignore_prev_ac > /home/judges/051009/conf/serve.cfg
-fara -f serve.cfg -q @problem.id && fara -f serve.cfg -q @problem.id -s max_vm_size -u 512M | fara -q @problem.id -s max_stack_size -u 512M > serve.cfg
+fara -f serve.cfg -q @problem.id && fara -f serve.cfg -q @problem.id -s max_vm_size -u 512M | fara -q @problem.id -s max_stack_size -u 512M > serve.cfg.new
 ```
 
 ![fara logo](https://algolymp.ru/static/img/fara.png)
+
+## pepel
+*Generate hasher solution based on a/ans/out files.*
 
 ## ripper
 *Change Ejudge runs status.*
