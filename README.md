@@ -263,6 +263,22 @@ fara -f serve.cfg -q @problem.id && fara -f serve.cfg -q @problem.id -s max_vm_s
 ## pepel
 *Generate hasher solution based on a/ans/out files.*
 
+### About
+
+Print `python` solution that outputs correct answer for each passed input file and failes on any other.
+
+Useful with Polygon to upload a problem without main correct solution.
+
+It's ready to work with any input/output files, encoding and escape sequences don't matter.
+
+Works great with [wooda](#wooda).
+
+### Flags
+- `-i` - input files glob (required)
+- `-a` - answer files glob (required)
+
+You should know your shell and probably use `-g "<glob>"`, not `-g <glob>`.
+
 ## ripper
 *Change Ejudge runs status.*
 
@@ -306,7 +322,7 @@ boban -i 48001 -f "status == PR" -c 2000 | ripper -i 48001 -s OK # smart code-re
 3. Load tests metainfo;
 4. Store incremental scoring (0 0 5 5 ... 5 6 6 ... 6) with sum of 100.
 
-Very useful for dump problems, prepared in ICPC style.
+Very useful for dumb problems, prepared in ICPC style.
 
 ### Flags
 - `-i` - problem id (required)
@@ -393,7 +409,7 @@ Match all files in directory with glob pattern. Upload recognized files to Polyg
 - `-m` - uploading mode (required)
 - `-g` - problem files glob (required)
 
-You should know your shell and probably use `-g "<glob>"`, not `-g <glob>`
+You should know your shell and probably use `-g "<glob>"`, not `-g <glob>`.
 
 ### Config
 - `polygon.url`
