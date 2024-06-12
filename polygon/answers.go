@@ -25,6 +25,18 @@ type PackageAnswer struct {
 	Type                string `json:"type"`
 }
 
+type ProblemAnswer struct {
+	ID            int    `json:"id"`
+	Owner         string `json:"owner"`
+	Name          string `json:"name"`
+	Deleted       bool   `json:"deleted"`
+	Favourite     bool   `json:"favourite"`
+	AccessType    string `json:"accessType"`
+	Revision      int    `json:"revision"`
+	LatestPackage int    `json:"latestPackage,omitempty"`
+	Modified      bool   `json:"modified"`
+}
+
 type Answer struct {
 	Status  string          `json:"status"`
 	Comment string          `json:"comment"`

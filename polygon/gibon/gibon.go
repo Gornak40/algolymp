@@ -2,6 +2,8 @@ package gibon
 
 import (
 	"errors"
+	"fmt"
+	"os"
 	"slices"
 
 	"github.com/Gornak40/algolymp/polygon"
@@ -15,8 +17,11 @@ const (
 	ModeUpdate   = "update"
 )
 
+const packageMode = 0666
+
 var (
-	ErrNoPackages = errors.New("no suitable packages")
+	ErrNoPackage     = errors.New("no suitable package")
+	ErrUnknownMethod = errors.New("unknown method")
 )
 
 type Gibon struct {
@@ -31,38 +36,52 @@ func NewGibon(client *polygon.Polygon, pID int) *Gibon {
 	}
 }
 
+func (g *Gibon) resolveDownload() error {
+	prob, err := g.client.GetProblem(g.pID) // it's for zip naming
+	if err != nil {
+		logrus.WithError(err).Fatal("failed to get problem")
+	}
+	logrus.WithFields(logrus.Fields{
+		"name": prob.Name, "owner": prob.Owner, "access": prob.AccessType,
+		"package": prob.LatestPackage, "revision": prob.Revision,
+	}).Info("problem found")
+
+	pkgs, err := g.client.GetPackages(g.pID)
+	if err != nil {
+		return err
+	}
+	idx := slices.IndexFunc(pkgs, func(p polygon.PackageAnswer) bool {
+		return p.State == "READY" && p.Type == "linux" && p.Revision == prob.Revision
+	})
+	if idx == -1 {
+		return ErrNoPackage
+	}
+	p := pkgs[idx]
+	logrus.WithFields(logrus.Fields{
+		"revision": p.Revision, "comment": p.Comment, "type": p.Type,
+	}).Info("package found")
+
+	data, err := g.client.DownloadPackage(g.pID, p.ID, p.Type)
+	if err != nil {
+		return err
+	}
+	fname := fmt.Sprintf("%s-%d-%s.zip", prob.Name, p.Revision, p.Type)
+	logrus.WithField("filename", fname).Info("save package")
+
+	return os.WriteFile(fname, data, packageMode)
+}
+
 func (g *Gibon) Resolve(method string) error {
 	switch method {
 	case ModeCommit:
-		if err := g.client.Commit(g.pID, true, ""); err != nil {
-			return err
-		}
+		return g.client.Commit(g.pID, true, "")
 	case ModeDownload:
-		pkgs, err := g.client.GetPackages(g.pID)
-		if err != nil {
-			return err
-		}
-		idx := slices.IndexFunc(pkgs, func(p polygon.PackageAnswer) bool {
-			return p.State == "READY" && p.Type == "linux"
-		})
-		if idx == -1 {
-			return ErrNoPackages
-		}
-		p := pkgs[idx]
-		logrus.WithFields(logrus.Fields{
-			"revision": p.Revision,
-			"comment":  p.Comment,
-			"type":     p.Type,
-		}).Info("package found")
+		return g.resolveDownload()
 	case ModePackage:
-		if err := g.client.BuildPackage(g.pID, true, true); err != nil {
-			return err
-		}
+		return g.client.BuildPackage(g.pID, true, true)
 	case ModeUpdate:
-		if err := g.client.UpdateWorkingCopy(g.pID); err != nil {
-			return err
-		}
+		return g.client.UpdateWorkingCopy(g.pID)
 	}
 
-	return nil
+	return fmt.Errorf("%w: %s", ErrUnknownMethod, method)
 }

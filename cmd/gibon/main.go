@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	modes := []string{
+	methods := []string{
 		gibon.ModeCommit,
 		gibon.ModeDownload,
 		gibon.ModePackage,
@@ -23,7 +23,7 @@ func main() {
 		Required: true,
 		Help:     "Polygon problem ID",
 	})
-	method := parser.Selector("m", "method", modes, &argparse.Options{
+	method := parser.Selector("m", "method", methods, &argparse.Options{
 		Required: true,
 		Help:     "Polygon method",
 	})
