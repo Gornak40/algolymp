@@ -50,7 +50,7 @@ func main() {
 			logrus.WithError(err).Fatal("failed to build full package")
 		}
 	case modeCommit:
-		if err := pClient.Commit(*pID, true, "Committed using algolymp/gibon."); err != nil {
+		if err := pClient.Commit(*pID, true, ""); err != nil {
 			logrus.WithError(err).Fatal("failed to commit")
 		}
 	case modeUpdate:

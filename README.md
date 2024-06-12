@@ -278,7 +278,7 @@ The list of methods will continue to grow.
 
 - `build` - build standard package with verification
 - `build-full` - build full package with verification
-- `commit` - commit changes without email notification
+- `commit` - commit changes with empty message without email notification
 - `update` - update working copy
 
 ### Flags
