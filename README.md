@@ -294,8 +294,8 @@ The list of methods will continue to grow.
 
 ```bash
 gibon --help
-gibon -i 363802 -m build
 gibon -i 363802 -m commit
+gibon -i 363802 -m download
 gibon -i 363802 -m package
 gibon -i 363802 -m update
 ```
@@ -452,7 +452,7 @@ Match all files in directory with glob pattern. Upload recognized files to Polyg
 
 #### Supported modes
 
-- `t` - test
+- `t` - test (replace in order, not append)
 - `tags` - tags (each tag is on a new line)
 - `v` - validator
 - `c` - checker
