@@ -25,6 +25,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | 👻 | download/upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
+| 👻 | zip extractor for websites | | | 🤔 |
 
 ### Icons
 
@@ -263,11 +264,13 @@ fara -f serve.cfg -q @problem.id && fara -f serve.cfg -q @problem.id -s max_vm_s
 ![fara logo](https://algolymp.ru/static/img/fara.png)
 
 ## gibon
-*Polygon API multitool.*
+*Polygon API methods multitool.*
 
 ### About
 
 The tool is designed for Polygon API methods outside of the [wooda](#wooda) ideology.
+
+Useful when dealing with large size problems, as API methods do not timeout.
 
 The list of methods will continue to grow.
 

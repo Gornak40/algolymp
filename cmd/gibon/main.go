@@ -24,7 +24,7 @@ func main() {
 		modeUpdate,
 	}
 
-	parser := argparse.NewParser("gibon", "Polygon API multitool.")
+	parser := argparse.NewParser("gibon", "Polygon API methods multitool.")
 	pID := parser.Int("i", "pid", &argparse.Options{
 		Required: true,
 		Help:     "Polygon problem ID",
