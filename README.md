@@ -13,7 +13,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
-| [gibon](#gibon) | commit/update problem | | 🦍 | 🧑‍💻 |
+| [gibon](#gibon) | api multitool | | 🦍 | 🧑‍💻 |
 | [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
