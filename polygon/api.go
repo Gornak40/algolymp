@@ -163,12 +163,28 @@ func (p *Polygon) Commit(pID int, minor bool, message string) error {
 }
 
 func (p *Polygon) UpdateWorkingCopy(pid int) error {
-	link, params := p.buildURL("problem.commitChanges", url.Values{
+	link, params := p.buildURL("problem.updateWorkingCopy", url.Values{
 		"problemId": []string{strconv.Itoa(pid)},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err
+}
+
+func (p *Polygon) GetPackages(pID int) ([]PackageAnswer, error) {
+	link, params := p.buildURL("problem.packages", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+	})
+	ansP, err := p.makeQuery(http.MethodGet, link, params)
+	if err != nil {
+		return nil, err
+	}
+	var packages []PackageAnswer
+	if err := json.Unmarshal(ansP.Result, &packages); err != nil {
+		return nil, err
+	}
+
+	return packages, nil
 }
 
 func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
@@ -181,7 +197,9 @@ func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 		return nil, err
 	}
 	var groups []GroupAnswer
-	_ = json.Unmarshal(ansG.Result, &groups)
+	if err := json.Unmarshal(ansG.Result, &groups); err != nil {
+		return nil, err
+	}
 
 	return groups, nil
 }
@@ -197,7 +215,9 @@ func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
 		return nil, err
 	}
 	var tests []TestAnswer
-	_ = json.Unmarshal(ansT.Result, &tests)
+	if err := json.Unmarshal(ansT.Result, &tests); err != nil {
+		return nil, err
+	}
 
 	return tests, nil
 }

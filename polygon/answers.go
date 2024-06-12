@@ -16,6 +16,15 @@ type GroupAnswer struct {
 	Dependencies   []string `json:"dependencies"`
 }
 
+type PackageAnswer struct {
+	ID                  int    `json:"id"`
+	Revision            int    `json:"revision"`
+	CreationTimeSeconds int    `json:"creationTimeSeconds"`
+	State               string `json:"state"`
+	Comment             string `json:"comment"`
+	Type                string `json:"type"`
+}
+
 type Answer struct {
 	Status  string          `json:"status"`
 	Comment string          `json:"comment"`

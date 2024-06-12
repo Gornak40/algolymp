@@ -5,23 +5,17 @@ import (
 
 	"github.com/Gornak40/algolymp/config"
 	"github.com/Gornak40/algolymp/polygon"
+	"github.com/Gornak40/algolymp/polygon/gibon"
 	"github.com/akamensky/argparse"
 	"github.com/sirupsen/logrus"
 )
 
-const (
-	modeBuild     = "build"
-	modeBuildFull = "build-full"
-	modeCommit    = "commit"
-	modeUpdate    = "update"
-)
-
 func main() {
 	modes := []string{
-		modeBuild,
-		modeBuildFull,
-		modeCommit,
-		modeUpdate,
+		gibon.ModeCommit,
+		gibon.ModeDownload,
+		gibon.ModePackage,
+		gibon.ModeUpdate,
 	}
 
 	parser := argparse.NewParser("gibon", "Polygon API methods multitool.")
@@ -29,7 +23,7 @@ func main() {
 		Required: true,
 		Help:     "Polygon problem ID",
 	})
-	mode := parser.Selector("m", "method", modes, &argparse.Options{
+	method := parser.Selector("m", "method", modes, &argparse.Options{
 		Required: true,
 		Help:     "Polygon method",
 	})
@@ -39,24 +33,10 @@ func main() {
 
 	cfg := config.NewConfig()
 	pClient := polygon.NewPolygon(&cfg.Polygon)
+	gib := gibon.NewGibon(pClient, *pID)
 
-	switch *mode {
-	case modeBuild:
-		if err := pClient.BuildPackage(*pID, false, true); err != nil {
-			logrus.WithError(err).Fatal("failed to build package")
-		}
-	case modeBuildFull:
-		if err := pClient.BuildPackage(*pID, true, true); err != nil {
-			logrus.WithError(err).Fatal("failed to build full package")
-		}
-	case modeCommit:
-		if err := pClient.Commit(*pID, true, ""); err != nil {
-			logrus.WithError(err).Fatal("failed to commit")
-		}
-	case modeUpdate:
-		if err := pClient.UpdateWorkingCopy(*pID); err != nil {
-			logrus.WithError(err).Fatal("failed to update working copy")
-		}
+	if err := gib.Resolve(*method); err != nil {
+		logrus.WithError(err).Fatal("failed to resolve")
 	}
-	logrus.WithFields(logrus.Fields{"problem": *pID, "mode": *mode}).Info("success")
+	logrus.WithFields(logrus.Fields{"problem": *pID, "method": *method}).Info("success")
 }

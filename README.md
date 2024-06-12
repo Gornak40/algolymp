@@ -276,9 +276,9 @@ The list of methods will continue to grow.
 
 #### Supported methods
 
-- `build` - build standard package with verification
-- `build-full` - build full package with verification
 - `commit` - commit changes with empty message without email notification
+- `download` - download the last linux package
+- `package` - build full package with verification
 - `update` - update working copy
 
 ### Flags
@@ -295,8 +295,8 @@ The list of methods will continue to grow.
 ```bash
 gibon --help
 gibon -i 363802 -m build
-gibon -i 363802 -m build-full
 gibon -i 363802 -m commit
+gibon -i 363802 -m package
 gibon -i 363802 -m update
 ```
 
