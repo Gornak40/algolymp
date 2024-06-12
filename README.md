@@ -13,18 +13,19 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
+| [gibon](#gibon) | api multitool | | 🦍 | 🧑‍💻 |
 | [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | 🧑‍💻 |
 | ⚙️ | move json config to ini | | | 🤔 |
-| 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
-| 👻 | download/upload package | | 🦍 | 🤔 |
+| 👻 | upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
+| 👻 | zip extractor for websites | | | 🤔 |
 
 ### Icons
 
@@ -262,6 +263,45 @@ fara -f serve.cfg -q @problem.id && fara -f serve.cfg -q @problem.id -s max_vm_s
 
 ![fara logo](https://algolymp.ru/static/img/fara.png)
 
+## gibon
+*Polygon API methods multitool.*
+
+### About
+
+The tool is designed for Polygon API methods outside of the [wooda](#wooda) ideology.
+
+Useful when dealing with large size problems, as API methods do not timeout.
+
+The list of methods will continue to grow.
+
+#### Supported methods
+
+- `commit` - commit changes with empty message without email notification
+- `download` - download the latest (problem revision) linux package
+- `package` - build full package with verification
+- `update` - update working copy
+
+### Flags
+- `-i` - problem id (required)
+- `-m` - method (required)
+
+### Config
+- `polygon.url`
+- `polygon.apiKey`
+- `polygon.apiSecret`
+
+### Examples
+
+```bash
+gibon --help
+gibon -i 363802 -m commit
+gibon -i 363802 -m download
+gibon -i 363802 -m package
+gibon -i 363802 -m update
+```
+
+![gibon logo](https://algolymp.ru/static/img/gibon.png)
+
 ## pepel
 *Generate hasher solution based on a/ans/out files.*
 
@@ -412,7 +452,7 @@ Match all files in directory with glob pattern. Upload recognized files to Polyg
 
 #### Supported modes
 
-- `t` - test
+- `t` - test (replace in order, not append)
 - `tags` - tags (each tag is on a new line)
 - `v` - validator
 - `c` - checker

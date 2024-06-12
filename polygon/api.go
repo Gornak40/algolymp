@@ -42,6 +42,7 @@ const (
 var (
 	ErrBadPolygonStatus = errors.New("bad polygon status")
 	ErrInvalidMethod    = errors.New("invalid method")
+	ErrProblemNotFound  = errors.New("problem not found")
 )
 
 type Config struct {
@@ -140,6 +141,53 @@ func (p *Polygon) buildURL(method string, params url.Values) (string, url.Values
 	return url, params
 }
 
+func (p *Polygon) BuildPackage(pID int, full, verify bool) error {
+	link, params := p.buildURL("problem.buildPackage", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"full":      []string{strconv.FormatBool(full)},
+		"verify":    []string{strconv.FormatBool(verify)},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) Commit(pID int, minor bool, message string) error {
+	link, params := p.buildURL("problem.commitChanges", url.Values{
+		"problemId":    []string{strconv.Itoa(pID)},
+		"minorChanges": []string{strconv.FormatBool(minor)},
+		"message":      []string{message},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) UpdateWorkingCopy(pid int) error {
+	link, params := p.buildURL("problem.updateWorkingCopy", url.Values{
+		"problemId": []string{strconv.Itoa(pid)},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) GetPackages(pID int) ([]PackageAnswer, error) {
+	link, params := p.buildURL("problem.packages", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+	})
+	ansP, err := p.makeQuery(http.MethodGet, link, params)
+	if err != nil {
+		return nil, err
+	}
+	var packages []PackageAnswer
+	if err := json.Unmarshal(ansP.Result, &packages); err != nil {
+		return nil, err
+	}
+
+	return packages, nil
+}
+
 func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 	link, params := p.buildURL("problem.viewTestGroup", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
@@ -150,9 +198,30 @@ func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 		return nil, err
 	}
 	var groups []GroupAnswer
-	_ = json.Unmarshal(ansG.Result, &groups)
+	if err := json.Unmarshal(ansG.Result, &groups); err != nil {
+		return nil, err
+	}
 
 	return groups, nil
+}
+
+func (p *Polygon) GetProblem(pID int) (*ProblemAnswer, error) {
+	link, params := p.buildURL("problems.list", url.Values{
+		"id": []string{strconv.Itoa(pID)},
+	})
+	ansP, err := p.makeQuery(http.MethodGet, link, params)
+	if err != nil {
+		return nil, err
+	}
+	var problems []ProblemAnswer
+	if err := json.Unmarshal(ansP.Result, &problems); err != nil {
+		return nil, err
+	}
+	if len(problems) == 0 {
+		return nil, ErrProblemNotFound
+	}
+
+	return &problems[0], nil
 }
 
 func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
@@ -166,9 +235,30 @@ func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
 		return nil, err
 	}
 	var tests []TestAnswer
-	_ = json.Unmarshal(ansT.Result, &tests)
+	if err := json.Unmarshal(ansT.Result, &tests); err != nil {
+		return nil, err
+	}
 
 	return tests, nil
+}
+
+func (p *Polygon) DownloadPackage(pID, packID int, packType string) ([]byte, error) {
+	link, params := p.buildURL("problem.package", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"packageId": []string{strconv.Itoa(packID)},
+		"type":      []string{packType},
+	})
+	req, err := buildRequest(http.MethodPost, link, params)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := p.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	return io.ReadAll(resp.Body)
 }
 
 func (p *Polygon) EnableGroups(pID int) error {
