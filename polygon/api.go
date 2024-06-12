@@ -140,6 +140,26 @@ func (p *Polygon) buildURL(method string, params url.Values) (string, url.Values
 	return url, params
 }
 
+func (p *Polygon) Commit(pID int, minor bool, message string) error {
+	link, params := p.buildURL("problem.commitChanges", url.Values{
+		"problemId":    []string{strconv.Itoa(pID)},
+		"minorChanges": []string{strconv.FormatBool(minor)},
+		"message":      []string{message},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) UpdateWorkingCopy(pid int) error {
+	link, params := p.buildURL("problem.commitChanges", url.Values{
+		"problemId": []string{strconv.Itoa(pid)},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
 func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 	link, params := p.buildURL("problem.viewTestGroup", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},

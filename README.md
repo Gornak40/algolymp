@@ -13,13 +13,13 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
+| [gibon](#gibon) | commit/update problem | | 🦍 | 🧑‍💻 |
 | [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | 🧑‍💻 |
 | ⚙️ | move json config to ini | | | 🤔 |
-| 👻 | list/commit problems | | 🦍 | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
 | 👻 | download/upload package | | 🦍 | 🤔 |
@@ -261,6 +261,35 @@ fara -f serve.cfg -q @problem.id && fara -f serve.cfg -q @problem.id -s max_vm_s
 ```
 
 ![fara logo](https://algolymp.ru/static/img/fara.png)
+
+## gibon
+*Polygon API multitool.*
+
+### About
+
+The tool is designed for Polygon API methods outside of the [wooda](#wooda) ideology.
+
+The list of methods will continue to grow.
+
+- Commit changes;
+- Update working copy.
+
+### Flags
+- `-i` - problem id (required)
+- `-m` - method (required, `commit|update`)
+
+### Config
+- `polygon.url`
+- `polygon.apiKey`
+- `polygon.apiSecret`
+
+### Examples
+
+```bash
+gibon --help
+gibon -i 363802 -m update
+gibon -i 363802 -m commit
+```
 
 ## pepel
 *Generate hasher solution based on a/ans/out files.*
