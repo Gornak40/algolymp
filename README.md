@@ -271,12 +271,16 @@ The tool is designed for Polygon API methods outside of the [wooda](#wooda) ideo
 
 The list of methods will continue to grow.
 
-- Commit changes;
-- Update working copy.
+#### Supported methods
+
+- `build` - build standard package with verification
+- `build-full` - build full package with verification
+- `commit` - commit changes without email notification
+- `update` - update working copy
 
 ### Flags
 - `-i` - problem id (required)
-- `-m` - method (required, `commit|update`)
+- `-m` - method (required)
 
 ### Config
 - `polygon.url`
@@ -287,9 +291,13 @@ The list of methods will continue to grow.
 
 ```bash
 gibon --help
-gibon -i 363802 -m update
+gibon -i 363802 -m build
+gibon -i 363802 -m build-full
 gibon -i 363802 -m commit
+gibon -i 363802 -m update
 ```
+
+![gibon logo](https://algolymp.ru/static/img/gibon.png)
 
 ## pepel
 *Generate hasher solution based on a/ans/out files.*

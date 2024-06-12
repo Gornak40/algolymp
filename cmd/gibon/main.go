@@ -10,12 +10,16 @@ import (
 )
 
 const (
-	modeCommit = "commit"
-	modeUpdate = "update"
+	modeBuild     = "build"
+	modeBuildFull = "build-full"
+	modeCommit    = "commit"
+	modeUpdate    = "update"
 )
 
 func main() {
 	modes := []string{
+		modeBuild,
+		modeBuildFull,
 		modeCommit,
 		modeUpdate,
 	}
@@ -25,7 +29,7 @@ func main() {
 		Required: true,
 		Help:     "Polygon problem ID",
 	})
-	mode := parser.Selector("m", "mode", modes, &argparse.Options{
+	mode := parser.Selector("m", "method", modes, &argparse.Options{
 		Required: true,
 		Help:     "Polygon method",
 	})
@@ -37,8 +41,16 @@ func main() {
 	pClient := polygon.NewPolygon(&cfg.Polygon)
 
 	switch *mode {
+	case modeBuild:
+		if err := pClient.BuildPackage(*pID, false, true); err != nil {
+			logrus.WithError(err).Fatal("failed to build package")
+		}
+	case modeBuildFull:
+		if err := pClient.BuildPackage(*pID, true, true); err != nil {
+			logrus.WithError(err).Fatal("failed to build full package")
+		}
 	case modeCommit:
-		if err := pClient.Commit(*pID, true, ""); err != nil {
+		if err := pClient.Commit(*pID, true, "Committed using algolymp/gibon."); err != nil {
 			logrus.WithError(err).Fatal("failed to commit")
 		}
 	case modeUpdate:

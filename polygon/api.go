@@ -140,6 +140,17 @@ func (p *Polygon) buildURL(method string, params url.Values) (string, url.Values
 	return url, params
 }
 
+func (p *Polygon) BuildPackage(pID int, full, verify bool) error {
+	link, params := p.buildURL("problem.buildPackage", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"full":      []string{strconv.FormatBool(full)},
+		"verify":    []string{strconv.FormatBool(verify)},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
 func (p *Polygon) Commit(pID int, minor bool, message string) error {
 	link, params := p.buildURL("problem.commitChanges", url.Values{
 		"problemId":    []string{strconv.Itoa(pID)},
