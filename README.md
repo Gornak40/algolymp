@@ -22,7 +22,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | ⚙️ | move json config to ini | | | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
-| 👻 | download/upload package | | 🦍 | 🤔 |
+| 👻 | upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
 | 👻 | zip extractor for websites | | | 🤔 |
@@ -277,7 +277,7 @@ The list of methods will continue to grow.
 #### Supported methods
 
 - `commit` - commit changes with empty message without email notification
-- `download` - download the last linux package
+- `download` - download the latest (problem revision) linux package
 - `package` - build full package with verification
 - `update` - update working copy
 
