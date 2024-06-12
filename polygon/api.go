@@ -248,7 +248,7 @@ func (p *Polygon) DownloadPackage(pID, packID int, packType string) ([]byte, err
 		"packageId": []string{strconv.Itoa(packID)},
 		"type":      []string{packType},
 	})
-	req, err := buildRequest(http.MethodGet, link, params)
+	req, err := buildRequest(http.MethodPost, link, params)
 	if err != nil {
 		return nil, err
 	}
