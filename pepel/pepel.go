@@ -1,6 +1,8 @@
 package pepel
 
 import (
+	"bytes"
+	"compress/zlib"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
@@ -15,7 +17,7 @@ type MagicPair struct {
 	AnsBase64 string
 }
 
-func GenMagicPair(inf, ans string) (*MagicPair, error) {
+func GenMagicPair(inf, ans string, zFlag bool) (*MagicPair, error) {
 	finf, err := os.Open(inf)
 	if err != nil {
 		return nil, err
@@ -37,6 +39,17 @@ func GenMagicPair(inf, ans string) (*MagicPair, error) {
 	if err != nil {
 		logrus.WithError(err).Fatal("failed to read answer file")
 	}
+
+	if zFlag {
+		var b bytes.Buffer
+		w := zlib.NewWriter(&b)
+		if _, err := w.Write(ansData); err != nil {
+			return nil, err
+		}
+		w.Close()
+		ansData = b.Bytes()
+	}
+
 	ansEnc := base64.StdEncoding.EncodeToString(ansData)
 
 	return &MagicPair{
