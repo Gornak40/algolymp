@@ -8,6 +8,7 @@ import (
 	"github.com/Gornak40/algolymp/polygon"
 	"github.com/Gornak40/algolymp/polygon/wooda"
 	"github.com/akamensky/argparse"
+	"github.com/facette/natsort"
 	"github.com/sirupsen/logrus"
 )
 
@@ -54,6 +55,7 @@ func main() {
 
 		return
 	}
+	natsort.Sort(files)
 	logrus.WithFields(logrus.Fields{"glob": *glob, "count": len(files)}).
 		Info("glob match result")
 

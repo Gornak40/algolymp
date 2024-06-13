@@ -12,15 +12,15 @@ import (
 )
 
 const (
-	ModeTest              = "t"
+	ModeTest              = "test"
 	ModeTags              = "tags"
-	ModeValidator         = "v"
-	ModeChecker           = "c"
-	ModeInteractor        = "i"
-	ModeSolutionMain      = "ma"
+	ModeValidator         = "val"
+	ModeChecker           = "check"
+	ModeInteractor        = "inter"
+	ModeSolutionMain      = "main"
 	ModeSolutionCorrect   = "ok"
-	ModeSolutionIncorrect = "rj"
-	ModeSample            = "s"
+	ModeSolutionIncorrect = "incor"
+	ModeSample            = "sample"
 )
 
 var (
@@ -28,18 +28,20 @@ var (
 )
 
 type Wooda struct {
-	client    *polygon.Polygon
-	pID       int
-	mode      string
-	testIndex int
+	client  *polygon.Polygon
+	pID     int
+	mode    string
+	testIDs map[int]struct{}
+	testMex int
 }
 
 func NewWooda(pClient *polygon.Polygon, pID int, mode string) *Wooda {
 	return &Wooda{
-		client:    pClient,
-		pID:       pID,
-		mode:      mode,
-		testIndex: 1,
+		client:  pClient,
+		pID:     pID,
+		mode:    mode,
+		testIDs: make(map[int]struct{}),
+		testMex: 1,
 	}
 }
 
@@ -74,15 +76,43 @@ func (w *Wooda) Resolve(path string) error {
 	}
 }
 
+func (w *Wooda) initTMode() error {
+	ansT, err := w.client.GetTests(w.pID)
+	if err != nil {
+		return err
+	}
+	for _, t := range ansT {
+		w.testIDs[t.Index] = struct{}{}
+	}
+	w.updateMex()
+
+	return nil
+}
+
+func (w *Wooda) updateMex() {
+	for {
+		if _, ok := w.testIDs[w.testMex]; !ok {
+			break
+		}
+		w.testMex++
+	}
+}
+
 func (w *Wooda) resolveTest(path, data string, sample bool) error {
-	tr := polygon.NewTestRequest(w.pID, w.testIndex).
+	if len(w.testIDs) == 0 { // initial request for append
+		if err := w.initTMode(); err != nil {
+			return err
+		}
+	}
+	tr := polygon.NewTestRequest(w.pID, w.testMex).
 		Input(data).
 		Description(fmt.Sprintf("File \"%s\"", filepath.Base(path))).
 		UseInStatements(sample)
 	if err := w.client.SaveTest(tr); err != nil {
 		return err
 	}
-	w.testIndex++
+	w.testIDs[w.testMex] = struct{}{}
+	w.updateMex()
 
 	return nil
 }
