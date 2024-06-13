@@ -18,7 +18,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
-| [wooda](#wooda) | glob problem files upload | | 🦍 | 🧑‍💻 |
+| [wooda](#wooda) | glob problem files upload | | 🦍 | ✅ |
 | ⚙️ | move json config to ini | | | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
@@ -446,9 +446,9 @@ valeria -i 285375 -t moscow -c n -c m -c k
 
 ### About
 
-**Now this is a proof of concept. Many more modes will be supported in the future.**
-
 Match all files in directory with glob pattern. Upload recognized files to Polygon.
+
+Matching uses natural order (`test.1.in`, `test.2.in`, ..., `test.10.in`, ...).
 
 #### Supported modes
 
