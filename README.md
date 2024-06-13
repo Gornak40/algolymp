@@ -452,15 +452,15 @@ Match all files in directory with glob pattern. Upload recognized files to Polyg
 
 #### Supported modes
 
-- `t` - test (replace in order, not append)
+- `test` - test (append, not replace)
 - `tags` - tags (each tag is on a new line)
-- `v` - validator
-- `c` - checker
-- `i` - interactor
-- `ma` - main solution
+- `val` - validator
+- `check` - checker
+- `inter` - interactor
+- `main` - main solution
 - `ok` - correct solution
-- `rj` - incorrect solution
-- `s` - sample
+- `incor` - incorrect solution
+- `sample` - sample (append, not replace)
 
 ### Flags
 - `-i` - problem id (required)
@@ -478,15 +478,15 @@ You should know your shell and probably use `-g "<glob>"`, not `-g <glob>`.
 
 ```bash
 wooda --help
-wooda -i 337320 -m t -g "tests/*[^.a]" # exclude output
+wooda -i 337320 -m test -g "tests/*[^.a]" # exclude output
 wooda -i 337320 -m tags -g tags
-wooda -i 337320 -m v -g files/val*.cpp
-wooda -i 337320 -m c -g check.cpp
-wooda -i 337320 -m i -g interactor.cpp
-wooda -i 337320 -m ma -g solutions/main.cpp # Main solution
+wooda -i 337320 -m val -g files/val*.cpp
+wooda -i 337320 -m check -g check.cpp
+wooda -i 337320 -m inter -g interactor.cpp
+wooda -i 337320 -m main -g solutions/main.cpp # Main solution
 wooda -i 337320 -m ok -g solutions/sol_apachee.cpp # OK solution
-wooda -i 337320 -m rj -g solutions/brute.py # TL solution
-wooda -i 337320 -m s -g "statements/russian/example.[0-9][0-9]"
+wooda -i 337320 -m incor -g solutions/brute.py # TL solution
+wooda -i 337320 -m sample -g "statements/russian/example.[0-9][0-9]"
 ```
 
 ![wooda logo](https://algolymp.ru/static/img/wooda.png)
