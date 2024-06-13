@@ -21,6 +21,10 @@ func main() {
 		Required: true,
 		Help:     "Answer files glob",
 	})
+	zFlag := parser.Flag("z", "zip", &argparse.Options{
+		Required: false,
+		Help:     "Compress answers using zlib",
+	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
 	}
@@ -51,16 +55,21 @@ func main() {
 			"inf": filepath.Base(inf), "ans": filepath.Base(ans),
 		}).Info("calculate hash")
 
-		mPair, err := pepel.GenMagicPair(inf, ans)
+		mPair, err := pepel.GenMagicPair(inf, ans, *zFlag)
 		if err != nil {
 			logrus.WithError(err).Fatal("failed to generate magic pair")
 		}
 		program = append(program, fmt.Sprintf("\t%q: %q,", mPair.InfSHA256, mPair.AnsBase64))
 	}
 	program = append(program,
-		"}",
-		"stdout.buffer.write(b64decode(d[m.hexdigest()]))",
+		"}", "r = b64decode(d[m.hexdigest()])",
 	)
+	if *zFlag {
+		program = append(program,
+			"from zlib import decompress", "r = decompress(r)",
+		)
+	}
+	program = append(program, "stdout.buffer.write(r)")
 
 	fmt.Println(strings.Join(program, "\n")) //nolint:forbidigo // Basic functionality.
 }
