@@ -31,7 +31,7 @@ type Wooda struct {
 	client  *polygon.Polygon
 	pID     int
 	mode    string
-	testIds map[int]struct{}
+	testIDs map[int]struct{}
 	testMex int
 }
 
@@ -40,7 +40,7 @@ func NewWooda(pClient *polygon.Polygon, pID int, mode string) *Wooda {
 		client:  pClient,
 		pID:     pID,
 		mode:    mode,
-		testIds: make(map[int]struct{}),
+		testIDs: make(map[int]struct{}),
 		testMex: 1,
 	}
 }
@@ -82,7 +82,7 @@ func (w *Wooda) initTMode() error {
 		return err
 	}
 	for _, t := range ansT {
-		w.testIds[t.Index] = struct{}{}
+		w.testIDs[t.Index] = struct{}{}
 	}
 	w.updateMex()
 
@@ -91,7 +91,7 @@ func (w *Wooda) initTMode() error {
 
 func (w *Wooda) updateMex() {
 	for {
-		if _, ok := w.testIds[w.testMex]; !ok {
+		if _, ok := w.testIDs[w.testMex]; !ok {
 			break
 		}
 		w.testMex++
@@ -99,7 +99,7 @@ func (w *Wooda) updateMex() {
 }
 
 func (w *Wooda) resolveTest(path, data string, sample bool) error {
-	if len(w.testIds) == 0 { // initial request for append
+	if len(w.testIDs) == 0 { // initial request for append
 		if err := w.initTMode(); err != nil {
 			return err
 		}
@@ -111,7 +111,7 @@ func (w *Wooda) resolveTest(path, data string, sample bool) error {
 	if err := w.client.SaveTest(tr); err != nil {
 		return err
 	}
-	w.testIds[w.testMex] = struct{}{}
+	w.testIDs[w.testMex] = struct{}{}
 	w.updateMex()
 
 	return nil
