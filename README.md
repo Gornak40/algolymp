@@ -336,6 +336,7 @@ No config needed.
 pepel --help
 pepel -i "K/*.in.*" -a "K/*.out.*" > pepel.py
 pepel -i "tests/*[^.a]" -a "tests/*.a" | bat -l python
+pepel -i "*.in.*" -a "*.out.*" -z > pepel-mini.py
 ```
 
 ![pepel logo](https://algolymp.ru/static/img/pepel.png)
