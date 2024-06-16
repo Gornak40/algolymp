@@ -52,7 +52,7 @@ func (v *Vydra) uploadSolution(sol *Solution) error {
 	}
 
 	var tag polygon.SolutionTag
-	switch sol.Tag {
+	switch sol.Tag { // TODO: add other tags
 	case "main":
 		tag = polygon.TagMain
 	case "accepted":
