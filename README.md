@@ -316,6 +316,8 @@ Print `python` solution that outputs correct answer for each passed input file a
 
 Useful with Polygon to upload a problem without main correct solution.
 
+**Make sure your input files has `\r\n` line endings (use `unix2dos`), because Polygon works in Windows.**
+
 It's ready to work with any input/output files, encoding and escape sequences don't matter.
 
 Works great with [wooda](#wooda).
@@ -449,6 +451,32 @@ valeria -i 285375 -t moscow -c n -c m -c k
 ```
 
 ![valeria logo](https://algolymp.ru/static/img/valeria.png)
+
+## vydra
+*Upload full problem package to Polygon using API.*
+
+### About
+
+This tool uses `problem.xml` for uploading everything.
+
+Useful for migration from `polygon.lksh.ru` to `polygon.codeforces.com`.
+
+Designed to replace legacy [polygon-cli](https://github.com/kunyavskiy/polygon-cli) tool.
+
+### Flags
+- `-i` - problem id (required)
+
+### Config
+- `polygon.url`
+- `polygon.apiKey`
+- `polygon.apiSecret`
+
+### Examples
+
+```bash
+vydra --help
+vydra -i 364022
+```
 
 ## wooda
 *Upload problem files filtered by glob to Polygon using API.*

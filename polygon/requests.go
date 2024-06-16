@@ -109,3 +109,26 @@ func (fr FileRequest) SourceType(typ string) FileRequest {
 }
 
 // TODO: add other options
+
+type SolutionRequest url.Values
+
+func NewSolutionRequest(pID int, name, file string, tag SolutionTag) SolutionRequest {
+	return SolutionRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"name":      []string{name},
+		"file":      []string{file},
+		"tag":       []string{string(tag)},
+	}
+}
+
+func (sr SolutionRequest) CheckExisting(f bool) SolutionRequest {
+	sr["checkExisting"] = []string{strconv.FormatBool(f)}
+
+	return sr
+}
+
+func (sr SolutionRequest) SourceType(typ string) SolutionRequest {
+	sr["sourceType"] = []string{typ}
+
+	return sr
+}

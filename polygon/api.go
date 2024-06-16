@@ -28,9 +28,15 @@ const (
 type SolutionTag string
 
 const (
-	TagMain      SolutionTag = "MA"
-	TagCorrect   SolutionTag = "OK"
-	TagIncorrect SolutionTag = "RJ"
+	TagMain              SolutionTag = "MA"
+	TagCorrect           SolutionTag = "OK"
+	TagIncorrect         SolutionTag = "RJ"
+	TagTimeLimit         SolutionTag = "TL"
+	TagTLorOK            SolutionTag = "TO"
+	TagWrongAnswer       SolutionTag = "WA"
+	TagPresentationError SolutionTag = "PE"
+	TagMemoryLimit       SolutionTag = "ML"
+	TagRuntimeError      SolutionTag = "RE"
 )
 
 type FileType string
@@ -371,13 +377,8 @@ func (p *Polygon) SetInteractor(pID int, interactor string) error {
 	return err
 }
 
-func (p *Polygon) SaveSolution(pID int, name, data string, tag SolutionTag) error {
-	link, params := p.buildURL("problem.saveSolution", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"name":      []string{name},
-		"file":      []string{data},
-		"tag":       []string{string(tag)},
-	})
+func (p *Polygon) SaveSolution(sr SolutionRequest) error {
+	link, params := p.buildURL("problem.saveSolution", url.Values(sr))
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err
