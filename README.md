@@ -18,11 +18,11 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
+| [vydra](#vydra) | upload package | | 🦍 | 🧑‍💻 |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | ✅ |
 | ⚙️ | move json config to ini | | | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
-| 👻 | upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
 | 👻 | zip extractor for websites | | | 🤔 |
