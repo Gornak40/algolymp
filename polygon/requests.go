@@ -95,7 +95,6 @@ func NewFileRequest(pID int, typ FileType, name, file string) FileRequest {
 	}
 }
 
-// TODO: fix it.
 func (fr FileRequest) CheckExisting(f bool) FileRequest {
 	fr["checkExisting"] = []string{strconv.FormatBool(f)}
 

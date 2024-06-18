@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/Gornak40/algolymp/polygon"
 	"github.com/sirupsen/logrus"
@@ -67,10 +68,24 @@ func (v *Vydra) uploadSolution(sol *Solution) error {
 		return fmt.Errorf("%w: %s", ErrBadSolutionTag, sol.Tag)
 	}
 
-	sr := polygon.NewSolutionRequest(v.pID, sol.Source.Path, string(data), tag).
+	sr := polygon.NewSolutionRequest(v.pID, filepath.Base(sol.Source.Path), string(data), tag).
 		SourceType(sol.Source.Type)
 
 	return v.client.SaveSolution(sr)
+}
+
+func (v *Vydra) uploadResource(res *File) error {
+	logrus.WithFields(logrus.Fields{
+		"path": res.Path, "type": res.Type,
+	}).Info("upload resource")
+	data, err := os.ReadFile(res.Path)
+	if err != nil {
+		return err
+	}
+
+	fr := polygon.NewFileRequest(v.pID, polygon.TypeResource, filepath.Base(res.Path), string(data))
+
+	return v.client.SaveFile(fr)
 }
 
 func (v *Vydra) Upload() error {
@@ -79,6 +94,11 @@ func (v *Vydra) Upload() error {
 	}
 	for _, sol := range v.prob.Assets.Solutions.Solutions {
 		if err := v.uploadSolution(&sol); err != nil {
+			return err
+		}
+	}
+	for _, res := range v.prob.Files.Resources.Files {
+		if err := v.uploadResource(&res); err != nil {
 			return err
 		}
 	}
