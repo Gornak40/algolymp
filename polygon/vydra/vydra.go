@@ -88,6 +88,21 @@ func (v *Vydra) uploadResource(res *File) error {
 	return v.client.SaveFile(fr)
 }
 
+func (v *Vydra) uploadExecutable(exe *Executable) error {
+	logrus.WithFields(logrus.Fields{
+		"path": exe.Source.Path, "type": exe.Source.Type,
+	}).Info("upload executable")
+	data, err := os.ReadFile(exe.Source.Path)
+	if err != nil {
+		return err
+	}
+
+	fr := polygon.NewFileRequest(v.pID, polygon.TypeSource, filepath.Base(exe.Source.Path), string(data)).
+		SourceType(exe.Source.Type)
+
+	return v.client.SaveFile(fr)
+}
+
 func (v *Vydra) Upload() error {
 	if err := v.readXML("problem.xml"); err != nil {
 		return err
@@ -99,6 +114,11 @@ func (v *Vydra) Upload() error {
 	}
 	for _, res := range v.prob.Files.Resources.Files {
 		if err := v.uploadResource(&res); err != nil {
+			return err
+		}
+	}
+	for _, exe := range v.prob.Files.Executables.Executables {
+		if err := v.uploadExecutable(&exe); err != nil {
 			return err
 		}
 	}
