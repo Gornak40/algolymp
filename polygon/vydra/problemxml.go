@@ -5,12 +5,18 @@ type File struct {
 	Type string `xml:"type,attr"`
 }
 
+type Source struct {
+	Path string `xml:"path,attr"`
+	Type string `xml:"type,attr"`
+}
+
+type Executable struct {
+	Source Source `xml:"source"`
+}
+
 type Solution struct {
 	Tag    string `xml:"tag,attr"`
-	Source struct {
-		Path string `xml:"path,attr"`
-		Type string `xml:"type,attr"`
-	} `xml:"source"`
+	Source Source `xml:"source"`
 }
 
 type Assets struct {
@@ -23,6 +29,9 @@ type Files struct {
 	Resources struct {
 		Files []File `xml:"file"`
 	} `xml:"resources"`
+	Executables struct {
+		Executables []Executable `xml:"executable"`
+	} `xml:"executables"`
 }
 
 type ProblemXML struct {
