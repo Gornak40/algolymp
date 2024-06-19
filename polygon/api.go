@@ -152,7 +152,7 @@ func (p *Polygon) skipEscape(params url.Values) string {
 		return pairs[i].value < pairs[j].value
 	})
 
-	var pairs2 []string
+	pairs2 := make([]string, 0, len(pairs))
 	for _, p := range pairs {
 		pairs2 = append(pairs2, fmt.Sprintf("%s=%s", p.key, p.value))
 	}
