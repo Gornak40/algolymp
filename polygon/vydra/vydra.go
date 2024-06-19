@@ -4,11 +4,16 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 
 	"github.com/Gornak40/algolymp/polygon"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	statementType = "application/x-tex"
 )
 
 var (
@@ -103,6 +108,47 @@ func (v *Vydra) uploadExecutable(exe *Executable) error {
 	return v.client.SaveFile(fr)
 }
 
+// TODO: add more files.
+func (v *Vydra) uploadStatement(stat *Statement) error {
+	if stat.Type != statementType {
+		return nil
+	}
+	logrus.WithFields(logrus.Fields{
+		"language": stat.Language, "type": stat.Type, "charset": stat.Charset,
+	}).Info("upload statement")
+	dir := "statement-sections/" + stat.Language
+
+	return filepath.WalkDir(dir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		data, err := os.ReadFile(path)
+		if err != nil {
+			return err
+		}
+		sr := polygon.NewStatementRequest(v.pID, stat.Language).
+			Encoding(stat.Charset)
+		switch filepath.Base(path) {
+		case "input.tex":
+			sr.Input(string(data))
+		case "output.tex":
+			sr.Output(string(data))
+		case "legend.tex":
+			sr.Legend(string(data))
+		case "name.tex":
+			sr.Name(string(data))
+		default:
+			return nil
+		}
+		logrus.WithField("path", path).Info("upload statement section")
+
+		return v.client.SaveStatement(sr)
+	})
+}
+
 func (v *Vydra) Upload() error {
 	if err := v.readXML("problem.xml"); err != nil {
 		return err
@@ -119,6 +165,11 @@ func (v *Vydra) Upload() error {
 	}
 	for _, exe := range v.prob.Files.Executables.Executables {
 		if err := v.uploadExecutable(&exe); err != nil {
+			return err
+		}
+	}
+	for _, stat := range v.prob.Statements.Statements {
+		if err := v.uploadStatement(&stat); err != nil {
 			return err
 		}
 	}
