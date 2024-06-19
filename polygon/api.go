@@ -133,15 +133,31 @@ func (p *Polygon) makeQuery(method, link string, params url.Values) (*Answer, er
 }
 
 func (p *Polygon) skipEscape(params url.Values) string {
-	pairs := []string{}
+	type pair struct {
+		key   string
+		value string
+	}
+
+	var pairs []pair
 	for k, vals := range params {
 		for _, v := range vals {
-			pairs = append(pairs, fmt.Sprintf("%s=%s", k, v))
+			pairs = append(pairs, pair{key: k, value: v})
 		}
 	}
-	sort.Strings(pairs)
+	sort.Slice(pairs, func(i, j int) bool {
+		if pairs[i].key != pairs[j].key {
+			return pairs[i].key < pairs[j].key
+		}
 
-	return strings.Join(pairs, "&")
+		return pairs[i].value < pairs[j].value
+	})
+
+	var pairs2 []string
+	for _, p := range pairs {
+		pairs2 = append(pairs2, fmt.Sprintf("%s=%s", p.key, p.value))
+	}
+
+	return strings.Join(pairs2, "&")
 }
 
 func (p *Polygon) buildURL(method string, params url.Values) (string, url.Values) {
@@ -379,6 +395,13 @@ func (p *Polygon) SetInteractor(pID int, interactor string) error {
 
 func (p *Polygon) SaveSolution(sr SolutionRequest) error {
 	link, params := p.buildURL("problem.saveSolution", url.Values(sr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveStatement(sr StatementRequest) error {
+	link, params := p.buildURL("problem.saveStatement", url.Values(sr))
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err

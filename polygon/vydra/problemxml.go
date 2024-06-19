@@ -19,6 +19,13 @@ type Solution struct {
 	Source Source `xml:"source"`
 }
 
+type Statement struct {
+	Charset  string `xml:"charset,attr"`
+	Language string `xml:"language,attr"`
+	Path     string `xml:"path,attr"`
+	Type     string `xml:"type,attr"`
+}
+
 type Assets struct {
 	Solutions struct {
 		Solutions []Solution `xml:"solution"`
@@ -35,8 +42,11 @@ type Files struct {
 }
 
 type ProblemXML struct {
-	Revision  int    `xml:"revision,attr"`
-	ShortName string `xml:"short-name,attr"`
-	Assets    Assets `xml:"assets"`
-	Files     Files  `xml:"files"`
+	Revision   int    `xml:"revision,attr"`
+	ShortName  string `xml:"short-name,attr"`
+	Assets     Assets `xml:"assets"`
+	Files      Files  `xml:"files"`
+	Statements struct {
+		Statements []Statement `xml:"statement"`
+	} `xml:"statements"`
 }
