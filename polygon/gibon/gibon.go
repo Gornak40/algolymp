@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	ModeContest  = "contest"
 	ModeCommit   = "commit"
 	ModeDownload = "download"
 	ModePackage  = "package"
@@ -71,8 +72,22 @@ func (g *Gibon) resolveDownload() error {
 	return os.WriteFile(fname, data, packageMode)
 }
 
+func (g *Gibon) listProblems() error {
+	probs, err := g.client.ContestProblems(g.pID)
+	if err != nil {
+		return err
+	}
+	for _, p := range probs {
+		fmt.Println(p.ID) //nolint:forbidigo // Basic functionality.
+	}
+
+	return nil
+}
+
 func (g *Gibon) Resolve(method string) error {
 	switch method {
+	case ModeContest:
+		return g.listProblems()
 	case ModeCommit:
 		return g.client.Commit(g.pID, true, "")
 	case ModeDownload:

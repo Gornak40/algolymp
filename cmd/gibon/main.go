@@ -12,6 +12,7 @@ import (
 
 func main() {
 	methods := []string{
+		gibon.ModeContest,
 		gibon.ModeCommit,
 		gibon.ModeDownload,
 		gibon.ModePackage,
@@ -21,7 +22,7 @@ func main() {
 	parser := argparse.NewParser("gibon", "Polygon API methods multitool.")
 	pID := parser.Int("i", "pid", &argparse.Options{
 		Required: true,
-		Help:     "Polygon problem ID",
+		Help:     "Polygon problem/contest ID",
 	})
 	method := parser.Selector("m", "method", methods, &argparse.Options{
 		Required: true,

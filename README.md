@@ -13,7 +13,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
-| [gibon](#gibon) | api multitool | | 🦍 | 🧑‍💻 |
+| [gibon](#gibon) | api multitool | | 🦍 | ✅ |
 | [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
@@ -272,18 +272,21 @@ The tool is designed for Polygon API methods outside of the [wooda](#wooda) ideo
 
 Useful when dealing with large size problems, as API methods do not timeout.
 
-The list of methods will continue to grow.
+The method `contest` is useful when using [scalp](#scalp) or other [gibon](#gibon) methods.
 
 #### Supported methods
 
+- `contest` - print problem ids in specified contest
 - `commit` - commit changes with empty message without email notification
 - `download` - download the latest (problem revision) linux package
 - `package` - build full package with verification
 - `update` - update working copy
 
 ### Flags
-- `-i` - problem id (required)
+- `-i` - problem/contest id (required)
 - `-m` - method (required)
+
+All methods except `contest` accept a problem id with `-i` flag.
 
 ### Config
 - `polygon.url`
@@ -294,10 +297,12 @@ The list of methods will continue to grow.
 
 ```bash
 gibon --help
+gibon -i 42619 -m contest
 gibon -i 363802 -m commit
 gibon -i 363802 -m download
 gibon -i 363802 -m package
 gibon -i 363802 -m update
+for i in $(gibon -i 42619 -m contest); do gibon -i $i -m commit && gibon -i $i -m package; done
 ```
 
 ![gibon logo](https://algolymp.ru/static/img/gibon.png)

@@ -152,6 +152,23 @@ func (p *Polygon) BuildPackage(pID int, full, verify bool) error {
 	return err
 }
 
+// Problem Idx (A, B, C) -> Problem.
+func (p *Polygon) ContestProblems(pID int) (map[string]ProblemAnswer, error) {
+	link, params := p.buildURL("contest.problems", url.Values{
+		"contestId": []string{strconv.Itoa(pID)},
+	})
+	ansC, err := p.makeQuery(http.MethodGet, link, params)
+	if err != nil {
+		return nil, err
+	}
+	var problems map[string]ProblemAnswer
+	if err := json.Unmarshal(ansC.Result, &problems); err != nil {
+		return nil, err
+	}
+
+	return problems, nil
+}
+
 func (p *Polygon) Commit(pID int, minor bool, message string) error {
 	link, params := p.buildURL("problem.commitChanges", url.Values{
 		"problemId":    []string{strconv.Itoa(pID)},
