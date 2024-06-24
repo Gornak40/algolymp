@@ -95,7 +95,6 @@ func NewFileRequest(pID int, typ FileType, name, file string) FileRequest {
 	}
 }
 
-// TODO: fix it.
 func (fr FileRequest) CheckExisting(f bool) FileRequest {
 	fr["checkExisting"] = []string{strconv.FormatBool(f)}
 
@@ -109,3 +108,89 @@ func (fr FileRequest) SourceType(typ string) FileRequest {
 }
 
 // TODO: add other options
+
+type SolutionRequest url.Values
+
+func NewSolutionRequest(pID int, name, file string, tag SolutionTag) SolutionRequest {
+	return SolutionRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"name":      []string{name},
+		"file":      []string{file},
+		"tag":       []string{string(tag)},
+	}
+}
+
+func (sr SolutionRequest) CheckExisting(f bool) SolutionRequest {
+	sr["checkExisting"] = []string{strconv.FormatBool(f)}
+
+	return sr
+}
+
+func (sr SolutionRequest) SourceType(typ string) SolutionRequest {
+	sr["sourceType"] = []string{typ}
+
+	return sr
+}
+
+type StatementRequest url.Values
+
+func NewStatementRequest(pID int, lang string) StatementRequest {
+	return StatementRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"lang":      []string{lang},
+	}
+}
+
+func (sr StatementRequest) Encoding(enc string) StatementRequest {
+	sr["encoding"] = []string{enc}
+
+	return sr
+}
+
+func (sr StatementRequest) Name(name string) StatementRequest {
+	sr["name"] = []string{name}
+
+	return sr
+}
+
+func (sr StatementRequest) Legend(legend string) StatementRequest {
+	sr["legend"] = []string{legend}
+
+	return sr
+}
+
+func (sr StatementRequest) Input(input string) StatementRequest {
+	sr["input"] = []string{input}
+
+	return sr
+}
+
+func (sr StatementRequest) Output(output string) StatementRequest {
+	sr["output"] = []string{output}
+
+	return sr
+}
+
+func (sr StatementRequest) Scoring(scoring string) StatementRequest {
+	sr["scoring"] = []string{scoring}
+
+	return sr
+}
+
+func (sr StatementRequest) Interaction(interaction string) StatementRequest {
+	sr["interaction"] = []string{interaction}
+
+	return sr
+}
+
+func (sr StatementRequest) Notes(notes string) StatementRequest {
+	sr["notes"] = []string{notes}
+
+	return sr
+}
+
+func (sr StatementRequest) Tutorial(tutorial string) StatementRequest {
+	sr["tutorial"] = []string{tutorial}
+
+	return sr
+}
