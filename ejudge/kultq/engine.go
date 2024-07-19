@@ -3,10 +3,8 @@ package kultq
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/abiosoft/ishell/v2"
-	"github.com/fatih/color"
 )
 
 type Config struct {
@@ -16,23 +14,16 @@ type Config struct {
 }
 
 type Engine struct {
-	cfg      *Config
-	problems []problem
+	cfg       *Config
+	probNames []string
+	probMapa  map[string]problem
 }
 
 func NewEngine(cfg *Config) *Engine {
 	return &Engine{
-		cfg: cfg,
+		cfg:      cfg,
+		probMapa: make(map[string]problem),
 	}
-}
-
-func (e *Engine) GetProblems() []string {
-	probs := make([]string, 0, len(e.problems))
-	for _, p := range e.problems {
-		probs = append(probs, p.name)
-	}
-
-	return probs
 }
 
 func (e *Engine) Run() error {
@@ -44,11 +35,12 @@ func (e *Engine) Run() error {
 		if !f.IsDir() {
 			continue
 		}
+		e.probNames = append(e.probNames, f.Name())
 		p := problem{name: f.Name(), cfg: e.cfg}
 		if p.init() != nil {
 			return err
 		}
-		e.problems = append(e.problems, p)
+		e.probMapa[f.Name()] = p
 	}
 	e.runShell()
 
@@ -57,14 +49,15 @@ func (e *Engine) Run() error {
 
 func (e *Engine) runShell() {
 	shell := ishell.New()
-	probs := e.GetProblems()
 
 	shell.AddCmd(&ishell.Cmd{
 		Name: "list",
 		Help: "list contest problems",
 		Func: func(c *ishell.Context) {
-			list := strings.Join(probs, " ")
-			c.Println(color.YellowString(list))
+			for _, name := range e.probNames {
+				p := e.probMapa[name]
+				c.Println(p.String())
+			}
 		},
 	})
 
@@ -72,10 +65,10 @@ func (e *Engine) runShell() {
 		Name: "run",
 		Help: "run antiplagiarism comparator",
 		Func: func(c *ishell.Context) {
-			choices := c.Checklist(probs, "Which problems you want to check?", nil)
+			choices := c.Checklist(e.probNames, "Which problems you want to check?", nil)
 			sprobs := make([]string, 0, len(choices))
 			for _, idx := range choices {
-				sprobs = append(sprobs, probs[idx])
+				sprobs = append(sprobs, e.probNames[idx])
 			}
 			e.runProbs(c, sprobs)
 		},
@@ -85,20 +78,14 @@ func (e *Engine) runShell() {
 }
 
 func (e *Engine) runProbs(c *ishell.Context, probs []string) {
-	pMapa := make(map[string]struct{})
-	for _, name := range probs {
-		pMapa[name] = struct{}{}
-	}
 	totUsr := 0
 	prog := make(chan struct{})
 	errs := make(chan error)
-	for _, p := range e.problems {
-		if _, ok := pMapa[p.name]; ok {
-			c.Printf("problem %s: %d users, %d nested directories, %v unknown languages\n",
-				p.name, len(p.users), p.nestedCnt, p.unknown)
-			totUsr += len(p.users)
-			go p.checkProblem(prog, errs)
-		}
+	for _, name := range probs {
+		p := e.probMapa[name]
+		c.Println(p.String())
+		totUsr += len(p.users)
+		go p.checkProblem(prog, errs)
 	}
 
 	progUsr := 0
