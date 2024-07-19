@@ -3,11 +3,14 @@ package kultq
 import (
 	"bytes"
 	"encoding/csv"
+	"fmt"
 	"os"
 	"os/exec"
 	"path"
 	"strconv"
 	"strings"
+
+	"github.com/fatih/color"
 )
 
 type problem struct {
@@ -17,6 +20,11 @@ type problem struct {
 	writer    *csv.Writer
 	nestedCnt int
 	unknown   map[string]int
+}
+
+func (p *problem) String() string {
+	return fmt.Sprintf("problem %s: %d users; unknown langs: %s",
+		color.YellowString(p.name), len(p.users), color.RedString(fmt.Sprint(p.unknown)))
 }
 
 func (p *problem) init() error {
@@ -54,7 +62,7 @@ func (p *problem) runDream(lang string, runs1, runs2 []string) error {
 			if err != nil {
 				return err
 			}
-			record := []string{output, path.Base(runs1[i]), path.Base(runs2[j])}
+			record := []string{output, runs1[i], runs2[j]}
 			if err := p.writer.Write(record); err != nil {
 				return err
 			}
