@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 
 	"github.com/abiosoft/ishell/v2"
 )
@@ -63,6 +64,49 @@ func (e *Engine) comRunFunc(c *ishell.Context) {
 	e.runProbs(c, sprobs)
 }
 
+func (e *Engine) comSliceFunc(c *ishell.Context) {
+	choice := c.MultiChoice(e.probNames, "Which problem you want to slice?")
+	if choice == -1 {
+		return
+	}
+	stat := stata{}
+	if err := stat.read(e.probNames[choice]); err != nil {
+		c.Err(err)
+
+		return
+	}
+
+	c.ShowPrompt(false)
+	defer c.ShowPrompt(true)
+	c.Print("Lower bound (%): ")
+	lbs := c.ReadLine()
+	lb, err := strconv.Atoi(lbs)
+	if err != nil {
+		c.Err(err)
+
+		return
+	}
+	lbf := float64(lb) / 100 //nolint:mnd // percents
+	c.Print("Upper bound (%): ")
+	rbs := c.ReadLine()
+	rb, err := strconv.Atoi(rbs)
+	if err != nil {
+		c.Err(err)
+
+		return
+	}
+	rbf := float64(rb) / 100 //nolint:mnd // percents
+
+	var slip []statPair
+	for _, p := range stat.pairs {
+		if lbf <= p.score && p.score <= rbf {
+			slip = append(slip, p)
+		}
+	}
+
+	c.Printf("Slice size: %d pairs\n", len(slip))
+}
+
 func (e *Engine) comStatsFunc(c *ishell.Context) {
 	choice := c.MultiChoice(e.probNames, "Which csv report you want to display?")
 	if choice == -1 {
@@ -77,8 +121,8 @@ func (e *Engine) comStatsFunc(c *ishell.Context) {
 	ps := make([]int, len(e.cfg.StatBounds))
 	for _, s := range stat.pairs {
 		idx := sort.Search(len(e.cfg.StatBounds), func(i int) bool {
-			return e.cfg.StatBounds[i] >= s.score
-		})
+			return e.cfg.StatBounds[i] > s.score
+		}) - 1
 		ps[idx]++
 	}
 	c.Printf("Stats for problem %s:\n", e.probNames[choice])
@@ -102,6 +146,12 @@ func (e *Engine) runShell() {
 		Name: "run",
 		Help: "run antiplagiarism comparator",
 		Func: e.comRunFunc,
+	})
+
+	shell.AddCmd(&ishell.Cmd{
+		Name: "slice",
+		Help: "check random pairs in fixed interval",
+		Func: e.comSliceFunc,
 	})
 
 	shell.AddCmd(&ishell.Cmd{
