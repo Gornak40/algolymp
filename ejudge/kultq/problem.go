@@ -9,8 +9,6 @@ import (
 	"path"
 	"strconv"
 	"strings"
-
-	"github.com/fatih/color"
 )
 
 type problem struct {
@@ -23,8 +21,8 @@ type problem struct {
 }
 
 func (p *problem) String() string {
-	return fmt.Sprintf("problem %s: %d users; unknown langs: %s",
-		color.YellowString(p.name), len(p.users), color.RedString(fmt.Sprint(p.unknown)))
+	return fmt.Sprintf("Problem %s: %d users; unknown langs: %s",
+		p.name, len(p.users), fmt.Sprint(p.unknown))
 }
 
 func (p *problem) init() error {
