@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	parser := argparse.NewParser("kultq", "Anti plagiarism checker with web UI and interactive shell.")
+	parser := argparse.NewParser("kultq", "Anti plagiarism checker with interactive shell.")
 	contestDir := parser.String("c", "contest", &argparse.Options{
 		Required: true,
 		Help:     "Contest directory with <problem>/<user-login>/<run>.[py|cpp]",
