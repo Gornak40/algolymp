@@ -12,6 +12,7 @@ import (
 type Config struct {
 	DreamPath  string    `json:"dreamPath"`
 	StatBounds []float64 `json:"statBounds"`
+	Batcat     string    `json:"batcat"`
 }
 
 type Engine struct {
@@ -43,6 +44,7 @@ func (e *Engine) Run() error {
 		}
 		e.probMapa[f.Name()] = p
 	}
+
 	e.runShell()
 
 	return nil
@@ -62,6 +64,16 @@ func (e *Engine) comRunFunc(c *ishell.Context) {
 		sprobs = append(sprobs, e.probNames[idx])
 	}
 	e.runProbs(c, sprobs)
+}
+
+func confirm(c *ishell.Context, message string) (bool, error) {
+	c.Print(message, " [y/N]? ")
+	yn, err := c.ReadLineErr()
+	if err != nil {
+		return false, err
+	}
+
+	return yn == "y" || yn == "Y", nil
 }
 
 func (e *Engine) comSliceFunc(c *ishell.Context) {
@@ -105,6 +117,16 @@ func (e *Engine) comSliceFunc(c *ishell.Context) {
 	}
 
 	c.Printf("Slice size: %d pairs\n", len(slip))
+	if len(slip) == 0 {
+		return
+	}
+	if yn, _ := confirm(c, "Start comparator"); yn {
+		if err := e.startUI(c, slip); err != nil {
+			c.Err(err)
+
+			return
+		}
+	}
 }
 
 func (e *Engine) comStatsFunc(c *ishell.Context) {
