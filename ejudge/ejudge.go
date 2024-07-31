@@ -1,8 +1,10 @@
 package ejudge
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
@@ -49,11 +51,17 @@ type Ejudge struct {
 func NewEjudge(cfg *Config) *Ejudge {
 	logrus.WithField("url", cfg.URL).Info("init ejudge engine")
 	jar, _ := cookiejar.New(nil)
+	trans := &http.Transport{
+		DialContext: func(_ context.Context, _, addr string) (net.Conn, error) {
+			return net.Dial("tcp4", addr)
+		},
+	}
 
 	return &Ejudge{
 		cfg: cfg,
 		client: &http.Client{
-			Jar: jar,
+			Jar:       jar,
+			Transport: trans,
 		},
 	}
 }
