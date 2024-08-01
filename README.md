@@ -14,6 +14,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
 | [gibon](#gibon) | api multitool | | 🦍 | ✅ |
+| [kultq](#kultq) | anti plagiarism checker | 🦍 | | 🧑‍💻 |
 | [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
@@ -306,6 +307,9 @@ for i in $(gibon -i 42619 -m contest); do gibon -i $i -m commit && gibon -i $i -
 ```
 
 ![gibon logo](https://algolymp.ru/static/img/gibon.png)
+
+## kultq
+*Anti plagiarism checker with interactive shell.*
 
 ## pepel
 *Generate hasher solution based on a/ans/out files.*
