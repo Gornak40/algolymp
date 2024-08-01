@@ -25,7 +25,13 @@ func main() {
 	pClient := polygon.NewPolygon(&cfg.Polygon)
 
 	vyd := vydra.NewVydra(pClient, *pID)
-	if err := vyd.Upload(); err != nil {
+	errs := make(chan error)
+	go func() {
+		for err := range errs {
+			logrus.WithError(err).Error("vydra error")
+		}
+	}()
+	if err := vyd.Upload(errs); err != nil {
 		logrus.WithError(err).Fatal("upload failed")
 	}
 }

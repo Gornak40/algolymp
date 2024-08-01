@@ -151,28 +151,29 @@ func (v *Vydra) uploadStatement(stat *Statement) error {
 	})
 }
 
-func (v *Vydra) Upload() error {
+func (v *Vydra) Upload(errs chan error) error {
+	defer close(errs)
 	if err := v.readXML("problem.xml"); err != nil {
 		return err
 	}
 	for _, sol := range v.prob.Assets.Solutions.Solutions {
 		if err := v.uploadSolution(&sol); err != nil {
-			return err
+			errs <- err
 		}
 	}
 	for _, res := range v.prob.Files.Resources.Files {
 		if err := v.uploadResource(&res); err != nil {
-			return err
+			errs <- err
 		}
 	}
 	for _, exe := range v.prob.Files.Executables.Executables {
 		if err := v.uploadExecutable(&exe); err != nil {
-			return err
+			errs <- err
 		}
 	}
 	for _, stat := range v.prob.Statements.Statements {
 		if err := v.uploadStatement(&stat); err != nil {
-			return err
+			errs <- err
 		}
 	}
 
