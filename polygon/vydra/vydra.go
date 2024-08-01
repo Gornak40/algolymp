@@ -14,7 +14,13 @@ import (
 )
 
 const (
+	megabyte = 1024 * 1024
+
 	statementType = "application/x-tex"
+	defaultTL     = 1000
+	defaultML     = 256
+	defaultInput  = "input"
+	defaultOutput = "output"
 )
 
 var (
@@ -175,25 +181,52 @@ func (v *Vydra) uploadTags(tags []Tag) error {
 }
 
 // TODO: add validator tests.
-func (v *Vydra) uploadValidator(val *Validator) error {
+func (v *Vydra) initValidator(val *Validator) error {
 	logrus.WithFields(logrus.Fields{
 		"path": val.Source.Path, "type": val.Source.Type,
-	}).Info("upload validator")
+	}).Info("init validator")
 
 	return v.client.SetValidator(v.pID, filepath.Base(val.Source.Path))
 }
 
 // TODO: add checker tests.
-func (v *Vydra) uploadChecker(chk *Checker) error {
+func (v *Vydra) initChecker(chk *Checker) error {
 	path := chk.Name
 	if path == "" {
 		path = filepath.Base(chk.Source.Path)
 	}
 	logrus.WithFields(logrus.Fields{
 		"path": path, "type": chk.Type,
-	}).Info("upload checker")
+	}).Info("init checker")
 
 	return v.client.SetChecker(v.pID, path)
+}
+
+func (v *Vydra) initProblem(judge *Judging) error {
+	input := defaultInput
+	if judge.InputFile != "" {
+		input = judge.InputFile
+	}
+	output := defaultOutput
+	if judge.OutputFile != "" {
+		output = judge.OutputFile
+	}
+	tl := defaultTL
+	ml := defaultML
+	if len(judge.TestSets) != 0 {
+		tl = judge.TestSets[0].TimeLimit
+		ml = judge.TestSets[0].MemoryLimit / megabyte
+	}
+	logrus.WithFields(logrus.Fields{
+		"input": input, "output": output,
+		"tl": tl, "ml": ml,
+	}).Info("init problem")
+
+	pr := polygon.NewProblemRequest(v.pID).
+		InputFile(input).OutputFile(output).
+		TimeLimit(tl).MemoryLimit(ml)
+
+	return v.client.UpdateInfo(pr)
 }
 
 func (v *Vydra) Upload(errs chan error) error {
@@ -201,6 +234,8 @@ func (v *Vydra) Upload(errs chan error) error {
 	if err := v.readXML("problem.xml"); err != nil {
 		return err
 	}
+	errs <- v.initProblem(&v.prob.Judging)
+	errs <- v.uploadTags(v.prob.Tags.Tags)
 	for _, sol := range v.prob.Assets.Solutions.Solutions {
 		errs <- v.uploadSolution(&sol)
 	}
@@ -213,12 +248,11 @@ func (v *Vydra) Upload(errs chan error) error {
 	for _, stat := range v.prob.Statements.Statements {
 		errs <- v.uploadStatement(&stat)
 	}
-	errs <- v.uploadTags(v.prob.Tags.Tags)
 	if val := v.prob.Assets.Validators.Validator; val != nil {
-		errs <- v.uploadValidator(val)
+		errs <- v.initValidator(val)
 	}
 	if chk := v.prob.Assets.Checker; chk != nil {
-		errs <- v.uploadChecker(chk)
+		errs <- v.initChecker(chk)
 	}
 
 	return nil

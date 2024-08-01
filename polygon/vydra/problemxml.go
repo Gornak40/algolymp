@@ -27,13 +27,16 @@ type Statement struct {
 }
 
 type Test struct {
-	Method  string `xml:"method,attr"`
-	Sample  bool   `xml:"sample,attr"`
-	Cmd     string `xml:"cmd,attr"`
-	Verdict string `xml:"verdict,attr"`
+	Description string `xml:"description,attr"`
+	Method      string `xml:"method,attr"`
+	Sample      bool   `xml:"sample,attr"`
+	Cmd         string `xml:"cmd,attr"`
+	Verdict     string `xml:"verdict,attr"`
 }
 
 type TestSet struct {
+	TimeLimit         int    `xml:"time-limit"`
+	MemoryLimit       int    `xml:"memory-limit"`
 	TestCount         int    `xml:"test-count"`
 	InputPathPattern  string `xml:"input-path-pattern"`
 	OutputPathPattern string `xml:"output-path-pattern"`
@@ -76,6 +79,14 @@ type Tag struct {
 	Value string `xml:"value,attr"`
 }
 
+type Judging struct {
+	CPUName    string    `xml:"cpu-name,attr"`
+	CPUSpeed   int       `xml:"cpu-speed,attr"`
+	InputFile  string    `xml:"input-file,attr"`
+	OutputFile string    `xml:"output-file,attr"`
+	TestSets   []TestSet `xml:"testset"`
+}
+
 type ProblemXML struct {
 	Revision   int    `xml:"revision,attr"`
 	ShortName  string `xml:"short-name,attr"`
@@ -84,7 +95,8 @@ type ProblemXML struct {
 	Statements struct {
 		Statements []Statement `xml:"statement"`
 	} `xml:"statements"`
-	Tags struct {
+	Judging Judging `xml:"judging"`
+	Tags    struct {
 		Tags []Tag `xml:"tag"`
 	} `xml:"tags"`
 }
