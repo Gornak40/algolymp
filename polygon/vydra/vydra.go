@@ -69,6 +69,8 @@ func (v *Vydra) uploadSolution(sol *Solution) error {
 		tag = polygon.TagTimeLimit
 	case "wrong-answer":
 		tag = polygon.TagWrongAnswer
+	case "time-limit-exceeded-or-accepted":
+		tag = polygon.TagTLorOK
 	default:
 		return fmt.Errorf("%w: %s", ErrBadSolutionTag, sol.Tag)
 	}
