@@ -1,6 +1,7 @@
 package polygon
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha512"
 	"encoding/hex"
@@ -8,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/url"
 	"sort"
@@ -77,12 +79,21 @@ func buildRequest(method, link string, params url.Values) (*http.Request, error)
 
 		return http.NewRequestWithContext(context.TODO(), method, link, nil)
 	case http.MethodPost:
-		buf := strings.NewReader(params.Encode())
+		buf := &bytes.Buffer{}
+		writer := multipart.NewWriter(buf)
+		for k, vals := range params {
+			for _, v := range vals {
+				if err := writer.WriteField(k, v); err != nil {
+					return nil, err
+				}
+			}
+		}
+		writer.Close()
 		req, err := http.NewRequestWithContext(context.TODO(), method, link, buf)
 		if err != nil {
 			return nil, err
 		}
-		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		req.Header.Set("Content-Type", writer.FormDataContentType())
 
 		return req, nil
 	default:
