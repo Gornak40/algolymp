@@ -26,10 +26,41 @@ type Statement struct {
 	Type     string `xml:"type,attr"`
 }
 
+type Test struct {
+	Method  string `xml:"method,attr"`
+	Sample  bool   `xml:"sample,attr"`
+	Cmd     string `xml:"cmd,attr"`
+	Verdict string `xml:"verdict,attr"`
+}
+
+type TestSet struct {
+	TestCount         int    `xml:"test-count"`
+	InputPathPattern  string `xml:"input-path-pattern"`
+	OutputPathPattern string `xml:"output-path-pattern"`
+	AnswerPathPattern string `xml:"answer-path-pattern"`
+	Tests             []Test `xml:"tests"`
+}
+
+type Validator struct {
+	Source  Source  `xml:"source"`
+	TestSet TestSet `xml:"testset"`
+}
+
+type Checker struct {
+	Name    string  `xml:"name,attr"`
+	Type    string  `xml:"type,attr"`
+	Source  Source  `xml:"source"`
+	TestSet TestSet `xml:"testset"`
+}
+
 type Assets struct {
 	Solutions struct {
 		Solutions []Solution `xml:"solution"`
 	} `xml:"solutions"`
+	Validators struct {
+		Validator *Validator `xml:"validator"`
+	} `xml:"validators"`
+	Checker *Checker `xml:"checker"`
 }
 
 type Files struct {
@@ -41,6 +72,10 @@ type Files struct {
 	} `xml:"executables"`
 }
 
+type Tag struct {
+	Value string `xml:"value,attr"`
+}
+
 type ProblemXML struct {
 	Revision   int    `xml:"revision,attr"`
 	ShortName  string `xml:"short-name,attr"`
@@ -49,4 +84,7 @@ type ProblemXML struct {
 	Statements struct {
 		Statements []Statement `xml:"statement"`
 	} `xml:"statements"`
+	Tags struct {
+		Tags []Tag `xml:"tag"`
+	} `xml:"tags"`
 }

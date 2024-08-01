@@ -28,7 +28,9 @@ func main() {
 	errs := make(chan error)
 	go func() {
 		for err := range errs {
-			logrus.WithError(err).Error("vydra error")
+			if err != nil {
+				logrus.WithError(err).Error("vydra error")
+			}
 		}
 	}()
 	if err := vyd.Upload(errs); err != nil {
