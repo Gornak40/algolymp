@@ -393,6 +393,17 @@ func (p *Polygon) SetInteractor(pID int, interactor string) error {
 	return err
 }
 
+func (p *Polygon) SaveScript(pID int, testset, source string) error {
+	link, params := p.buildURL("problem.saveScript", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testset":   []string{testset},
+		"source":    []string{source},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
 func (p *Polygon) SaveSolution(sr SolutionRequest) error {
 	link, params := p.buildURL("problem.saveSolution", url.Values(sr))
 	_, err := p.makeQuery(http.MethodPost, link, params)

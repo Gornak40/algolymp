@@ -35,13 +35,16 @@ type Test struct {
 }
 
 type TestSet struct {
+	Name              string `xml:"name,attr"`
 	TimeLimit         int    `xml:"time-limit"`
 	MemoryLimit       int    `xml:"memory-limit"`
 	TestCount         int    `xml:"test-count"`
 	InputPathPattern  string `xml:"input-path-pattern"`
 	OutputPathPattern string `xml:"output-path-pattern"`
 	AnswerPathPattern string `xml:"answer-path-pattern"`
-	Tests             []Test `xml:"tests"`
+	Tests             struct {
+		Tests []Test `xml:"test"`
+	} `xml:"tests"`
 }
 
 type Validator struct {

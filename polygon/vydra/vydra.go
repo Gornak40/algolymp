@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 
+	"github.com/Gornak40/algolymp/internal/natstream"
 	"github.com/Gornak40/algolymp/polygon"
 	"github.com/sirupsen/logrus"
 )
@@ -31,12 +33,14 @@ type Vydra struct {
 	client *polygon.Polygon
 	pID    int
 	prob   ProblemXML
+	stream *natstream.NatStream
 }
 
 func NewVydra(client *polygon.Polygon, pID int) *Vydra {
 	return &Vydra{
 		client: client,
 		pID:    pID,
+		stream: new(natstream.NatStream),
 	}
 }
 
@@ -229,6 +233,39 @@ func (v *Vydra) initProblem(judge *Judging) error {
 	return v.client.UpdateInfo(pr)
 }
 
+// TODO: add points, groups, etc.
+func (v *Vydra) uploadTest(testset string, idx int, test *Test) error {
+	logrus.WithFields(logrus.Fields{
+		"testset": testset, "idx": idx, "method": test.Method, "sample": test.Sample,
+	}).Info("upload test")
+
+	tr := polygon.NewTestRequest(v.pID, idx).
+		Description(test.Description).
+		UseInStatements(test.Sample)
+	if test.Method == "manual" {
+		text, err := v.stream.Next()
+		if err != nil {
+			return err
+		}
+		tr.Input(text)
+	}
+
+	return v.client.SaveTest(tr)
+}
+
+func (v *Vydra) uploadScript(testset *TestSet) error {
+	logrus.WithField("testset", testset.Name).Info("upload script")
+	gens := make([]string, 0, testset.TestCount)
+	for idx, test := range testset.Tests.Tests { // build script
+		if test.Method == "generated" {
+			gens = append(gens, fmt.Sprintf("%s > %d", test.Cmd, idx+1))
+		}
+	}
+	script := strings.Join(gens, "\n")
+
+	return v.client.SaveScript(v.pID, testset.Name, script)
+}
+
 func (v *Vydra) Upload(errs chan error) error {
 	defer close(errs)
 	if err := v.readXML("problem.xml"); err != nil {
@@ -253,6 +290,17 @@ func (v *Vydra) Upload(errs chan error) error {
 	}
 	if chk := v.prob.Assets.Checker; chk != nil {
 		errs <- v.initChecker(chk)
+	}
+	for _, testset := range v.prob.Judging.TestSets {
+		errs <- v.uploadScript(&testset)
+		if err := v.stream.Init(path.Join(testset.Name, "*[^.a]")); err != nil {
+			errs <- err
+
+			continue
+		}
+		for idx, test := range testset.Tests.Tests {
+			errs <- v.uploadTest(testset.Name, idx+1, &test)
+		}
 	}
 
 	return nil
