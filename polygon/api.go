@@ -22,7 +22,6 @@ import (
 
 const (
 	sixSecretSymbols = "gorill"
-	defaultTestset   = "tests"
 )
 
 type SolutionTag string
@@ -413,6 +412,13 @@ func (p *Polygon) SaveSolution(sr SolutionRequest) error {
 
 func (p *Polygon) SaveStatement(sr StatementRequest) error {
 	link, params := p.buildURL("problem.saveStatement", url.Values(sr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveValidatorTest(vtr ValidatorTestRequest) error {
+	link, params := p.buildURL("problem.saveValidatorTest", url.Values(vtr))
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err

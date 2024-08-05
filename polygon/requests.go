@@ -6,6 +6,10 @@ import (
 	"strconv"
 )
 
+const (
+	defaultTestset = "tests"
+)
+
 type TestRequest url.Values
 
 func NewTestRequest(pID int, index int) TestRequest {
@@ -14,6 +18,12 @@ func NewTestRequest(pID int, index int) TestRequest {
 		"testIndex": []string{strconv.Itoa(index)},
 		"testset":   []string{defaultTestset},
 	}
+}
+
+func (tr TestRequest) TestSet(testset string) TestRequest {
+	tr["testset"] = []string{testset}
+
+	return tr
 }
 
 func (tr TestRequest) Group(group string) TestRequest {
@@ -193,4 +203,26 @@ func (sr StatementRequest) Tutorial(tutorial string) StatementRequest {
 	sr["tutorial"] = []string{tutorial}
 
 	return sr
+}
+
+type ValidatorTestRequest url.Values
+
+func NewValidatorTestRequest(pID, index int) ValidatorTestRequest {
+	return ValidatorTestRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testIndex": []string{strconv.Itoa(index)},
+	}
+}
+
+func (vtr ValidatorTestRequest) Input(input string) ValidatorTestRequest {
+	vtr["testInput"] = []string{input}
+
+	return vtr
+}
+
+// VALID or INVALID.
+func (vtr ValidatorTestRequest) Verdict(verdict string) ValidatorTestRequest {
+	vtr["testVerdict"] = []string{verdict}
+
+	return vtr
 }

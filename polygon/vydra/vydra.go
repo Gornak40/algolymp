@@ -240,6 +240,7 @@ func (v *Vydra) uploadTest(testset string, idx int, test *Test) error {
 	}).Info("upload test")
 
 	tr := polygon.NewTestRequest(v.pID, idx).
+		TestSet(testset).
 		Description(test.Description).
 		UseInStatements(test.Sample)
 	if test.Method == "manual" {
@@ -266,6 +267,19 @@ func (v *Vydra) uploadScript(testset *TestSet) error {
 	return v.client.SaveScript(v.pID, testset.Name, script)
 }
 
+func (v *Vydra) uploadValidatorTest(idx int, test *Test) error {
+	logrus.WithFields(logrus.Fields{"idx": idx}).Info("upload validator test")
+	text, err := v.stream.Next()
+	if err != nil {
+		return err
+	}
+
+	vtr := polygon.NewValidatorTestRequest(v.pID, idx).
+		Input(text).Verdict(strings.ToUpper(test.Verdict))
+
+	return v.client.SaveValidatorTest(vtr)
+}
+
 func (v *Vydra) Upload(errs chan error) error {
 	defer close(errs)
 	if err := v.readXML("problem.xml"); err != nil {
@@ -287,10 +301,22 @@ func (v *Vydra) Upload(errs chan error) error {
 	}
 	if val := v.prob.Assets.Validators.Validator; val != nil {
 		errs <- v.initValidator(val)
+		if err := v.stream.Init("files/tests/validator-tests/*"); err != nil {
+			errs <- err
+
+			goto checker
+		}
+		for idx, test := range val.TestSet.Tests.Tests {
+			errs <- v.uploadValidatorTest(idx+1, &test)
+		}
 	}
+checker:
 	if chk := v.prob.Assets.Checker; chk != nil {
 		errs <- v.initChecker(chk)
+
+		goto judging
 	}
+judging:
 	for _, testset := range v.prob.Judging.TestSets {
 		errs <- v.uploadScript(&testset)
 		if err := v.stream.Init(path.Join(testset.Name, "*[^.a]")); err != nil {
