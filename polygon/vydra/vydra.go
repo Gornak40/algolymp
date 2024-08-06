@@ -20,8 +20,8 @@ const (
 
 	defaultTL     = 1000
 	defaultML     = 256
-	defaultInput  = "input"
-	defaultOutput = "output"
+	defaultInput  = "stdin"
+	defaultOutput = "stdout"
 
 	chkTests = "files/tests/checker-tests"
 )
@@ -314,7 +314,9 @@ func (v *Vydra) Upload(errs chan error) error {
 		return err
 	}
 	errs <- v.initProblem(&v.prob.Judging)
-	errs <- v.uploadTags(v.prob.Tags.Tags)
+	if tags := v.prob.Tags.Tags; len(tags) != 0 {
+		errs <- v.uploadTags(tags)
+	}
 	for _, sol := range v.prob.Assets.Solutions.Solutions {
 		errs <- v.uploadSolution(&sol)
 	}
