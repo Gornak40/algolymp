@@ -16,9 +16,17 @@ func main() {
 		Required: true,
 		Help:     "Polygon problem ID",
 	})
+	pDir := parser.String("p", "prob-dir", &argparse.Options{
+		Required: false,
+		Default:  ".",
+		Help:     "Problem directory (with problem.xml)",
+	})
 
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
+	}
+	if err := os.Chdir(*pDir); err != nil {
+		logrus.WithError(err).Fatal("bad problem directory")
 	}
 
 	cfg := config.NewConfig()

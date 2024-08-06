@@ -469,6 +469,7 @@ Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polyg
 
 ### Flags
 - `-i` - problem id (required)
+- `-p` - problem directory (default: `.`)
 
 ### Config
 - `polygon.url`
@@ -481,6 +482,8 @@ Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polyg
 vydra --help
 vydra -i 364022
 ```
+
+![vydra logo](https://algolymp.ru/static/img/vydra.png)
 
 ## wooda
 *Upload problem files filtered by glob to Polygon using API.*
