@@ -240,6 +240,10 @@ func (v *Vydra) initProblem(judge *Judging) error {
 
 // TODO: add points, groups, etc.
 func (v *Vydra) uploadTest(testset string, idx int, test *Test) error {
+	// It's kind of experimental solution.
+	if (*test == Test{Cmd: test.Cmd, Method: "generated"}) {
+		return nil
+	}
 	logrus.WithFields(logrus.Fields{
 		"testset": testset, "idx": idx, "method": test.Method, "sample": test.Sample,
 	}).Info("upload test")
