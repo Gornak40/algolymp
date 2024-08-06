@@ -423,3 +423,10 @@ func (p *Polygon) SaveValidatorTest(vtr ValidatorTestRequest) error {
 
 	return err
 }
+
+func (p *Polygon) SaveCheckerTest(ctr CheckerTestRequest) error {
+	link, params := p.buildURL("problem.saveCheckerTest", url.Values(ctr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}

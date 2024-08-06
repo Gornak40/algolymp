@@ -18,11 +18,12 @@ import (
 const (
 	megabyte = 1024 * 1024
 
-	statementType = "application/x-tex"
 	defaultTL     = 1000
 	defaultML     = 256
 	defaultInput  = "input"
 	defaultOutput = "output"
+
+	chkTests = "files/tests/checker-tests"
 )
 
 var (
@@ -30,17 +31,21 @@ var (
 )
 
 type Vydra struct {
-	client *polygon.Polygon
-	pID    int
-	prob   ProblemXML
-	stream *natstream.NatStream
+	client    *polygon.Polygon
+	pID       int
+	prob      ProblemXML
+	streamIn  *natstream.NatStream
+	streamOut *natstream.NatStream
+	streamAns *natstream.NatStream
 }
 
 func NewVydra(client *polygon.Polygon, pID int) *Vydra {
 	return &Vydra{
-		client: client,
-		pID:    pID,
-		stream: new(natstream.NatStream),
+		client:    client,
+		pID:       pID,
+		streamIn:  new(natstream.NatStream),
+		streamOut: new(natstream.NatStream),
+		streamAns: new(natstream.NatStream),
 	}
 }
 
@@ -126,7 +131,7 @@ func (v *Vydra) uploadExecutable(exe *Executable) error {
 }
 
 func (v *Vydra) uploadStatement(stat *Statement) error {
-	if stat.Type != statementType {
+	if stat.Type != "application/x-tex" {
 		return nil
 	}
 	logrus.WithFields(logrus.Fields{
@@ -244,11 +249,11 @@ func (v *Vydra) uploadTest(testset string, idx int, test *Test) error {
 		Description(test.Description).
 		UseInStatements(test.Sample)
 	if test.Method == "manual" {
-		text, err := v.stream.Next()
+		input, err := v.streamIn.Next()
 		if err != nil {
 			return err
 		}
-		tr.Input(text)
+		tr.Input(input)
 	}
 
 	return v.client.SaveTest(tr)
@@ -269,17 +274,40 @@ func (v *Vydra) uploadScript(testset *TestSet) error {
 
 func (v *Vydra) uploadValidatorTest(idx int, test *Test) error {
 	logrus.WithFields(logrus.Fields{"idx": idx}).Info("upload validator test")
-	text, err := v.stream.Next()
+	input, err := v.streamIn.Next()
 	if err != nil {
 		return err
 	}
 
 	vtr := polygon.NewValidatorTestRequest(v.pID, idx).
-		Input(text).Verdict(strings.ToUpper(test.Verdict))
+		Input(input).Verdict(strings.ToUpper(test.Verdict))
 
 	return v.client.SaveValidatorTest(vtr)
 }
 
+func (v *Vydra) uploadCheckerTest(idx int, test *Test) error {
+	logrus.WithFields(logrus.Fields{"idx": idx}).Info("upload checker test")
+	input, err := v.streamIn.Next()
+	if err != nil {
+		return err
+	}
+	output, err := v.streamOut.Next()
+	if err != nil {
+		return err
+	}
+	answer, err := v.streamAns.Next()
+	if err != nil {
+		return err
+	}
+
+	ctr := polygon.NewCheckerTestRequest(v.pID, idx).
+		Input(input).Output(output).Answer(answer).
+		Verdict(strings.ReplaceAll(strings.ToUpper(test.Verdict), "-", "_")) // oh my God
+
+	return v.client.SaveCheckerTest(ctr)
+}
+
+//nolint:funlen,cyclop // it's good design
 func (v *Vydra) Upload(errs chan error) error {
 	defer close(errs)
 	if err := v.readXML("problem.xml"); err != nil {
@@ -301,7 +329,7 @@ func (v *Vydra) Upload(errs chan error) error {
 	}
 	if val := v.prob.Assets.Validators.Validator; val != nil {
 		errs <- v.initValidator(val)
-		if err := v.stream.Init("files/tests/validator-tests/*"); err != nil {
+		if err := v.streamIn.Init("files/tests/validator-tests/*"); err != nil {
 			errs <- err
 
 			goto checker
@@ -313,13 +341,29 @@ func (v *Vydra) Upload(errs chan error) error {
 checker:
 	if chk := v.prob.Assets.Checker; chk != nil {
 		errs <- v.initChecker(chk)
+		if err := v.streamIn.Init(filepath.Join(chkTests, "*[^.ao]")); err != nil {
+			errs <- err
 
-		goto judging
+			goto judging
+		}
+		if err := v.streamOut.Init(filepath.Join(chkTests, "*.o")); err != nil {
+			errs <- err
+
+			goto judging
+		}
+		if err := v.streamAns.Init(filepath.Join(chkTests, "*.a")); err != nil {
+			errs <- err
+
+			goto judging
+		}
+		for idx, test := range chk.TestSet.Tests.Tests {
+			errs <- v.uploadCheckerTest(idx+1, &test)
+		}
 	}
 judging:
 	for _, testset := range v.prob.Judging.TestSets {
 		errs <- v.uploadScript(&testset)
-		if err := v.stream.Init(path.Join(testset.Name, "*[^.a]")); err != nil {
+		if err := v.streamIn.Init(path.Join(testset.Name, "*[^.a]")); err != nil {
 			errs <- err
 
 			continue

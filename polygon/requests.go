@@ -226,3 +226,36 @@ func (vtr ValidatorTestRequest) Verdict(verdict string) ValidatorTestRequest {
 
 	return vtr
 }
+
+type CheckerTestRequest url.Values
+
+func NewCheckerTestRequest(pID, index int) CheckerTestRequest {
+	return CheckerTestRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testIndex": []string{strconv.Itoa(index)},
+	}
+}
+
+func (ctr CheckerTestRequest) Input(input string) CheckerTestRequest {
+	ctr["testInput"] = []string{input}
+
+	return ctr
+}
+
+func (ctr CheckerTestRequest) Answer(answer string) CheckerTestRequest {
+	ctr["testAnswer"] = []string{answer}
+
+	return ctr
+}
+
+func (ctr CheckerTestRequest) Output(output string) CheckerTestRequest {
+	ctr["testOutput"] = []string{output}
+
+	return ctr
+}
+
+func (ctr CheckerTestRequest) Verdict(verdict string) CheckerTestRequest {
+	ctr["testVerdict"] = []string{verdict}
+
+	return ctr
+}
