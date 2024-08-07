@@ -66,16 +66,16 @@ func (v *Vydra) initPoints() error {
 }
 
 func (v *Vydra) uploadGroup(testset string, group *Group) error {
-	logrus.WithFields(logrus.Fields{
-		"feedback":     group.FeedbackPolicy,
-		"points":       group.PointsPolicy,
-		"dependencies": group.Dependencies.Dependencies,
-	}).Info("upload group")
-
 	deps := make([]string, 0, len(group.Dependencies.Dependencies))
 	for _, d := range group.Dependencies.Dependencies {
 		deps = append(deps, d.Group)
 	}
+	logrus.WithFields(logrus.Fields{
+		"feedback":     group.FeedbackPolicy,
+		"points":       group.PointsPolicy,
+		"dependencies": deps,
+	}).Info("upload group")
+
 	tgr := polygon.NewTestGroupRequest(v.pID, testset, group.Name).
 		FeedbackPolicy(convertString(group.FeedbackPolicy)).
 		PointsPolicy(convertString(group.PointsPolicy)).
