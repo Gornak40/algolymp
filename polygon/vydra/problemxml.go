@@ -27,11 +27,25 @@ type Statement struct {
 }
 
 type Test struct {
-	Description string `xml:"description,attr"`
-	Method      string `xml:"method,attr"`
-	Sample      bool   `xml:"sample,attr"`
-	Cmd         string `xml:"cmd,attr"`
-	Verdict     string `xml:"verdict,attr"`
+	Description string  `xml:"description,attr"`
+	Method      string  `xml:"method,attr"`
+	Sample      bool    `xml:"sample,attr"`
+	Cmd         string  `xml:"cmd,attr"`
+	Verdict     string  `xml:"verdict,attr"`
+	Group       string  `xml:"group,attr"`
+	Points      float32 `xml:"points,attr"`
+}
+
+type Group struct {
+	FeedbackPolicy string  `xml:"feedback-policy,attr"`
+	PointsPolicy   string  `xml:"points-policy,attr"`
+	Name           string  `xml:"name,attr"`
+	Points         float32 `xml:"points,attr"`
+	Dependencies   struct {
+		Dependencies []struct {
+			Group string `xml:"group,attr"`
+		} `xml:"dependency"`
+	} `xml:"dependencies"`
 }
 
 type TestSet struct {
@@ -45,6 +59,9 @@ type TestSet struct {
 	Tests             struct {
 		Tests []Test `xml:"test"`
 	} `xml:"tests"`
+	Groups struct {
+		Groups []Group `xml:"group"`
+	} `xml:"groups"`
 }
 
 type Validator struct {

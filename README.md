@@ -457,15 +457,15 @@ valeria -i 285375 -t moscow -c n -c m -c k
 
 ### About
 
-**This tool is still in development.**
-
-*Reset problem to a zero revision for better user experience.*
+**This tool is in beta right now.**
 
 This tool uses `problem.xml` for uploading all package content.
 
 Useful for migration from `polygon.lksh.ru` to `polygon.codeforces.com`.
 
 Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polygon-cli) tool.
+
+*Ensure that the problem you are uploading the package into is empty.*
 
 ### Flags
 - `-i` - problem id (required)

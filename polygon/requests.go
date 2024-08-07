@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -258,4 +259,32 @@ func (ctr CheckerTestRequest) Verdict(verdict string) CheckerTestRequest {
 	ctr["testVerdict"] = []string{verdict}
 
 	return ctr
+}
+
+type TestGroupRequest url.Values
+
+func NewTestGroupRequest(pID int, testset, group string) TestGroupRequest {
+	return TestGroupRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testset":   []string{testset},
+		"group":     []string{group},
+	}
+}
+
+func (tgr TestGroupRequest) PointsPolicy(policy string) TestGroupRequest {
+	tgr["pointsPolicy"] = []string{policy}
+
+	return tgr
+}
+
+func (tgr TestGroupRequest) FeedbackPolicy(feedback string) TestGroupRequest {
+	tgr["feedbackPolicy"] = []string{feedback}
+
+	return tgr
+}
+
+func (tgr TestGroupRequest) Dependencies(deps []string) TestGroupRequest {
+	tgr["dependencies"] = []string{strings.Join(deps, ",")}
+
+	return tgr
 }

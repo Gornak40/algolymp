@@ -430,3 +430,10 @@ func (p *Polygon) SaveCheckerTest(ctr CheckerTestRequest) error {
 
 	return err
 }
+
+func (p *Polygon) SaveTestGroup(tgr TestGroupRequest) error {
+	link, params := p.buildURL("problem.saveTestGroup", url.Values(tgr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
