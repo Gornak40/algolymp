@@ -18,6 +18,9 @@ func (v *Vydra) uploadScript(testset *TestSet) error {
 		}
 	}
 	script := strings.Join(gens, "\n")
+	if script == "" {
+		return nil
+	}
 
 	return v.client.SaveScript(v.pID, testset.Name, script)
 }
