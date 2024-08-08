@@ -37,8 +37,10 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 - 🦍 Engines usage
 
 ## Build
+
+Download and install the latest version of [Go](https://go.dev/doc/install).
+
 ```bash
-sudo apt install go
 make
 export PATH=$(pwd)/bin:$PATH
 ```
@@ -465,7 +467,7 @@ Useful for migration from `polygon.lksh.ru` to `polygon.codeforces.com`.
 
 Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polygon-cli) tool.
 
-*Ensure that the problem you are uploading the package into is empty.*
+**Ensure that the problem you are uploading the package into is empty.**
 
 ### Flags
 - `-i` - problem id (required)
