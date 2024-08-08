@@ -34,6 +34,7 @@ type Test struct {
 	Verdict     string  `xml:"verdict,attr"`
 	Group       string  `xml:"group,attr"`
 	Points      float32 `xml:"points,attr"`
+	FromFile    string  `xml:"from-file,attr"`
 }
 
 type Group struct {

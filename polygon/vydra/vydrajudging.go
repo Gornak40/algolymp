@@ -14,7 +14,11 @@ func (v *Vydra) uploadScript(testset *TestSet) error {
 	gens := make([]string, 0, testset.TestCount)
 	for idx, test := range testset.Tests.Tests { // build script
 		if test.Method == "generated" {
-			gens = append(gens, fmt.Sprintf("%s > %d", test.Cmd, idx+1))
+			cmd := test.Cmd
+			if test.FromFile != "" { // TODO: find better solution for `gen > {3-100}``
+				cmd += " " + test.FromFile
+			}
+			gens = append(gens, fmt.Sprintf("%s > %d", cmd, idx+1))
 		}
 	}
 	script := strings.Join(gens, "\n")
