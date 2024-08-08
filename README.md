@@ -469,6 +469,15 @@ Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polyg
 
 **Ensure that the problem you are uploading the package into is empty.**
 
+### Known issues
+
+- If problem has testsets other than `tests`, you should create them manually, [issue](https://github.com/Codeforces/polygon-issue-tracking/issues/549);
+- If problem is interactive, set `Is problem interactive` checkbox manually;
+- If problem has statements resources, upload them manually;
+- If problem has custom input/output, set it manually;
+- If problem has [FreeMaker](https://freemarker.apache.org) generator, it will expand;
+- If problem has stresses, unpload them manually.
+
 ### Flags
 - `-i` - problem id (required)
 - `-p` - problem directory (default: `.`)

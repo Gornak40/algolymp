@@ -15,7 +15,7 @@ func (v *Vydra) uploadScript(testset *TestSet) error {
 	for idx, test := range testset.Tests.Tests { // build script
 		if test.Method == "generated" {
 			cmd := test.Cmd
-			if test.FromFile != "" { // TODO: find better solution for `gen > {3-100}``
+			if test.FromFile != "" { // TODO: find better solution for `gen > {3-100}`
 				cmd += " " + test.FromFile
 			}
 			gens = append(gens, fmt.Sprintf("%s > %d", cmd, idx+1))
