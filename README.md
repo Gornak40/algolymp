@@ -463,7 +463,7 @@ valeria -i 285375 -t moscow -c n -c m -c k
 
 This tool uses `problem.xml` for uploading all package content.
 
-Useful for migration from `polygon.lksh.ru` to `polygon.codeforces.com`.
+Useful for migration between `polygon.lksh.ru` and `polygon.codeforces.com`.
 
 Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polygon-cli) tool.
 
