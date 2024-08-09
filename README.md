@@ -18,11 +18,11 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
+| [vydra](#vydra) | upload package | | 🦍 | 🧑‍💻 |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | ✅ |
 | ⚙️ | move json config to ini | | | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
-| 👻 | upload package | | 🦍 | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
 | 👻 | zip extractor for websites | | | 🤔 |
@@ -37,8 +37,10 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 - 🦍 Engines usage
 
 ## Build
+
+Download and install the latest version of [Go](https://go.dev/doc/install).
+
 ```bash
-sudo apt install go
 make
 export PATH=$(pwd)/bin:$PATH
 ```
@@ -316,6 +318,8 @@ Print `python` solution that outputs correct answer for each passed input file a
 
 Useful with Polygon to upload a problem without main correct solution.
 
+**Make sure your input files has `\r\n` line endings (use `unix2dos`), because Polygon works in Windows.**
+
 It's ready to work with any input/output files, encoding and escape sequences don't matter.
 
 Works great with [wooda](#wooda).
@@ -449,6 +453,49 @@ valeria -i 285375 -t moscow -c n -c m -c k
 ```
 
 ![valeria logo](https://algolymp.ru/static/img/valeria.png)
+
+## vydra
+*Upload full problem package to Polygon using API.*
+
+### About
+
+**This tool is in beta right now.**
+
+This tool uses `problem.xml` for uploading all package content.
+
+Useful for migration between `polygon.lksh.ru` and `polygon.codeforces.com`.
+
+Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polygon-cli) tool.
+
+**Ensure that the problem you are uploading the package into is empty.**
+
+### Known issues
+
+- If problem has testsets other than `tests`, you should create them manually, [issue](https://github.com/Codeforces/polygon-issue-tracking/issues/549);
+- If problem is interactive, set `Is problem interactive` checkbox manually;
+- If problem has statements resources, upload them manually;
+- If problem has custom input/output, set it manually;
+- If problem has [FreeMaker](https://freemarker.apache.org) generator, it will expand;
+- If problem has stresses, unpload them manually;
+- If checker is custom, it's recommended to set `Auto-update` checkbox for `testlib.h`.
+
+### Flags
+- `-i` - problem id (required)
+- `-p` - problem directory (default: `.`)
+
+### Config
+- `polygon.url`
+- `polygon.apiKey`
+- `polygon.apiSecret`
+
+### Examples
+
+```bash
+vydra --help
+vydra -i 364022
+```
+
+![vydra logo](https://algolymp.ru/static/img/vydra.png)
 
 ## wooda
 *Upload problem files filtered by glob to Polygon using API.*

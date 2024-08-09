@@ -4,6 +4,11 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+	"strings"
+)
+
+const (
+	defaultTestset = "tests"
 )
 
 type TestRequest url.Values
@@ -14,6 +19,12 @@ func NewTestRequest(pID int, index int) TestRequest {
 		"testIndex": []string{strconv.Itoa(index)},
 		"testset":   []string{defaultTestset},
 	}
+}
+
+func (tr TestRequest) TestSet(testset string) TestRequest {
+	tr["testset"] = []string{testset}
+
+	return tr
 }
 
 func (tr TestRequest) Group(group string) TestRequest {
@@ -95,7 +106,6 @@ func NewFileRequest(pID int, typ FileType, name, file string) FileRequest {
 	}
 }
 
-// TODO: fix it.
 func (fr FileRequest) CheckExisting(f bool) FileRequest {
 	fr["checkExisting"] = []string{strconv.FormatBool(f)}
 
@@ -109,3 +119,172 @@ func (fr FileRequest) SourceType(typ string) FileRequest {
 }
 
 // TODO: add other options
+
+type SolutionRequest url.Values
+
+func NewSolutionRequest(pID int, name, file string, tag SolutionTag) SolutionRequest {
+	return SolutionRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"name":      []string{name},
+		"file":      []string{file},
+		"tag":       []string{string(tag)},
+	}
+}
+
+func (sr SolutionRequest) CheckExisting(f bool) SolutionRequest {
+	sr["checkExisting"] = []string{strconv.FormatBool(f)}
+
+	return sr
+}
+
+func (sr SolutionRequest) SourceType(typ string) SolutionRequest {
+	sr["sourceType"] = []string{typ}
+
+	return sr
+}
+
+type StatementRequest url.Values
+
+func NewStatementRequest(pID int, lang string) StatementRequest {
+	return StatementRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"lang":      []string{lang},
+	}
+}
+
+func (sr StatementRequest) Encoding(enc string) StatementRequest {
+	sr["encoding"] = []string{enc}
+
+	return sr
+}
+
+func (sr StatementRequest) Name(name string) StatementRequest {
+	sr["name"] = []string{name}
+
+	return sr
+}
+
+func (sr StatementRequest) Legend(legend string) StatementRequest {
+	sr["legend"] = []string{legend}
+
+	return sr
+}
+
+func (sr StatementRequest) Input(input string) StatementRequest {
+	sr["input"] = []string{input}
+
+	return sr
+}
+
+func (sr StatementRequest) Output(output string) StatementRequest {
+	sr["output"] = []string{output}
+
+	return sr
+}
+
+func (sr StatementRequest) Scoring(scoring string) StatementRequest {
+	sr["scoring"] = []string{scoring}
+
+	return sr
+}
+
+func (sr StatementRequest) Interaction(interaction string) StatementRequest {
+	sr["interaction"] = []string{interaction}
+
+	return sr
+}
+
+func (sr StatementRequest) Notes(notes string) StatementRequest {
+	sr["notes"] = []string{notes}
+
+	return sr
+}
+
+func (sr StatementRequest) Tutorial(tutorial string) StatementRequest {
+	sr["tutorial"] = []string{tutorial}
+
+	return sr
+}
+
+type ValidatorTestRequest url.Values
+
+func NewValidatorTestRequest(pID, index int) ValidatorTestRequest {
+	return ValidatorTestRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testIndex": []string{strconv.Itoa(index)},
+	}
+}
+
+func (vtr ValidatorTestRequest) Input(input string) ValidatorTestRequest {
+	vtr["testInput"] = []string{input}
+
+	return vtr
+}
+
+// VALID or INVALID.
+func (vtr ValidatorTestRequest) Verdict(verdict string) ValidatorTestRequest {
+	vtr["testVerdict"] = []string{verdict}
+
+	return vtr
+}
+
+type CheckerTestRequest url.Values
+
+func NewCheckerTestRequest(pID, index int) CheckerTestRequest {
+	return CheckerTestRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testIndex": []string{strconv.Itoa(index)},
+	}
+}
+
+func (ctr CheckerTestRequest) Input(input string) CheckerTestRequest {
+	ctr["testInput"] = []string{input}
+
+	return ctr
+}
+
+func (ctr CheckerTestRequest) Answer(answer string) CheckerTestRequest {
+	ctr["testAnswer"] = []string{answer}
+
+	return ctr
+}
+
+func (ctr CheckerTestRequest) Output(output string) CheckerTestRequest {
+	ctr["testOutput"] = []string{output}
+
+	return ctr
+}
+
+func (ctr CheckerTestRequest) Verdict(verdict string) CheckerTestRequest {
+	ctr["testVerdict"] = []string{verdict}
+
+	return ctr
+}
+
+type TestGroupRequest url.Values
+
+func NewTestGroupRequest(pID int, testset, group string) TestGroupRequest {
+	return TestGroupRequest{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testset":   []string{testset},
+		"group":     []string{group},
+	}
+}
+
+func (tgr TestGroupRequest) PointsPolicy(policy string) TestGroupRequest {
+	tgr["pointsPolicy"] = []string{policy}
+
+	return tgr
+}
+
+func (tgr TestGroupRequest) FeedbackPolicy(feedback string) TestGroupRequest {
+	tgr["feedbackPolicy"] = []string{feedback}
+
+	return tgr
+}
+
+func (tgr TestGroupRequest) Dependencies(deps []string) TestGroupRequest {
+	tgr["dependencies"] = []string{strings.Join(deps, ",")}
+
+	return tgr
+}

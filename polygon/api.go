@@ -22,15 +22,20 @@ import (
 
 const (
 	sixSecretSymbols = "gorill"
-	defaultTestset   = "tests"
 )
 
 type SolutionTag string
 
 const (
-	TagMain      SolutionTag = "MA"
-	TagCorrect   SolutionTag = "OK"
-	TagIncorrect SolutionTag = "RJ"
+	TagMain              SolutionTag = "MA"
+	TagCorrect           SolutionTag = "OK"
+	TagIncorrect         SolutionTag = "RJ"
+	TagTimeLimit         SolutionTag = "TL"
+	TagTLorOK            SolutionTag = "TO"
+	TagWrongAnswer       SolutionTag = "WA"
+	TagPresentationError SolutionTag = "PE"
+	TagMemoryLimit       SolutionTag = "ML"
+	TagRuntimeError      SolutionTag = "RE"
 )
 
 type FileType string
@@ -127,15 +132,31 @@ func (p *Polygon) makeQuery(method, link string, params url.Values) (*Answer, er
 }
 
 func (p *Polygon) skipEscape(params url.Values) string {
-	pairs := []string{}
+	type pair struct {
+		key   string
+		value string
+	}
+
+	var pairs []pair
 	for k, vals := range params {
 		for _, v := range vals {
-			pairs = append(pairs, fmt.Sprintf("%s=%s", k, v))
+			pairs = append(pairs, pair{key: k, value: v})
 		}
 	}
-	sort.Strings(pairs)
+	sort.Slice(pairs, func(i, j int) bool {
+		if pairs[i].key != pairs[j].key {
+			return pairs[i].key < pairs[j].key
+		}
 
-	return strings.Join(pairs, "&")
+		return pairs[i].value < pairs[j].value
+	})
+
+	pairs2 := make([]string, 0, len(pairs))
+	for _, p := range pairs {
+		pairs2 = append(pairs2, fmt.Sprintf("%s=%s", p.key, p.value))
+	}
+
+	return strings.Join(pairs2, "&")
 }
 
 func (p *Polygon) buildURL(method string, params url.Values) (string, url.Values) {
@@ -371,12 +392,57 @@ func (p *Polygon) SetInteractor(pID int, interactor string) error {
 	return err
 }
 
-func (p *Polygon) SaveSolution(pID int, name, data string, tag SolutionTag) error {
-	link, params := p.buildURL("problem.saveSolution", url.Values{
+func (p *Polygon) SaveScript(pID int, testset, source string) error {
+	link, params := p.buildURL("problem.saveScript", url.Values{
+		"problemId": []string{strconv.Itoa(pID)},
+		"testset":   []string{testset},
+		"source":    []string{source},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveSolution(sr SolutionRequest) error {
+	link, params := p.buildURL("problem.saveSolution", url.Values(sr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveStatement(sr StatementRequest) error {
+	link, params := p.buildURL("problem.saveStatement", url.Values(sr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveValidatorTest(vtr ValidatorTestRequest) error {
+	link, params := p.buildURL("problem.saveValidatorTest", url.Values(vtr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveCheckerTest(ctr CheckerTestRequest) error {
+	link, params := p.buildURL("problem.saveCheckerTest", url.Values(ctr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveTestGroup(tgr TestGroupRequest) error {
+	link, params := p.buildURL("problem.saveTestGroup", url.Values(tgr))
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SaveStatementResource(pID int, name, file string) error {
+	link, params := p.buildURL("problem.saveScript", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
 		"name":      []string{name},
-		"file":      []string{data},
-		"tag":       []string{string(tag)},
+		"file":      []string{file},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 

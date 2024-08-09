@@ -160,5 +160,7 @@ func (w *Wooda) resolveInteractor(path, data string) error {
 }
 
 func (w *Wooda) resolveSolution(path, data string, tag polygon.SolutionTag) error {
-	return w.client.SaveSolution(w.pID, filepath.Base(path), data, tag)
+	sr := polygon.NewSolutionRequest(w.pID, filepath.Base(path), data, tag)
+
+	return w.client.SaveSolution(sr)
 }
