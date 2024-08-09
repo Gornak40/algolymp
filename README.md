@@ -476,7 +476,8 @@ Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polyg
 - If problem has statements resources, upload them manually;
 - If problem has custom input/output, set it manually;
 - If problem has [FreeMaker](https://freemarker.apache.org) generator, it will expand;
-- If problem has stresses, unpload them manually.
+- If problem has stresses, unpload them manually;
+- If checker is custom, it's recommended to set `Auto-update` checkbox for `testlib.h`.
 
 ### Flags
 - `-i` - problem id (required)
