@@ -14,11 +14,11 @@ func (v *Vydra) uploadScript(testset *TestSet) error {
 	gens := make([]string, 0, testset.TestCount)
 	for idx, test := range testset.Tests.Tests { // build script
 		if test.Method == "generated" {
-			cmd := test.Cmd
+			line := fmt.Sprintf("%s > %d", test.Cmd, idx+1)
 			if test.FromFile != "" { // TODO: find better solution for `gen > {3-100}`
-				cmd += " " + test.FromFile
+				line = fmt.Sprintf("%s > {%d}", test.Cmd, idx+1)
 			}
-			gens = append(gens, fmt.Sprintf("%s > %d", cmd, idx+1))
+			gens = append(gens, line)
 		}
 	}
 	script := strings.Join(gens, "\n")
@@ -31,7 +31,7 @@ func (v *Vydra) uploadScript(testset *TestSet) error {
 
 func (v *Vydra) uploadTest(testset string, idx int, test *Test) error {
 	// It's kind of experimental solution.
-	if (*test == Test{Cmd: test.Cmd, Method: "generated"}) {
+	if (*test == Test{Cmd: test.Cmd, FromFile: test.FromFile, Method: "generated"}) {
 		return nil
 	}
 	logrus.WithFields(logrus.Fields{
