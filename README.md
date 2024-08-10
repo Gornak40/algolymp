@@ -465,7 +465,7 @@ This tool uses `problem.xml` for uploading all package content.
 
 Useful for migration between `polygon.lksh.ru` and `polygon.codeforces.com`.
 
-Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polygon-cli) tool.
+Designed designed as an alternative to [polygon-cli](https://github.com/kunyavskiy/polygon-cli).
 
 **Ensure that the problem you are uploading the package into is empty.**
 
@@ -473,7 +473,7 @@ Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polyg
 
 - If problem has testsets other than `tests`, you should create them manually, [issue](https://github.com/Codeforces/polygon-issue-tracking/issues/549);
 - If problem is interactive, set `Is problem interactive` checkbox manually;
-- If problem has statements resources, upload them manually;
+- If problem has statement resources, upload them manually;
 - If problem has custom input/output, set it manually;
 - If problem has [FreeMaker](https://freemarker.apache.org) generator, it will expand;
 - If problem has stresses, unpload them manually;
@@ -517,6 +517,7 @@ Matching uses natural order (`test.1.in`, `test.2.in`, ..., `test.10.in`, ...).
 - `ok` - correct solution
 - `incor` - incorrect solution
 - `sample` - sample (append, not replace)
+- `image` - statement resource (likely image)
 
 ### Flags
 - `-i` - problem id (required)

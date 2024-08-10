@@ -88,12 +88,18 @@ func buildRequest(method, link string, params url.Values) (*http.Request, error)
 		writer := multipart.NewWriter(buf)
 		for k, vals := range params {
 			for _, v := range vals {
-				if err := writer.WriteField(k, v); err != nil {
+				wr, err := writer.CreateFormFile(k, k)
+				if err != nil {
+					return nil, err
+				}
+				if _, err := wr.Write([]byte(v)); err != nil {
 					return nil, err
 				}
 			}
 		}
-		writer.Close()
+		if err := writer.Close(); err != nil {
+			return nil, err
+		}
 		req, err := http.NewRequestWithContext(context.TODO(), method, link, buf)
 		if err != nil {
 			return nil, err
@@ -438,11 +444,11 @@ func (p *Polygon) SaveTestGroup(tgr TestGroupRequest) error {
 	return err
 }
 
-func (p *Polygon) SaveStatementResource(pID int, name, file string) error {
-	link, params := p.buildURL("problem.saveScript", url.Values{
+func (p *Polygon) SaveStatementResource(pID int, name, data string) error {
+	link, params := p.buildURL("problem.saveStatementResource", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
 		"name":      []string{name},
-		"file":      []string{file},
+		"file":      []string{data},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
