@@ -465,7 +465,7 @@ This tool uses `problem.xml` for uploading all package content.
 
 Useful for migration between `polygon.lksh.ru` and `polygon.codeforces.com`.
 
-Designed to replace ~~legacy~~ [polygon-cli](https://github.com/kunyavskiy/polygon-cli) tool.
+Designed designed as an alternative to [polygon-cli](https://github.com/kunyavskiy/polygon-cli).
 
 **Ensure that the problem you are uploading the package into is empty.**
 
