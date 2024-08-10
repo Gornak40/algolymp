@@ -23,7 +23,7 @@ func main() {
 	}
 
 	cfg := config.NewConfig()
-	engine := kultq.NewEngine(&cfg.Kultq)
+	engine := kultq.NewEngine(&cfg.Antiplag)
 	if err := engine.Run(); err != nil {
 		logrus.WithError(err).Fatal("failed to run kultq")
 	}

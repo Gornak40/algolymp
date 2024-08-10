@@ -15,10 +15,10 @@ type System struct {
 }
 
 type Config struct {
-	Ejudge  ejudge.Config  `json:"ejudge"`
-	Polygon polygon.Config `json:"polygon"`
-	System  System         `json:"system"`
-	Kultq   kultq.Config   `json:"kultq"`
+	Ejudge   ejudge.Config  `json:"ejudge"`
+	Polygon  polygon.Config `json:"polygon"`
+	System   System         `json:"system"`
+	Antiplag kultq.Config   `json:"antiplag"`
 }
 
 func NewConfig() *Config {

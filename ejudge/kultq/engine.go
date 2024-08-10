@@ -10,9 +10,11 @@ import (
 )
 
 type Config struct {
-	DreamPath  string    `json:"dreamPath"`
+	DreamBin   string    `json:"dreamBin"`
 	StatBounds []float64 `json:"statBounds"`
-	Batcat     string    `json:"batcat"`
+	BatBin     string    `json:"batBin"`
+	BatArgs    []string  `json:"batArgs"`
+	Unescape   bool      `json:"unescape"`
 }
 
 type Engine struct {

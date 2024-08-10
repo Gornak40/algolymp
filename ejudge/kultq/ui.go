@@ -11,13 +11,19 @@ import (
 
 func (e *Engine) startUI(c *ishell.Context, slip []statPair) error {
 	printCode := func(path string) error {
-		bat := exec.Command(e.cfg.Batcat, "--pager", "cat", path) //nolint:gosec // this is the way
+		args := make([]string, len(e.cfg.BatArgs), len(e.cfg.BatArgs)+1)
+		copy(args, e.cfg.BatArgs)
+		args = append(args, path)
+		bat := exec.Command(e.cfg.BatBin, args...) //nolint:gosec // this is the way
 		bat.Stdout = os.Stdout
 
 		return bat.Run()
 	}
 
 	for _, s := range slip {
+		if err := c.ClearScreen(); err != nil {
+			return err
+		}
 		if err := printCode(s.path1); err != nil {
 			return err
 		}
