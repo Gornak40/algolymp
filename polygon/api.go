@@ -438,11 +438,11 @@ func (p *Polygon) SaveTestGroup(tgr TestGroupRequest) error {
 	return err
 }
 
-func (p *Polygon) SaveStatementResource(pID int, name, file string) error {
-	link, params := p.buildURL("problem.saveScript", url.Values{
+func (p *Polygon) SaveStatementResource(pID int, name, data string) error {
+	link, params := p.buildURL("problem.saveStatementResource", url.Values{
 		"problemId": []string{strconv.Itoa(pID)},
 		"name":      []string{name},
-		"file":      []string{file},
+		"file":      []string{data},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 

@@ -21,6 +21,7 @@ const (
 	ModeSolutionCorrect   = "ok"
 	ModeSolutionIncorrect = "incor"
 	ModeSample            = "sample"
+	ModeImage             = "image" // statement resource
 )
 
 var (
@@ -71,6 +72,8 @@ func (w *Wooda) Resolve(path string) error {
 		return w.resolveSolution(path, file, polygon.TagIncorrect)
 	case ModeSample:
 		return w.resolveTest(path, file, true)
+	case ModeImage:
+		return w.resolveImage(path, file)
 	default:
 		return fmt.Errorf("%w: %s", ErrUnknownMode, w.mode)
 	}
@@ -163,4 +166,8 @@ func (w *Wooda) resolveSolution(path, data string, tag polygon.SolutionTag) erro
 	sr := polygon.NewSolutionRequest(w.pID, filepath.Base(path), data, tag)
 
 	return w.client.SaveSolution(sr)
+}
+
+func (w *Wooda) resolveImage(path, data string) error {
+	return w.client.SaveStatementResource(w.pID, filepath.Base(path), data)
 }
