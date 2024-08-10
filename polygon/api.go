@@ -88,12 +88,18 @@ func buildRequest(method, link string, params url.Values) (*http.Request, error)
 		writer := multipart.NewWriter(buf)
 		for k, vals := range params {
 			for _, v := range vals {
-				if err := writer.WriteField(k, v); err != nil {
+				wr, err := writer.CreateFormFile(k, k)
+				if err != nil {
+					return nil, err
+				}
+				if _, err := wr.Write([]byte(v)); err != nil {
 					return nil, err
 				}
 			}
 		}
-		writer.Close()
+		if err := writer.Close(); err != nil {
+			return nil, err
+		}
 		req, err := http.NewRequestWithContext(context.TODO(), method, link, buf)
 		if err != nil {
 			return nil, err
