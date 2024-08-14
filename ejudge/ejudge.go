@@ -4,12 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/sirupsen/logrus"
@@ -67,12 +71,7 @@ func NewEjudge(cfg *Config) *Ejudge {
 }
 
 func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, *goquery.Document, error) {
-	url, err := url.JoinPath(ej.cfg.URL, method)
-	if err != nil {
-		return nil, nil, err
-	}
-	logrus.WithField("url", url).Debug("post query")
-	resp, err := ej.client.PostForm(url, params) //nolint:noctx  // don't need context here.
+	resp, err := ej.getPostRequestResponse(method, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -86,6 +85,15 @@ func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, 
 	}
 
 	return resp.Request, doc, nil
+}
+
+func (ej *Ejudge) getPostRequestResponse(method string, params url.Values) (*http.Response, error) {
+	url, err := url.JoinPath(ej.cfg.URL, method)
+	if err != nil {
+		return nil, err
+	}
+	logrus.WithField("url", url).Debug("post query")
+	return ej.client.PostForm(url, params) //nolint:noctx  // don't need context here.
 }
 
 func (ej *Ejudge) Login() (string, error) {
@@ -321,4 +329,38 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	})
 
 	return err
+}
+
+func (ej *Ejudge) DownloadRunFile(csid string, runID int, dst string) (string, error) {
+	resp, err := ej.getPostRequestResponse("new-master", url.Values{
+		"SID":    {csid},
+		"action": {"91"},
+		"run_id": {strconv.Itoa(runID)},
+	})
+	if err != nil {
+		logrus.WithError(err).Error("cannot get run's source code")
+	}
+
+	contentDisposition := resp.Header.Get("Content-Disposition")
+	if contentDisposition == "" {
+		logrus.WithError(err).Error("cannot get filename from content desposition header")
+	}
+	filename := strings.Trim(strings.Split(contentDisposition, "filename=")[1], "\"")
+	dst = filepath.Join(dst, filename)
+
+	file, err := os.Create(dst)
+	if err != nil {
+		logrus.WithError(err).Error("cannot create file for run's source code")
+	}
+	defer file.Close()
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		logrus.WithError(err).Error("cannot write to source code file")
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"CSID": csid, "run": runID,
+	}).Info("downloaded run as ", dst)
+
+	return filename, err
 }
