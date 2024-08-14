@@ -169,7 +169,7 @@ func (ej *Ejudge) ChangeRunStatus(csid string, runID int, status string) error {
 	if err != nil {
 		return err
 	}
-	logrus.WithFields(logrus.Fields{"CSID": csid, "run": runID, "status": idx}).
+	logrus.WithFields(logrus.Fields{"CSID": csid, "run": runID, "status": status}).
 		Info("success set status")
 
 	return nil

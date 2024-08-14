@@ -37,7 +37,7 @@ for file in "$contestId"/*; do
             read -p "Type the resolution (OK, RJ): " verdict
             verdict=$(echo "$verdict" | tr '[:lower:]' '[:upper:]') # Преобразование в верхний регистр
             if [ "$verdict" = "OK" ]; then
-                echo $((runId)) | ripper -i "$contestId" -s "OK"
+                echo $runId | ripper -i "$contestId" -s "OK"
                 break
             elif [ "$verdict" = "RJ" ]; then
                 read -p "Any comment?: " comment
