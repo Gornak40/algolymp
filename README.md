@@ -364,6 +364,7 @@ Change runs status. Designed to work with [boban](#boban) or with raw ids from `
 ### Flags
 - `-i` - contest id (required)
 - `-s` - new status (required, `DQ|IG|OK|PR|RJ|SM|SV|rejudge`)
+- `-c` - send run comment (if empty, do not send)
 
 ### Config
 - `ejudge.url`
@@ -379,6 +380,7 @@ cat banlist.txt | ripper -i 47110 -s DQ # ban submits with list
 boban -i 52010 -f "prob == 'D' && score >= 50" -c 10000 | ripper -i 52010 -s rejudge # rejudge incorrect group
 boban -i 50014 -f "login == 'barmaley' && status == OK" | ripper -i 50014 -s SM # torture a participant
 boban -i 48001 -f "status == PR" -c 2000 | ripper -i 48001 -s OK # smart code-review
+echo 8 | ripper -i 46512 -s RJ -c "remove #define int long long" # send run comment
 ```
 
 ![ripper logo](https://algolymp.ru/static/img/ripper.png)
