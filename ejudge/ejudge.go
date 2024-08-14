@@ -308,3 +308,17 @@ func (ej *Ejudge) RegisterUser(csid, login string) error {
 
 	return err
 }
+
+func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
+	logrus.WithFields(logrus.Fields{
+		"CSID": csid, "run": runID, "comment": comment,
+	}).Info("send run comment")
+	_, _, err := ej.postRequest("new-master", url.Values{
+		"SID":      {csid},
+		"action":   {"64"},
+		"run_id":   {strconv.Itoa(runID)},
+		"msg_text": {comment},
+	})
+
+	return err
+}

@@ -29,6 +29,10 @@ func main() {
 		Required: true,
 		Help:     "New runs status",
 	})
+	comment := parser.String("c", "comment", &argparse.Options{
+		Required: false,
+		Help:     "Send run comment",
+	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
 	}
@@ -58,6 +62,11 @@ func main() {
 		}
 		if err := ejClient.ChangeRunStatus(csid, runID, *status); err != nil {
 			logrus.WithError(err).Fatal("failed change run status")
+		}
+		if *comment != "" {
+			if err := ejClient.SendRunComment(csid, runID, *comment); err != nil {
+				logrus.WithError(err).Fatal("failed to send run comment")
+			}
 		}
 	}
 
