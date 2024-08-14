@@ -93,6 +93,7 @@ func (ej *Ejudge) getPostRequestResponse(method string, params url.Values) (*htt
 		return nil, err
 	}
 	logrus.WithField("url", url).Debug("post query")
+
 	return ej.client.PostForm(url, params) //nolint:noctx  // don't need context here.
 }
 
@@ -340,6 +341,7 @@ func (ej *Ejudge) DownloadRunFile(csid string, runID int, dst string) (string, e
 	if err != nil {
 		logrus.WithError(err).Error("cannot get run's source code")
 	}
+	defer resp.Body.Close()
 
 	contentDisposition := resp.Header.Get("Content-Disposition")
 	if contentDisposition == "" {

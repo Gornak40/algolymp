@@ -64,7 +64,7 @@ func main() {
 	for _, run := range runs {
 		fmt.Println(run) //nolint:forbidigo // Basic functionality.
 		if len(sourcesDst) > 0 {
-			downloadSourceCode(ejClient, csid, run, sourcesDst)
+			_, _ = downloadSourceCode(ejClient, csid, run, sourcesDst)
 		}
 	}
 
@@ -78,13 +78,14 @@ func downloadSourceCode(ejClient *ejudge.Ejudge, csid string, runID int, dst str
 	if err != nil {
 		logrus.WithError(err).Fatal("failed download run file")
 	}
+
 	return filename, err
 }
 
 func makeContestDir(dst string, cID int) string {
-	dst = filepath.Join(filepath.Dir(dst), "ejudge", strconv.Itoa(cID))
+	dst = filepath.Join(filepath.Dir(dst), strconv.Itoa(cID))
 	if _, err := os.Stat(dst); os.IsNotExist(err) {
-		err := os.MkdirAll(dst, 0755) // 0755 is the permission mode
+		err := os.MkdirAll(dst, 0644) //nolint:mnd
 		if err != nil {
 			logrus.WithError(err).Fatal("directory create failed")
 		}
@@ -92,5 +93,6 @@ func makeContestDir(dst string, cID int) string {
 	} else {
 		logrus.Info("directory [" + dst + "] already exists")
 	}
+
 	return dst
 }
