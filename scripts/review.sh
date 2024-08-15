@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export LC_ALL=en_US.UTF-8
+
 NC='\033[0m'       # Text Reset
 
 # Regular Colors
@@ -35,9 +37,6 @@ echo -e "${Cyan}INFO${NC}       Filtering runs from contest [$contestId] with fi
 echo -e "${Cyan}INFO${NC}       Reviewing ${IYellow}[$(boban -i "$contestId" -f "$filter" -c "$count" -d . | wc -l | xargs)]${NC} filtered runs"
 
 cleanup() {
-  if [ -f "$current" ]; then
-    rm "$current"
-  fi
   rm -r "$contestId"
 }
 
@@ -51,15 +50,19 @@ for file in "$contestId"/*; do
         cp "$file" "$current"
         echo -e "${Cyan}INFO${NC}       Review $file => $current"
 
+        runLinesCount=$(cat "$current" | awk '/=============== COMMENTS/{print NR-2; exit}') # количестов строк кода в посылке до секции комментов
+
         while [ 1 ]; do
-            read -p "$(echo -e "${Green}INTERACT${NC}")   Type the resolution ($(echo -e "${Green}OK${NC}/${RED}RJ${NC}/rejudge")): " verdict
+            read -r -p "$(echo -e "${Green}INTERACT${NC}")   Type the resolution ($(echo -e "${Green}OK${NC}/${RED}RJ${NC}/rejudge")): " verdict
             verdict=$(echo "$verdict" | tr '[:lower:]' '[:upper:]') # Преобразование в верхний регистр
-            if [ "$verdict" = "OK" ]; then
-                echo $runId | ripper -i "$contestId" -s "OK"
-                break
-            elif [ "$verdict" = "RJ" ]; then
-                read -p "Any comment?: " comment
-                echo $runId | ripper -i "$contestId" -s "RJ" -c "$comment"
+
+            comment=$(head -n "$runLinesCount" "$current" | nl -w4 -s"] " | sed -e 's/ \([0-9]\)/[\1/' | grep -C 1 "///")
+            if [[ -n $comment ]]; then
+              comment=$'--\n'"$comment"$'\n--'
+            fi
+
+            if [ "$verdict" = "OK" ] || [ "$verdict" = "RJ" ]; then
+                echo $runId | ripper -i "$contestId" -s "$verdict" -c "$comment"
                 break
              elif [ "$verdict" = "REJUDGE" ]; then
                  echo $runId | ripper -i "$contestId" -s "rejudge"
@@ -69,8 +72,6 @@ for file in "$contestId"/*; do
                 exit 0
             fi
         done
-
-        rm $current
     fi
 done
 

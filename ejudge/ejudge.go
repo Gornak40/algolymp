@@ -361,7 +361,7 @@ func extractComments(commentsSelection *goquery.Selection) []Comment {
 func (ej *Ejudge) GetAllComments(csid string, runID int) ([]Comment, []Comment, error) {
 	logrus.WithFields(logrus.Fields{
 		"CSID": csid, "run": runID,
-	}).Infof("get comments for run %s", runID)
+	}).Infof("get comments for run")
 
 	_, doc, err := ej.postRequest("new-master", url.Values{
 		"SID":    {csid},
