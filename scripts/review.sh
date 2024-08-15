@@ -50,7 +50,7 @@ for file in "$contestId"/*; do
         cp "$file" "$current"
         echo -e "${Cyan}INFO${NC}       Review $file => $current"
 
-        runLinesCount=$(cat "$current" | awk '/=============== COMMENTS/{print NR-2; exit}') # количестов строк кода в посылке до секции комментов
+        runLinesCount=$(cat "$current" | awk '/=============== COMMENTS/{print NR-2; found=1; exit} END{if(!found) print NR}') # количестов строк кода в посылке до секции комментов
 
         while [ 1 ]; do
             read -r -p "$(echo -e "${Green}INTERACT${NC}")   Type the resolution ($(echo -e "${Green}OK${NC}/${RED}RJ${NC}/rejudge")): " verdict
