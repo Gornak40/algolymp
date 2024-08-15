@@ -131,12 +131,13 @@ blanka -i 51013 -t 51000 -e
 
 ### About
 
-Filter and print Ejudge runs ids.
+Filter and print Ejudge runs ids. It may download source code for filtered run.
 
 ### Flags
 - `-i` - contest id (required)
 - `-f` - filter expression (default: empty)
 - `-c` - last runs count (default: 20)
+- `-d` - destination for download directory (if absent - no download will be processed)
 
 ### Config
 - `ejudge.url`
@@ -148,6 +149,7 @@ Filter and print Ejudge runs ids.
 boban --help
 boban -i 47106 -f "prob == 'A'" > runs.txt
 boban -i 50014 -f "status == PR" -c 1000
+boban -i 50014 -f "status == PR" -c 1000 -d .
 boban -i 50014 -c 10000 2> /dev/null | wc -l
 ```
 

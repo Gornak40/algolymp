@@ -32,7 +32,7 @@ func main() {
 	})
 	inputSourcesDst := parser.String("d", "destination", &argparse.Options{
 		Required: false,
-		Help:     "Download run's source code to directory",
+		Help:     "Download runs source codes to directory",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
@@ -63,7 +63,7 @@ func main() {
 
 	for _, run := range runs {
 		fmt.Println(run) //nolint:forbidigo // Basic functionality.
-		if len(sourcesDst) > 0 {
+		if sourcesDst != "" {
 			_, _ = downloadSourceCode(ejClient, csid, run, sourcesDst)
 		}
 	}
@@ -89,9 +89,9 @@ func makeContestDir(dst string, cID int) string {
 		if err != nil {
 			logrus.WithError(err).Fatal("directory create failed")
 		}
-		logrus.Info("directory [" + dst + "] created successfully")
+		logrus.Infof("directory [%s] created successfully", dst)
 	} else {
-		logrus.Info("directory [" + dst + "] already exists")
+		logrus.Infof("directory [%s] already exists", dst)
 	}
 
 	return dst

@@ -22,10 +22,11 @@ import (
 const BadSID = "0000000000000000"
 
 var (
-	ErrParseMasterSID = errors.New("can't parse master SID")
-	ErrBadStatusCode  = errors.New("bad status code")
-	ErrBadFilter      = errors.New("bad filter expression")
-	ErrUnknownVerdict = errors.New("unknown verdict")
+	ErrParseMasterSID    = errors.New("can't parse master SID")
+	ErrBadStatusCode     = errors.New("bad status code")
+	ErrBadFilter         = errors.New("bad filter expression")
+	ErrUnknownVerdict    = errors.New("unknown verdict")
+	ErrCannotGetFileName = errors.New("cannot get filename from content desposition header")
 )
 
 //nolint:gochecknoglobals,mnd // ejudge constants
@@ -332,37 +333,37 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	return err
 }
 
-func (ej *Ejudge) DownloadRunFile(csid string, runID int, dst string) (string, error) {
+func (ej *Ejudge) DownloadRunFile(csid string, runID int, dst string) (filename string, err error) {
 	resp, err := ej.getPostRequestResponse("new-master", url.Values{
 		"SID":    {csid},
 		"action": {"91"},
 		"run_id": {strconv.Itoa(runID)},
 	})
 	if err != nil {
-		logrus.WithError(err).Error("cannot get run's source code")
+		return "", fmt.Errorf("cannot get run's source code: %w", err)
 	}
 	defer resp.Body.Close()
 
 	contentDisposition := resp.Header.Get("Content-Disposition")
 	if contentDisposition == "" {
-		logrus.WithError(err).Error("cannot get filename from content desposition header")
+		return "", ErrCannotGetFileName
 	}
-	filename := strings.Trim(strings.Split(contentDisposition, "filename=")[1], "\"")
+	filename = strings.Trim(strings.Split(contentDisposition, "filename=")[1], "\"")
 	dst = filepath.Join(dst, filename)
 
 	file, err := os.Create(dst)
 	if err != nil {
-		logrus.WithError(err).Error("cannot create file for run's source code")
+		return "", fmt.Errorf("cannot create file for run's source code: %w", err)
 	}
 	defer file.Close()
 	_, err = io.Copy(file, resp.Body)
 	if err != nil {
-		logrus.WithError(err).Error("cannot write to source code file")
+		return "", fmt.Errorf("cannot write to source code file: %w", err)
 	}
 
 	logrus.WithFields(logrus.Fields{
 		"CSID": csid, "run": runID,
-	}).Info("downloaded run as ", dst)
+	}).Infof("downloaded run as %s", dst)
 
 	return filename, err
 }
