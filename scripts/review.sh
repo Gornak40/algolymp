@@ -61,6 +61,14 @@ for file in "$contestId"/*; do
               comment=$'--\n'"$comment"$'\n--'
             fi
 
+            if [ "$verdict" = "ЩЛ" ]; then
+              verdict="OK"
+            fi
+
+            if [ "$verdict" = "КО" ]; then
+              verdict="RJ"
+            fi
+
             if [ "$verdict" = "OK" ] || [ "$verdict" = "RJ" ]; then
                 echo $runId | ripper -i "$contestId" -s "$verdict" -c "$comment"
                 break
