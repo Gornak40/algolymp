@@ -1,20 +1,38 @@
 #!/bin/bash
 
-if [ "$#" -ne 3 ]; then
-    echo "Usage: $0 <contestId> <filter> <count>"
+NC='\033[0m'       # Text Reset
+
+# Regular Colors
+Red='\033[0;31m'          # Red
+Green='\033[0;32m'        # Green
+IYellow='\033[0;93m'
+Blue='\033[0;34m'         # Blue
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+White='\033[0;37m'        # White
+
+if [ "$#" -lt 3 ]; then
+    echo "Usage: $0 <contestId> <filter> <count> [<0/1 disable PR filter>]"
     exit 1
 fi
 
 contestId=$1
-filter="($2)&&status==PR"
+if [ $4 == '1' ]; then
+  filter=$2
+  RED='\033[0;31m'
+  NC='\033[0m' # No Color
+  echo -e "${Red}WARNING${NC}    Pending review filter is disabled, don't OK the run uncontrollably!"
+else
+  filter="($2)&&status==PR"
+fi
 count=$3
 
 if [ -d "$contestId" ]; then
   rm -r $contestId
 fi
 
-echo "Filtering runs from contest [$contestId] with filter [$filter] and limit [$count]"
-echo "Reviewing [$(boban -i "$contestId" -f "$filter" -c "$count" -d . | wc -l)] filtered runs"
+echo -e "${Cyan}INFO${NC}       Filtering runs from contest [$contestId] with filter [$filter] and limit [$count]"
+echo -e "${Cyan}INFO${NC}       Reviewing ${IYellow}[$(boban -i "$contestId" -f "$filter" -c "$count" -d . | wc -l | xargs)]${NC} filtered runs"
 
 cleanup() {
   if [ -f "$current" ]; then
@@ -31,10 +49,10 @@ for file in "$contestId"/*; do
 
         current="./main.$lang"
         cp "$file" "$current"
-        echo "Review $file => $current"
+        echo -e "${Cyan}INFO${NC}       Review $file => $current"
 
         while [ 1 ]; do
-            read -p "Type the resolution (OK, RJ): " verdict
+            read -p "$(echo -e "${Green}INTERACT${NC}")   Type the resolution ($(echo -e "${Green}OK${NC}/${RED}RJ${NC}/rejudge")): " verdict
             verdict=$(echo "$verdict" | tr '[:lower:]' '[:upper:]') # Преобразование в верхний регистр
             if [ "$verdict" = "OK" ]; then
                 echo $runId | ripper -i "$contestId" -s "OK"
@@ -43,7 +61,10 @@ for file in "$contestId"/*; do
                 read -p "Any comment?: " comment
                 echo $runId | ripper -i "$contestId" -s "RJ" -c "$comment"
                 break
-            elif [ -z "$verdict" ]; then
+             elif [ "$verdict" = "REJUDGE" ]; then
+                 echo $runId | ripper -i "$contestId" -s "rejudge"
+                 break
+             elif [ -z "$verdict" ]; then
                 cleanup
                 exit 0
             fi

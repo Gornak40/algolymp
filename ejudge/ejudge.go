@@ -333,6 +333,54 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	return err
 }
 
+type Comment struct {
+	Author string `json:"author"`
+	//Date      string `json:"date"`
+	//OldStatus string `json:"old_status"`
+	//NewStatus string `json:"new_status"`
+	Content string `json:"content"`
+}
+
+func extractComments(commentsSelection *goquery.Selection) []Comment {
+	var comments []Comment
+	commentsSelection.Find("tr").Each(func(i int, rowSelection *goquery.Selection) {
+		if i == 0 {
+			return
+		}
+		authorSelection := rowSelection.Find("td.profile b").First()
+		content := rowSelection.Find("td pre").Text()
+		comment := Comment{
+			Author:  authorSelection.Text(),
+			Content: content,
+		}
+		comments = append(comments, comment)
+	})
+	return comments
+}
+
+func (ej *Ejudge) GetAllComments(csid string, runID int) ([]Comment, []Comment, error) {
+	logrus.WithFields(logrus.Fields{
+		"CSID": csid, "run": runID,
+	}).Infof("get comments for run %s", runID)
+
+	_, doc, err := ej.postRequest("new-master", url.Values{
+		"SID":    {csid},
+		"action": {"36"},
+		"run_id": {strconv.Itoa(runID)},
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot get runs comments: %w", err)
+	}
+
+	tables := doc.Find(".message-table")
+	currentComments := extractComments(tables.First())
+	var previousComments []Comment = nil
+	if !tables.First().IsSelection(tables.Last()) {
+		previousComments = extractComments(tables.Last())
+	}
+	return currentComments, previousComments, err
+}
+
 func (ej *Ejudge) DownloadRunFile(csid string, runID int, dst string) (filename string, err error) {
 	resp, err := ej.getPostRequestResponse("new-master", url.Values{
 		"SID":    {csid},
