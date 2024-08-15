@@ -16,7 +16,7 @@ if [ "$#" -lt 3 ]; then
 fi
 
 contestId=$1
-if [ $4 == '1' ]; then
+if [ "$4" == '1' ]; then
   filter=$2
   echo -e "${Red}WARNING${NC}    Pending review filter is disabled, don't OK the run uncontrollably!"
 else
