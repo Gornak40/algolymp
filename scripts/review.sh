@@ -1,17 +1,19 @@
 #!/bin/bash
 
+templateContestId=46500
+
 export LC_ALL=en_US.UTF-8
+export PATH="$(dirname $0)/../bin:$PATH"
 
 NC='\033[0m'       # Text Reset
-
 # Regular Colors
 Red='\033[0;31m'          # Red
 Green='\033[0;32m'        # Green
 IYellow='\033[0;93m'
 Cyan='\033[0;36m'         # Cyan
 
-if [ "$#" -lt 3 ]; then
-    echo "Usage: $0 <contestId> <filter> <count> [<showAll>]"
+if [ "$#" -lt 2 ]; then
+    echo "Usage: $0 <contestId> <filter> [<count>] [<showAll>]"
     echo
     echo "             Run review for pending review filtered runs in contest."
     echo
@@ -19,19 +21,34 @@ if [ "$#" -lt 3 ]; then
     echo
     echo "  contestId    (int)        Contest id"
     echo "  filter       (string)     Filter expression to filter runs"
-    echo "  count        (int)        Maximum count of runs to review"
+    echo "  count        (int)        Maximum count of runs to review (default: 10)"
     echo "  showAll      (bool)       Disable pending review runs filter"
     exit 1
 fi
 
 contestId=$1
-if [ "$4" == 'true' ]; then
-  filter=$2
-  echo -e "${Red}WARNING${NC}    Pending review filter is disabled, don't OK the run uncontrollably!"
+filter=$2
+if [ 0 -le $3 ]; then
+  count=$3
 else
-  filter="($2)&&status==PR"
+  count=10
 fi
-count=$3
+showAll=$4
+
+if [ $contestId -le 31 ]; then
+  contestId=$((contestId+templateContestId))
+fi
+
+if [[ $filter =~ ^[A-Za-z]$ ]]; then
+  filter="prob=='$filter'"
+elif [[ $filter =~ ^[0-9]+$ ]]; then
+  filter="prob=='$filter'"
+  showAll='true'
+fi
+
+if [ "$4" != 'true' ]; then
+  filter="($filter)&&status==PR"
+fi
 
 cleanup() {
   if [ -d "$contestId" ]; then
@@ -43,6 +60,10 @@ cleanup
 
 echo -e "${Cyan}INFO${NC}       Filtering runs from contest [$contestId] with filter [$filter] and limit [$count]"
 echo -e "${Cyan}INFO${NC}       Reviewing ${IYellow}[$(boban -i "$contestId" -f "$filter" -c "$count" -e -d . | wc -l | xargs)]${NC} filtered runs"
+
+if [ "$4" == 'true' ]; then
+  echo -e "${Red}WARNING${NC}    Pending review filter is disabled, be aware for OK wrong run!"
+fi
 
 for file in "$contestId"/*; do
     if [ -f "$file" ]; then
