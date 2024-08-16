@@ -12,32 +12,80 @@ Green='\033[0;32m'        # Green
 IYellow='\033[0;93m'
 Cyan='\033[0;36m'         # Cyan
 
-if [ "$#" -lt 2 ]; then
-    echo "Usage: $0 <contestId> <filter> [<count>] [<showAll>]"
-    echo
-    echo "             Run review for pending review filtered runs in contest."
-    echo
-    echo "Arguments:"
-    echo
-    echo "  contestId    (int)        Contest id"
-    echo "  filter       (string)     Filter expression to filter runs"
-    echo "  count        (int)        Maximum count of runs to review (default: 10)"
-    echo "  showAll      (bool)       Disable pending review runs filter"
+legend() {
+  echo "Usage: $0 <filter> [<contestId>] [<count>] [<showAll>]"
+  echo
+  echo "             Run review for pending review filtered runs in contest."
+  echo
+  echo "Arguments:"
+  echo
+  echo "  contestId    (int)        Contest id"
+  echo "  filter       (string)     Filter expression to filter runs"
+  echo "  count        (int)        Maximum count of runs to review (default: 10)"
+  echo "  showAll      (bool)       Disable pending review runs filter"
+  echo
+  echo "Description:"
+  echo
+  echo "  To get certain run by id instead of 'id==137' you can use just '137':"
+  echo
+  echo "            review.sh 137 46500"
+  echo
+  echo
+  echo "  To get all runs for certain problem instead of 'prob==\"A\"' you can use just 'A':"
+  echo
+  echo "            review.sh A 46500"
+  echo
+  echo
+  echo "  Instead of full 'contestId' argument you may specify 'templateContestId' in this script"
+  echo "  and then use just number of the day, instead of 'xxx01' use '1':"
+  echo
+  echo "            review.sh A 1"
+  echo
+  echo
+  echo "  After first specification of 'contestId' you may just omit it for further requests:"
+  echo
+  echo "            review.sh A"
+  echo
+  echo
+  echo "Examples:"
+  echo
+  echo "  To get first 20 pending runs for problem 'C' with 'id % 6 = 1' in contest 46501:"
+  echo
+  echo "            review.sh \"prob=='A'&&id%6==1\" 46501 20"
+}
+
+if [ "$#" -lt 1 ]; then
+    legend
     exit 1
 fi
 
-contestId=$1
-filter=$2
-if [ 0 -le $3 ]; then
-  count=$3
-else
+contestId=$2
+filter=$1
+if [ -z $3 ]; then
   count=10
+else
+  count=$3
 fi
 showAll=$4
+
+if [ -z "$contestId" ]; then
+  if ! [ -d ~/.config/ejudge ]; then
+    mkdir ~/.config/ejudge
+  fi
+  contestId=$(cat ~/.config/ejudge/last_contest)
+fi
+if [ -z "$contestId" ]; then
+  legend
+  echo
+  echo -e "${Green}Please specify contestId argument, then it will be saved for future requests!${NC}"
+  exit 1
+fi
 
 if [ $contestId -le 31 ]; then
   contestId=$((contestId+templateContestId))
 fi
+
+echo $contestId > ~/.config/ejudge/last_contest
 
 if [[ $filter =~ ^[A-Za-z]$ ]]; then
   filter="prob=='$filter'"

@@ -138,6 +138,7 @@ Filter and print Ejudge runs ids. It may download source code for filtered run.
 - `-f` - filter expression (default: empty)
 - `-c` - last runs count (default: 20)
 - `-d` - destination for download directory (if absent - no download will be processed)
+- `-e` - if -d flag is present, will attach all comments to run directly to source file
 
 ### Config
 - `ejudge.url`

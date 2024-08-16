@@ -86,8 +86,8 @@ func main() {
 }
 
 // Используется в review.sh
-var CommentsSectionHeaderStart = "COMMENTS FOR CURRENT RUN"
-var CommentsSectionPreviousHeaderStart = "COMMENTS FOR PREVIOUS RUN"
+const CommentsSectionHeaderStart = "COMMENTS FOR CURRENT RUN"
+const CommentsSectionPreviousHeaderStart = "COMMENTS FOR PREVIOUS RUN"
 
 func appendCommentsToSourceCode(ejClient *ejudge.Ejudge, csid string, runId int, contestDestination string, runSourceCodeFilename string) {
 	currentComments, previousComments, _ := ejClient.GetAllComments(csid, runId)

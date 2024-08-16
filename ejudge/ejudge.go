@@ -334,10 +334,7 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 }
 
 type Comment struct {
-	Author string `json:"author"`
-	//Date      string `json:"date"`
-	//OldStatus string `json:"old_status"`
-	//NewStatus string `json:"new_status"`
+	Author  string `json:"author"`
 	Content string `json:"content"`
 }
 
