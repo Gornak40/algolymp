@@ -35,8 +35,16 @@ func main() {
 		Required: false,
 		Help:     "Download runs source codes to directory",
 	})
+	shouldAppendComment := parser.Flag("e", "comments", &argparse.Options{
+		Required: false,
+		Help:     "Should append comments to each run source file",
+	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
+	}
+
+	if *shouldAppendComment == true && *inputSourcesDst == "" {
+		logrus.Fatal("-e (--comments) flag requires either --destination or -d flag")
 	}
 
 	cfg := config.NewConfig()
@@ -58,7 +66,7 @@ func main() {
 	}
 
 	sourcesDst := ""
-	if len(*inputSourcesDst) > 0 {
+	if *inputSourcesDst != "" {
 		sourcesDst = makeContestDir(*inputSourcesDst, *cID)
 	}
 
@@ -66,7 +74,9 @@ func main() {
 		fmt.Println(run) //nolint:forbidigo // Basic functionality.
 		if sourcesDst != "" {
 			filename := downloadSourceCode(ejClient, csid, run, sourcesDst)
-			appendCommentsToSourceCode(ejClient, csid, run, sourcesDst, filename)
+			if *shouldAppendComment == true {
+				appendCommentsToSourceCode(ejClient, csid, run, sourcesDst, filename)
+			}
 		}
 	}
 
@@ -74,6 +84,10 @@ func main() {
 		logrus.WithError(err).Fatal("logout failed")
 	}
 }
+
+// Используется в review.sh
+var CommentsSectionHeaderStart = "COMMENTS FOR CURRENT RUN"
+var CommentsSectionPreviousHeaderStart = "COMMENTS FOR PREVIOUS RUN"
 
 func appendCommentsToSourceCode(ejClient *ejudge.Ejudge, csid string, runId int, contestDestination string, runSourceCodeFilename string) {
 	currentComments, previousComments, _ := ejClient.GetAllComments(csid, runId)
@@ -84,8 +98,8 @@ func appendCommentsToSourceCode(ejClient *ejudge.Ejudge, csid string, runId int,
 	}
 	defer file.Close()
 
-	writeCommentSection(file, "COMMENTS FOR CURRENT RUN", currentComments)
-	writeCommentSection(file, "COMMENTS FOR PREVIOUS RUN", previousComments)
+	writeCommentSection(file, CommentsSectionHeaderStart, currentComments)
+	writeCommentSection(file, CommentsSectionPreviousHeaderStart, previousComments)
 }
 
 func writeCommentSection(file *os.File, header string, comments []ejudge.Comment) {

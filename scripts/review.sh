@@ -11,12 +11,21 @@ IYellow='\033[0;93m'
 Cyan='\033[0;36m'         # Cyan
 
 if [ "$#" -lt 3 ]; then
-    echo "Usage: $0 <contestId> <filter> <count> [<0/1 disable PR filter>]"
+    echo "Usage: $0 <contestId> <filter> <count> [<showAll>]"
+    echo
+    echo "             Run review for pending review filtered runs in contest."
+    echo
+    echo "Arguments:"
+    echo
+    echo "  contestId    (int)        Contest id"
+    echo "  filter       (string)     Filter expression to filter runs"
+    echo "  count        (int)        Maximum count of runs to review"
+    echo "  showAll      (bool)       Disable pending review runs filter"
     exit 1
 fi
 
 contestId=$1
-if [ "$4" == '1' ]; then
+if [ "$4" == 'true' ]; then
   filter=$2
   echo -e "${Red}WARNING${NC}    Pending review filter is disabled, don't OK the run uncontrollably!"
 else
@@ -24,16 +33,16 @@ else
 fi
 count=$3
 
-if [ -d "$contestId" ]; then
-  rm -r $contestId
-fi
+cleanup() {
+  if [ -d "$contestId" ]; then
+    rm -r $contestId
+  fi
+}
+
+cleanup
 
 echo -e "${Cyan}INFO${NC}       Filtering runs from contest [$contestId] with filter [$filter] and limit [$count]"
-echo -e "${Cyan}INFO${NC}       Reviewing ${IYellow}[$(boban -i "$contestId" -f "$filter" -c "$count" -d . | wc -l | xargs)]${NC} filtered runs"
-
-cleanup() {
-  rm -r "$contestId"
-}
+echo -e "${Cyan}INFO${NC}       Reviewing ${IYellow}[$(boban -i "$contestId" -f "$filter" -c "$count" -e -d . | wc -l | xargs)]${NC} filtered runs"
 
 for file in "$contestId"/*; do
     if [ -f "$file" ]; then
@@ -45,7 +54,7 @@ for file in "$contestId"/*; do
         cp "$file" "$current"
         echo -e "${Cyan}INFO${NC}       Review $file => $current"
 
-        runLinesCount=$(cat "$current" | awk '/=============== COMMENTS/{print NR-2; found=1; exit} END{if(!found) print NR}') # количестов строк кода в посылке до секции комментов
+        runLinesCount=$(cat "$current" | awk '/COMMENTS FOR CURRENT RUN/{print NR-2; found=1; exit} END{if(!found) print NR}') # количестов строк кода в посылке до секции комментов
 
         while [ 1 ]; do
             read -r -p "$(echo -e "${Green}INTERACT${NC}")   Type the resolution ($(echo -e "${Green}OK(щл)${NC}/${Red}RJ(ко)${NC}/skip/rejudge")): " verdict
