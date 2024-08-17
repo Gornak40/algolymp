@@ -13,24 +13,24 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
-| [gibon](#gibon) | api multitool | | 🦍 | ✅ |
-| [pepel](#pepel) | generate hasher solution | | | ✅ |
+| [gibon](#gibon) | api multitool | | 🦍 | ✅ | ✅ |
+| [korob](#korob) | png grid generator | | 🦍 | 🛠️ |
+| [pepel](#pepel) | generate hasher solution | | 🦍 | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
-| [vydra](#vydra) | upload package | | 🦍 | 🧑‍💻 |
+| [vydra](#vydra) | upload package | | 🦍 | 🛠️ |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | ✅ |
-| ⚙️ | move json config to ini | | | 🤔 |
-| 👻 | set good random group scores | | 🦍 | 🤔 |
-| 👻 | algolymp config manager | | | 🤔 |
-| 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
+| ⚙️ | config manager | | | 🤔 |
+| 👻 | set good group scores | | 🦍 | 🤔 |
 | 👻 | autogen static problem | 🦍 | | 🤔 |
 | 👻 | zip extractor for websites | | | 🤔 |
+| 👻 | ~~import polygon problem~~ | 🦍 | 🦍 | 🤔 |
 
 ### Icons
 
 - ✅ Done
-- 🧑‍💻 In progress
+- 🛠️ In progress
 - 🤔 To do
 - 👻 Name placeholder
 - ⚙️ Refactor task
@@ -308,6 +308,9 @@ for i in $(gibon -i 42619 -m contest); do gibon -i $i -m commit && gibon -i $i -
 ```
 
 ![gibon logo](https://algolymp.ru/static/img/gibon.png)
+
+## korob
+*Generate PNG grid for problem statements.*
 
 ## pepel
 *Generate hasher solution based on a/ans/out files.*
