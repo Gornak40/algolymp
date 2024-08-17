@@ -35,8 +35,8 @@ type Korob struct {
 }
 
 func hexToColor(hex string) color.RGBA {
-	c := color.RGBA{A: 0xff}
-	if n, _ := fmt.Sscanf(hex, "#%02x%02x%02x", &c.R, &c.G, &c.B); n != 3 {
+	c := color.RGBA{A: 0xff}                                                //nolint:mnd // no alpha
+	if n, _ := fmt.Sscanf(hex, "#%02x%02x%02x", &c.R, &c.G, &c.B); n != 3 { //nolint:mnd // RGB
 		return color.RGBA{}
 	}
 
