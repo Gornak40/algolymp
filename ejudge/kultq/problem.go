@@ -48,7 +48,7 @@ func (p *problem) init() error {
 
 func (p *problem) runDream(lang string, runs1, runs2 []string) error {
 	for i := range runs1 {
-		for j := i + 1; j < len(runs2); j++ {
+		for j := range runs2 {
 			var out bytes.Buffer
 			cmd := exec.Command(p.cfg.DreamBin, lang, runs1[i], runs2[j]) //nolint:gosec
 			cmd.Stdout = &out
