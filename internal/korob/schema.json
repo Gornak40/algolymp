@@ -1,0 +1,63 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "horSquares": {
+            "type": "integer",
+            "description": "The number of horizontal squares in the grid."
+        },
+        "verSquares": {
+            "type": "integer",
+            "description": "The number of vertical squares in the grid."
+        },
+        "squarePixels": {
+            "type": "integer",
+            "description": "The side of each square in pixels."
+        },
+        "squareColorHex": {
+            "type": "string",
+            "description": "The color of the squares in the grid (RGB HEX). Leave empty for transparent.",
+            "pattern": "^#([A-Fa-f0-9]{6})$"
+        },
+        "marginPixels": {
+            "type": "integer",
+            "description": "The width of the margins between the squares in pixels."
+        },
+        "marginColorHex": {
+            "type": "string",
+            "description": "The color of the squares in the grid (RGB HEX). Leave empty for transparent.",
+            "pattern": "^#([A-Fa-f0-9]{6})$"
+        },
+        "grid": {
+            "type": "array",
+            "description": "An array containing the configuration for spicific squares in the grid.",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "row": {
+                        "type": "integer",
+                        "description": "The row number of the square."
+                    },
+                    "column": {
+                        "type": "integer",
+                        "description": "The column number of the square."
+                    },
+                    "colorHex": {
+                        "type": "string",
+                        "description": "The color of the squares in the grid (RGB HEX). Leave empty for transparent.",
+                        "pattern": "^#([A-Fa-f0-9]{6})$"
+                    }
+                },
+                "required": [
+                    "row",
+                    "column"
+                ]
+            }
+        }
+    },
+    "required": [
+        "horSquares",
+        "verSquares"
+    ]
+}
