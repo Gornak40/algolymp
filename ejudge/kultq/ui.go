@@ -2,12 +2,27 @@ package kultq
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"strconv"
 
 	"github.com/abiosoft/ishell/v2"
 )
+
+const idFmt = "%d"
+
+func (e *Engine) addDeathNote(path string) error {
+	var id int
+	_, _ = fmt.Sscanf(filepath.Base(path), idFmt, &id)
+	if _, err := e.deathNotes.Write([]byte(strconv.Itoa(id) + "\n")); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func (e *Engine) startUI(c *ishell.Context, slip []statPair) error {
 	printCode := func(path string) error {
@@ -39,7 +54,12 @@ func (e *Engine) startUI(c *ishell.Context, slip []statPair) error {
 			return err
 		}
 		if yn {
-			c.Println("KILLED") // TODO: implement
+			if err := e.addDeathNote(s.path1); err != nil {
+				return err
+			}
+			if err := e.addDeathNote(s.path2); err != nil {
+				return err
+			}
 		}
 	}
 

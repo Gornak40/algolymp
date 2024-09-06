@@ -2,6 +2,7 @@ package kultq
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"sort"
 	"strconv"
@@ -9,18 +10,22 @@ import (
 	"github.com/abiosoft/ishell/v2"
 )
 
+const (
+	deathPath = "death.csv"
+)
+
 type Config struct {
 	DreamBin   string    `json:"dreamBin"`
 	StatBounds []float64 `json:"statBounds"`
 	BatBin     string    `json:"batBin"`
 	BatArgs    []string  `json:"batArgs"`
-	Unescape   bool      `json:"unescape"`
 }
 
 type Engine struct {
-	cfg       *Config
-	probNames []string
-	probMapa  map[string]problem
+	cfg        *Config
+	probNames  []string
+	probMapa   map[string]problem
+	deathNotes io.Writer
 }
 
 func NewEngine(cfg *Config) *Engine {
@@ -45,6 +50,10 @@ func (e *Engine) Run() error {
 			return err
 		}
 		e.probMapa[f.Name()] = p
+	}
+	e.deathNotes, err = os.Create(deathPath)
+	if err != nil {
+		return err
 	}
 
 	e.runShell()
@@ -101,19 +110,10 @@ func (e *Engine) comSliceFunc(c *ishell.Context) {
 		return
 	}
 	lbf := float64(lb) / 100 //nolint:mnd // percents
-	c.Print("Upper bound (%): ")
-	rbs := c.ReadLine()
-	rb, err := strconv.Atoi(rbs)
-	if err != nil {
-		c.Err(err)
-
-		return
-	}
-	rbf := float64(rb) / 100 //nolint:mnd // percents
 
 	var slip []statPair
 	for _, p := range stat.pairs {
-		if lbf <= p.score && p.score <= rbf {
+		if lbf <= p.score {
 			slip = append(slip, p)
 		}
 	}
@@ -189,8 +189,9 @@ func (e *Engine) runShell() {
 
 func (e *Engine) runProbs(c *ishell.Context, probs []string) {
 	totUsr := 0
-	prog := make(chan struct{})
-	errs := make(chan error)
+	bufSize := len(probs) << 1
+	prog := make(chan struct{}, bufSize)
+	errs := make(chan error, bufSize)
 	for _, name := range probs {
 		p := e.probMapa[name]
 		c.Println(p.String())
