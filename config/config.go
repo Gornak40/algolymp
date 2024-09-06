@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/Gornak40/algolymp/ejudge"
+	"github.com/Gornak40/algolymp/ejudge/kultq"
 	"github.com/Gornak40/algolymp/polygon"
 	"github.com/sirupsen/logrus"
 )
@@ -14,9 +15,10 @@ type System struct {
 }
 
 type Config struct {
-	Ejudge  ejudge.Config  `json:"ejudge"`
-	Polygon polygon.Config `json:"polygon"`
-	System  System         `json:"system"`
+	Ejudge   ejudge.Config  `json:"ejudge"`
+	Polygon  polygon.Config `json:"polygon"`
+	System   System         `json:"system"`
+	Antiplag kultq.Config   `json:"antiplag"`
 }
 
 func NewConfig() *Config {
