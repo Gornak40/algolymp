@@ -56,7 +56,8 @@ Put your config file in `~/.config/algolymp/config.json`.
 		"url": "https://ejudge.algocourses.ru",
 		"login": "<login>",
 		"password": "<password>",
-		"judgesDir": "/home/judges"
+		"judgesDir": "/home/judges",
+		"secret1": "<random>"
 	},
 	"polygon": {
 		"url": "https://polygon.codeforces.com",
@@ -68,6 +69,10 @@ Put your config file in `~/.config/algolymp/config.json`.
 	}
 }
 ```
+
+If you are using Windows, put it in `%APPDATA/algolymp.config.json`.
+
+**Warning:** some tools may not work on Windows. Feel free to open a PR to fix this.
 
 ## baron
 *Register users to Ejudge contest (Pending status).*
