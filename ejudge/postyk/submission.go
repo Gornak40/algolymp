@@ -15,6 +15,7 @@ var (
 	ErrInvalidSubmission = errors.New("invalid submission string")
 )
 
+// Based on https://ejudge.ru/wiki/index.php/Serve.cfg:global:print_just_copy
 type Submission struct {
 	raw      string
 	Time     time.Time

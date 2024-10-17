@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"path"
 
 	"github.com/Gornak40/algolymp/ejudge"
 	"github.com/PuerkitoBio/goquery"
@@ -21,9 +23,10 @@ var (
 )
 
 type Indexer struct {
-	cfg    *ejudge.Config
-	client *http.Client
-	target string
+	cfg       *ejudge.Config
+	client    *http.Client
+	target    string
+	cachePath string
 }
 
 func NewIndexer(cfg *ejudge.Config) *Indexer {
@@ -34,27 +37,36 @@ func NewIndexer(cfg *ejudge.Config) *Indexer {
 }
 
 func (i *Indexer) Feed(cID int) error {
+	scID := fmt.Sprintf("%06d", cID)
+
 	var err error
+	i.cachePath, err = os.UserCacheDir()
+	if err != nil {
+		return err
+	}
+	i.cachePath = path.Join(i.cachePath, "algolymp", "postyk", scID)
+
 	i.target, err = url.JoinPath(i.cfg.URL,
 		printRoot,
 		i.cfg.Secret1,
-		fmt.Sprintf("%06d", cID),
+		scID,
 		"print")
 	if err != nil {
-		return fmt.Errorf("failed to build url: %w", err)
+		return err
 	}
 	logrus.WithField("url", i.target).Info("init indexer")
 
-	subs, err := i.LoadList()
-	if err != nil { // test load
+	subs, err := i.GetList()
+	if err != nil { // initial healthcheck
 		return err
 	}
-	logrus.WithField("count", len(subs)).Info("success ping directory")
+	logrus.WithField("count", len(subs)).Info("success ping shared directory")
 
 	return nil
 }
 
-func (i *Indexer) GetContent(name string) ([]byte, error) {
+func (i *Indexer) GetFile(name string) ([]byte, error) {
+	logrus.WithField("name", name).Info("downloading submission")
 	link, err := url.JoinPath(i.target, name)
 	if err != nil {
 		return nil, err
@@ -71,7 +83,8 @@ func (i *Indexer) GetContent(name string) ([]byte, error) {
 	return io.ReadAll(resp.Body)
 }
 
-func (i *Indexer) LoadList() ([]*Submission, error) {
+func (i *Indexer) GetList() ([]*Submission, error) {
+	logrus.Info("refreshing index")
 	resp, err := i.client.Get(i.target) //nolint:noctx // don't need context here
 	if err != nil {
 		return nil, err

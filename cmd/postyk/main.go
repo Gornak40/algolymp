@@ -2,11 +2,16 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/Gornak40/algolymp/config"
 	"github.com/Gornak40/algolymp/ejudge/postyk"
 	"github.com/akamensky/argparse"
 	"github.com/sirupsen/logrus"
+)
+
+const (
+	timeout = 5 * time.Second
 )
 
 func main() {
@@ -24,5 +29,12 @@ func main() {
 
 	if err := ind.Feed(*cID); err != nil {
 		logrus.WithError(err).Fatal("failed to ping print shared directory")
+	}
+	for {
+		if err := ind.Sync(); err != nil {
+			logrus.WithError(err).Fatal("sync failed")
+		}
+		logrus.Info("success sync")
+		time.Sleep(timeout)
 	}
 }
