@@ -70,7 +70,7 @@ Put your config file in `~/.config/algolymp/config.json`.
 }
 ```
 
-If you are using Windows, put it in `%APPDATA/algolymp.config.json`.
+If you are using Windows, put it in `%APPDATA/algolymp/config.json`.
 
 **Warning:** some tools may not work on Windows. Feel free to open a PR to fix this.
 
