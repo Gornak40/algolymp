@@ -14,6 +14,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
 | [gibon](#gibon) | api multitool | | 🦍 | ✅ |
+| [postyk](#postyk) | print submits | 🦍 | | 🧑‍💻 |
 | [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
@@ -349,6 +350,38 @@ pepel -i "*.in.*" -a "*.out.*" -z > pepel-mini.py
 ```
 
 ![pepel logo](https://algolymp.ru/static/img/pepel.png)
+
+## postyk
+*Service for printing Ejudge submits.*
+
+### About
+
+Daemon that sends ejudge submits to the printer.
+
+1. Enable [print_just_copy](https://ejudge.ru/wiki/index.php/Serve.cfg:global:print_just_copy) and [enable_printing](https://ejudge.ru/wiki/index.php/Serve.cfg:global:enable_printing) options in your contest.
+2. Share `/var/lib/ejudge/cwork` directory via url `/print/<secret>`. Check examples for [nginx](https://nginx.org) config.
+3. Set `ejudge.secret1` config parameter equal `<secret>`.
+
+Useful in team contests in ICPC format.
+
+### Flags
+- `-i` - contest id (required)
+
+### Config
+- `ejudge.url`
+- `ejudge.secret1`
+
+### Examples
+
+Nginx config:
+```nginx
+location /print/<secret> {
+	alias /var/lib/ejudge/cwork;
+	autoindex on;
+}
+```
+
+![postyk logo](https://algolymp.ru/static/img/postyk.png)
 
 ## ripper
 *Change Ejudge runs status.*
