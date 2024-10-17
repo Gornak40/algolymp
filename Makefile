@@ -6,7 +6,7 @@ ifeq ($(OS),Windows_NT)
     RM := del /Q /F
     RMDIR := rmdir /S /Q
     MKDIR := if not exist $(BIN_DIR) mkdir $(BIN_DIR)
-    BIN_EXT := .exe  # для создания exe файлов
+    BIN_EXT := .exe
 else
     RM := rm -f
     RMDIR := rm -rf
