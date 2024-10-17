@@ -66,7 +66,7 @@ func (i *Indexer) Feed(cID int) error {
 }
 
 func (i *Indexer) GetFile(name string) ([]byte, error) {
-	logrus.WithField("name", name).Info("downloading submission")
+	logrus.WithField("name", name).Info("download submission")
 	link, err := url.JoinPath(i.target, name)
 	if err != nil {
 		return nil, err
@@ -84,7 +84,7 @@ func (i *Indexer) GetFile(name string) ([]byte, error) {
 }
 
 func (i *Indexer) GetList() ([]*Submission, error) {
-	logrus.Info("refreshing index")
+	logrus.Info("refresh index")
 	resp, err := i.client.Get(i.target) //nolint:noctx // don't need context here
 	if err != nil {
 		return nil, err

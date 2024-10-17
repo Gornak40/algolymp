@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	timeout = 5 * time.Second
+	defaultTimeoutSecond = 20
 )
 
 func main() {
@@ -19,6 +19,11 @@ func main() {
 	cID := parser.Int("i", "cid", &argparse.Options{
 		Required: true,
 		Help:     "Ejudge contest ID",
+	})
+	timeout := parser.Int("t", "timeout", &argparse.Options{
+		Required: false,
+		Help:     "Refresh timeout in seconds",
+		Default:  defaultTimeoutSecond,
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
@@ -35,6 +40,6 @@ func main() {
 			logrus.WithError(err).Fatal("sync failed")
 		}
 		logrus.Info("success sync")
-		time.Sleep(timeout)
+		time.Sleep(time.Duration(*timeout) * time.Second)
 	}
 }

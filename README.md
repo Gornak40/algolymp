@@ -356,29 +356,37 @@ pepel -i "*.in.*" -a "*.out.*" -z > pepel-mini.py
 
 ### About
 
-Daemon that sends ejudge submits to the printer.
+Daemon that sends user-requested Ejudge submits to the printer.
 
 1. Enable [print_just_copy](https://ejudge.ru/wiki/index.php/Serve.cfg:global:print_just_copy) and [enable_printing](https://ejudge.ru/wiki/index.php/Serve.cfg:global:enable_printing) options in your contest.
-2. Share `/var/lib/ejudge/cwork` directory via url `/print/<secret>`. Check examples for [nginx](https://nginx.org) config.
-3. Set `ejudge.secret1` config parameter equal `<secret>`.
+2. Share `/var/lib/ejudge/cwork` directory via url `/print/<secret>`. Check out the [nginx](https://nginx.org) configuration example below.
+3. Set the `ejudge.secret1` config parameter to `<secret>`.
 
 Useful in team contests in ICPC format.
 
 ### Flags
 - `-i` - contest id (required)
+- `-t` - refresh timeout in seconds (default: 20)
 
 ### Config
 - `ejudge.url`
 - `ejudge.secret1`
 
-### Examples
+### Nginx
 
-Nginx config:
 ```nginx
 location /print/<secret> {
 	alias /var/lib/ejudge/cwork;
 	autoindex on;
 }
+```
+
+### Examples
+
+```bash
+postyk --help
+postyk -i 1010
+postyk -i 54007 -t 300
 ```
 
 ![postyk logo](https://algolymp.ru/static/img/postyk.png)
