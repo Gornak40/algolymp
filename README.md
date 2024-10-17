@@ -14,7 +14,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
 | [gibon](#gibon) | api multitool | | 🦍 | ✅ |
-| [postyk](#postyk) | print submits | 🦍 | | 🧑‍💻 |
+| [postyk](#postyk) | print submits 🖨️ | 🦍 | | 🧑‍💻 |
 | [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
@@ -70,7 +70,7 @@ Put your config file in `~/.config/algolymp/config.json`.
 }
 ```
 
-If you are using Windows, put it in `%APPDATA/algolymp/config.json`.
+If you are using Windows, put it in `%APPDATA%/algolymp/config.json`.
 
 **Warning:** some tools may not work on Windows. Feel free to open a PR to fix this.
 
@@ -368,6 +368,8 @@ Daemon that sends user-requested Ejudge submits to the printer.
 3. Set the `ejudge.secret1` config parameter to `<secret>`.
 
 Useful in team contests in ICPC format.
+
+**Warning:** unlike other tools, this one will work only in Windows. I'm sorry about that.
 
 ### Flags
 - `-i` - contest id (required)
