@@ -1,19 +1,15 @@
 BIN_DIR := bin
 TOOLS := $(notdir $(wildcard cmd/*))
-TOOL_TARGETS := $(addprefix $(BIN_DIR)/, $(TOOLS))
-GO_FILES := $(shell find $(SRC_DIRS) -type f -name '*.go')
+GO_FILES := $(wildcard cmd/*/*.go)
 
-all: $(TOOL_TARGETS)
+all: $(TOOLS)
 
-$(TOOL_TARGETS): $(GO_FILES)
-
-$(BIN_DIR)/%: cmd/%/main.go
+$(TOOLS):
 	@mkdir -p $(BIN_DIR)
-	@go build -o $@ $<
+	@go build -o $(BIN_DIR)/$@ ./cmd/$@/main.go
 
 clean:
-	@rm -f $(BIN_DIR)/*
-	@rmdir $(BIN_DIR)
+	@rm -rf $(BIN_DIR)
 
 test:
 	@go test ./...

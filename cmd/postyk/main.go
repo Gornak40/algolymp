@@ -39,7 +39,7 @@ func main() {
 		if err := ind.Sync(); err != nil {
 			logrus.WithError(err).Fatal("sync failed")
 		}
-		logrus.Info("success sync")
+		logrus.WithField("sleep", *timeout).Info("success sync")
 		time.Sleep(time.Duration(*timeout) * time.Second)
 	}
 }
