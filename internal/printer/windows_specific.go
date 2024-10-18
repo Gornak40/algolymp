@@ -1,0 +1,24 @@
+//go:build windows
+
+package printer
+
+import (
+	"fmt"
+	"os/exec"
+
+	"github.com/sirupsen/logrus"
+)
+
+func PrintFile(name, device string) error {
+	logrus.WithFields(logrus.Fields{"file": name, "printer": device}).Info("print file")
+
+	command := fmt.Sprintf("Get-Content -Path %q | Out-Printer -Name %q", name, device)
+	cmd := exec.Command("powershell", "-Command", command)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("%w: %s", err, out)
+	}
+	logrus.Info(out)
+
+	return nil
+}
