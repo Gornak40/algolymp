@@ -45,7 +45,7 @@ func (i *Indexer) Sync() error {
 				return err
 			}
 			if i.printer == "" {
-				logrus.Warn("no device provided, skip printing")
+				logrus.Warn("skip printing (no device provided)")
 
 				continue
 			}
