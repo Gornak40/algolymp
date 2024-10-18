@@ -46,9 +46,15 @@ make
 export PATH=$(pwd)/bin:$PATH
 ```
 
+**Warning:** Some tools may not work on Windows. Feel free to open a PR to fix this.
+
 ## Config
 
-Put your config file in `~/.config/algolymp/config.json`.
+Each tool specifies mandatory config variables. It is not necessary to fill in the others.
+
+Put your config file in `~/.config/algolymp/config.json`. If you are using Windows, put it in `%APPDATA%/algolymp/config.json`.
+
+Here is an example of a fully filled config:
 
 ```json
 {
@@ -65,14 +71,13 @@ Put your config file in `~/.config/algolymp/config.json`.
 		"apiSecret": "<secret>"
 	},
 	"system": {
-		"editor": "nano"
+		"editor": "nano",
+		"printer": "Samsung SCX-4200"
 	}
 }
 ```
 
-If you are using Windows, put it in `%APPDATA%/algolymp/config.json`.
-
-**Warning:** some tools may not work on Windows. Feel free to open a PR to fix this.
+**Tip:** You will probably need different configs. It's good practice to name them `config.json.lksh`, `config.json.tbank`, etc. and create a symlink to `config.json`.
 
 ## baron
 *Register users to Ejudge contest (Pending status).*
@@ -361,15 +366,14 @@ pepel -i "*.in.*" -a "*.out.*" -z > pepel-mini.py
 
 ### About
 
-Daemon that sends user-requested Ejudge submits to the printer.
+Daemon that sends user-requested Ejudge submits to the printer. Useful in team contests in ICPC format.
 
 1. Enable [print_just_copy](https://ejudge.ru/wiki/index.php/Serve.cfg:global:print_just_copy) and [enable_printing](https://ejudge.ru/wiki/index.php/Serve.cfg:global:enable_printing) options in your contest.
 2. Share `/var/lib/ejudge/cwork` directory via url `/print/<secret>`. Check out the [nginx](https://nginx.org) configuration example below.
 3. Set the `ejudge.secret1` config parameter to `<secret>`.
+4. Set the `system.printer` config parameter to hardware printer name. Leave it empty if you don't need printing.
 
-Useful in team contests in ICPC format.
-
-**Warning:** unlike other tools, this one will work only in Windows. I'm sorry about that.
+You can find out the printer name by using [lsusb](https://www.opennet.ru/man.shtml?topic=lsusb&category=8) on Linux or [Get-Printer](https://learn.microsoft.com/en-us/powershell/module/printmanagement/get-printer) on Windows.
 
 ### Flags
 - `-i` - contest id (required)
@@ -378,6 +382,7 @@ Useful in team contests in ICPC format.
 ### Config
 - `ejudge.url`
 - `ejudge.secret1`
+- `system.printer`
 
 ### Nginx
 

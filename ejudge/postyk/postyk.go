@@ -24,15 +24,17 @@ var (
 
 type Indexer struct {
 	cfg       *ejudge.Config
+	printer   string
 	client    *http.Client
 	target    string
 	cachePath string
 }
 
-func NewIndexer(cfg *ejudge.Config) *Indexer {
+func NewIndexer(cfg *ejudge.Config, printer string) *Indexer {
 	return &Indexer{
-		cfg:    cfg,
-		client: http.DefaultClient,
+		cfg:     cfg,
+		printer: printer,
+		client:  http.DefaultClient,
 	}
 }
 

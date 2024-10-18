@@ -30,7 +30,7 @@ func main() {
 	}
 
 	cfg := config.NewConfig()
-	ind := postyk.NewIndexer(&cfg.Ejudge)
+	ind := postyk.NewIndexer(&cfg.Ejudge, cfg.System.Printer)
 
 	if err := ind.Feed(*cID); err != nil {
 		logrus.WithError(err).Fatal("failed to ping print shared directory")

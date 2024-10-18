@@ -11,7 +11,8 @@ import (
 )
 
 type System struct {
-	Editor string `json:"editor"`
+	Editor  string `json:"editor"`
+	Printer string `json:"printer"`
 }
 
 type Config struct {
