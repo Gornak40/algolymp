@@ -4,6 +4,7 @@ import (
 	"os"
 	"path"
 
+	"github.com/Gornak40/algolymp/internal/printer"
 	"github.com/sirupsen/logrus"
 )
 
@@ -39,7 +40,16 @@ func (i *Indexer) Sync() error {
 			if err != nil {
 				return err
 			}
-			if err := os.WriteFile(path.Join(i.cachePath, s.raw), data, cacheFilePerm); err != nil {
+			fname := path.Join(i.cachePath, s.raw)
+			if err := os.WriteFile(fname, data, cacheFilePerm); err != nil {
+				return err
+			}
+			if i.printer == "" {
+				logrus.Warn("no device provided, skip printing")
+
+				continue
+			}
+			if err := printer.PrintFile(fname, i.printer); err != nil {
 				return err
 			}
 		}
