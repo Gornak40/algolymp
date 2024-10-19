@@ -57,8 +57,8 @@ func (i *Indexer) Feed(cID int) error {
 		return err
 	}
 	logrus.WithField("url", i.target).Info("init indexer")
-	if loc := i.cfg.ULocation; loc != "" {
-		logrus.WithField("location", loc).Info("filter by location")
+	if upri := i.cfg.UPrinter; upri != "" {
+		logrus.WithField("uprinter", upri).Info("filter by user printer (db)")
 	}
 
 	subs, err := i.GetList()
@@ -117,7 +117,7 @@ func (i *Indexer) GetList() ([]*Submission, error) {
 
 			continue
 		}
-		if loc := i.cfg.ULocation; loc != "" && loc != sub.Location {
+		if upri := i.cfg.UPrinter; upri != "" && upri != sub.Printer {
 			continue
 		}
 		subs = append(subs, sub)

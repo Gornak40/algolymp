@@ -42,7 +42,7 @@ type Config struct {
 	Password  string `json:"password"`
 	JudgesDir string `json:"judgesDir"`
 	Secret1   string `json:"secret1"`
-	ULocation string `json:"ulocation"`
+	UPrinter  string `json:"uprinter"`
 }
 
 type Ejudge struct {
