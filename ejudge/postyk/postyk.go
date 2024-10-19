@@ -57,6 +57,9 @@ func (i *Indexer) Feed(cID int) error {
 		return err
 	}
 	logrus.WithField("url", i.target).Info("init indexer")
+	if loc := i.cfg.ULocation; loc != "" {
+		logrus.WithField("location", loc).Info("filter by location")
+	}
 
 	subs, err := i.GetList()
 	if err != nil { // initial healthcheck
@@ -109,10 +112,12 @@ func (i *Indexer) GetList() ([]*Submission, error) {
 			continue
 		}
 		sub, err := parseSubmission(el)
-		if err != nil { // TODO: maybe just log?
-			return nil, err
+		if err != nil {
+			logrus.WithError(err).Warn("failed to parse submission")
+
+			continue
 		}
-		if loc := i.cfg.PLocation; loc != "" && loc != sub.Location {
+		if loc := i.cfg.ULocation; loc != "" && loc != sub.Location {
 			continue
 		}
 		subs = append(subs, sub)
