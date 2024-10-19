@@ -10,6 +10,7 @@ import (
 
 func PrintFile(name, device string) error {
 	logrus.WithFields(logrus.Fields{"file": filepath.Base(name), "printer": device}).Info("print file")
+	logrus.Warn("not implemented yet (use Windows)")
 
 	return nil
 }

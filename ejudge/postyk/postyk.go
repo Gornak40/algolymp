@@ -112,6 +112,9 @@ func (i *Indexer) GetList() ([]*Submission, error) {
 		if err != nil { // TODO: maybe just log?
 			return nil, err
 		}
+		if loc := i.cfg.PLocation; loc != "" && loc != sub.Location {
+			continue
+		}
 		subs = append(subs, sub)
 	}
 

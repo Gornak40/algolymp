@@ -17,9 +17,9 @@ func PrintFile(name, device string) error {
 	cmd := exec.Command("powershell", "-Command", command)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("%w: %s", err, out)
+		return fmt.Errorf("%w: %s", err, string(out))
 	}
-	logrus.Info(out)
+	logrus.Info(string(out))
 
 	return nil
 }
