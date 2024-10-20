@@ -1,19 +1,27 @@
 BIN_DIR := bin
 TOOLS := $(notdir $(wildcard cmd/*))
-TOOL_TARGETS := $(addprefix $(BIN_DIR)/, $(TOOLS))
-GO_FILES := $(shell find $(SRC_DIRS) -type f -name '*.go')
+GO_FILES := $(wildcard cmd/*/*.go)
 
-all: $(TOOL_TARGETS)
+ifeq ($(OS),Windows_NT)
+	RM := del /Q /F
+	RMDIR := rmdir /S /Q
+	MKDIR := if not exist $(BIN_DIR) mkdir $(BIN_DIR)
+	BIN_EXT := .exe
+else
+	RM := rm -f
+	RMDIR := rm -rf
+	MKDIR := mkdir -p $(BIN_DIR)
+	BIN_EXT :=
+endif
 
-$(TOOL_TARGETS): $(GO_FILES)
+all: $(TOOLS)
 
-$(BIN_DIR)/%: cmd/%/main.go
-	@mkdir -p $(BIN_DIR)
-	@go build -o $@ $<
+$(TOOLS):
+	@$(MKDIR)
+	@go build -o $(BIN_DIR)/$@$(BIN_EXT) ./cmd/$@/main.go
 
 clean:
-	@rm -f $(BIN_DIR)/*
-	@rmdir $(BIN_DIR)
+	@$(RMDIR) $(BIN_DIR)
 
 test:
 	@go test ./...

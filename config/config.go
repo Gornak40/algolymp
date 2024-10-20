@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"os"
+	"path"
 
 	"github.com/Gornak40/algolymp/ejudge"
 	"github.com/Gornak40/algolymp/polygon"
@@ -10,7 +11,8 @@ import (
 )
 
 type System struct {
-	Editor string `json:"editor"`
+	Editor  string `json:"editor"`
+	Printer string `json:"printer"`
 }
 
 type Config struct {
@@ -20,9 +22,9 @@ type Config struct {
 }
 
 func NewConfig() *Config {
-	confDir, _ := os.UserHomeDir()
-	path := confDir + "/.config/algolymp/config.json"
-	data, err := os.ReadFile(path)
+	confDir, _ := os.UserConfigDir()
+	confPath := path.Join(confDir, "algolymp", "config.json")
+	data, err := os.ReadFile(confPath)
 	if err != nil {
 		logrus.WithError(err).Fatal("failed to read config")
 	}

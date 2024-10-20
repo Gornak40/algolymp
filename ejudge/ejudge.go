@@ -41,6 +41,8 @@ type Config struct {
 	Login     string `json:"login"`
 	Password  string `json:"password"`
 	JudgesDir string `json:"judgesDir"`
+	Secret1   string `json:"secret1"`
+	UPrinter  string `json:"uprinter"`
 }
 
 type Ejudge struct {
