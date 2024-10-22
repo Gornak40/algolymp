@@ -19,7 +19,7 @@ jobs:
         VERSION=$(./scripts/semver.sh)
         echo "Project version: $VERSION"
 
-        git config --global user.name "Gornak40[bot]"
+        git config --global user.name "algolymp[bot]"
         git config --global user.email "noreply@algolymp.ru"
 
         MESSAGE=$(git log -1 --pretty=%s)
