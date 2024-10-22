@@ -373,7 +373,7 @@ Daemon that sends user-requested Ejudge submits to the printer. Useful in team c
 2. Share `/var/lib/ejudge/cwork` directory via url `/print/<secret>`. Check out the [nginx](https://nginx.org) configuration example below.
 3. Set the `ejudge.secret1` config parameter to `<secret>`.
 4. Set the `system.printer` config parameter to hardware printer name. Leave it empty if you don't need printing.
-5. Set the `ejudge.uprinter` config parameter to [location](https://ejudge.ru/wiki/index.php/Userdb:users). Leave it empty if you use only one printer.
+5. Set the `ejudge.uprinter` config parameter to [printer](https://ejudge.ru/wiki/index.php/Userdb:users). Leave it empty if you use only one printer.
 
 You can find out the printer name by using [lsusb](https://www.opennet.ru/man.shtml?topic=lsusb&category=8) on Linux or [Get-Printer](https://learn.microsoft.com/en-us/powershell/module/printmanagement/get-printer) on Windows.
 
