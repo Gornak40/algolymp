@@ -1,0 +1,29 @@
+name: Semver
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  set_tag:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Run version bump script
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        VERSION=$(./scripts/semver.sh)
+        echo "Project version: $VERSION"
+
+        git config --global user.name "algolymp[bot]"
+        git config --global user.email "noreply@algolymp.ru"
+
+        MESSAGE=$(git log -1 --pretty=%s)
+        echo "Tag message: $MESSAGE"
+
+        git tag -a "$VERSION" -m "$MESSAGE"
+        git push origin --tags
