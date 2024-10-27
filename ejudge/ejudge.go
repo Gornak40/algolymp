@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/sirupsen/logrus"
@@ -323,4 +324,19 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	})
 
 	return err
+}
+
+func (ej *Ejudge) DumpUsers(csid string) (string, error) {
+	logrus.WithFields(logrus.Fields{
+		"CSID": csid,
+	}).Info("dump contest users")
+	_, resp, err := ej.postRequest("new-master", url.Values{
+		"SID":    {csid},
+		"action": {"132"},
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(resp.Text()), nil
 }

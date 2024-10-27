@@ -14,12 +14,13 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
 | [gibon](#gibon) | api multitool | | 🦍 | ✅ |
-| [postyk](#postyk) | print submits 🖨️ | 🦍 | | 🧑‍💻 |
+| [postyk](#postyk) | print submits 🖨️ | 🦍 | | ✅ |
 | [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
+| [shoga](#shoga) | dump registered users | 🦍 | | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
-| [vydra](#vydra) | upload package | | 🦍 | 🧑‍💻 |
+| [vydra](#vydra) | upload package | | 🦍 | 🧪 |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | ✅ |
 | ⚙️ | move json config to ini | | | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
@@ -31,6 +32,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 ### Icons
 
 - ✅ Done
+- 🧪 Testing
 - 🧑‍💻 In progress
 - 🤔 To do
 - 👻 Name placeholder
@@ -469,6 +471,32 @@ scalp -i 330328 -s
 ```
 
 ![scalp logo](https://algolymp.ru/static/img/scalp.png)
+
+## shoga
+*Dump Ejudge contest users.*
+
+### About
+
+Print Ejudges users who registered in the specified contest (CSV format).
+
+You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/xsv.git) or [qsv](https://github.com/jqnatividad/qsv.git) to process the output. But I prefer to use vanilla [awk](https://www.opennet.ru/man.shtml?topic=awk).
+
+### Flags
+- `-i` - contest id (required)
+
+### Config
+- `ejudge.url`
+- `ejudge.login`
+- `ejudge.password`
+
+### Examples
+```bash
+shoga --help
+shoga -i 55000
+shoga -i 59000 | awk '{split($0,a,";"); print a[2]}'
+```
+
+![shoga logo](https://algolymp.ru/static/img/shoga.png)
 
 ## valeria
 *Build valuer + textable using Polygon API.*
