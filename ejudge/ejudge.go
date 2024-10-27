@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/sirupsen/logrus"
@@ -337,5 +338,5 @@ func (ej *Ejudge) DumpUsers(csid string) (string, error) {
 		return "", err
 	}
 
-	return resp.Text(), nil
+	return strings.TrimSpace(resp.Text()), nil
 }

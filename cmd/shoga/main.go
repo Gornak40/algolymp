@@ -37,7 +37,7 @@ func main() {
 	if err != nil {
 		logrus.WithError(err).Fatal("dump users failed")
 	}
-	fmt.Print(list) //nolint:forbidigo // Basic functionality.
+	fmt.Println(list) //nolint:forbidigo // Basic functionality.
 
 	if err := ejClient.Logout(sid); err != nil {
 		logrus.WithError(err).Fatal("logout failed")

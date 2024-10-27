@@ -479,6 +479,10 @@ scalp -i 330328 -s
 
 Print Ejudges users who registered in the specified contest (CSV format).
 
+You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/xsv.git) or [qsv](https://github.com/jqnatividad/qsv.git) to process the output.
+
+But I prefer to use vanilla [awk](https://www.opennet.ru/man.shtml?topic=awk).
+
 ### Flags
 - `-i` - contest id (required)
 
@@ -491,6 +495,7 @@ Print Ejudges users who registered in the specified contest (CSV format).
 ```bash
 shoga --help
 shoga -i 55000
+shoga -i 59000 | awk '{split($0,a,";"); print a[2]}'
 ```
 
 ## valeria
