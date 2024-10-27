@@ -324,3 +324,18 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 
 	return err
 }
+
+func (ej *Ejudge) DumpUsers(csid string) (string, error) {
+	logrus.WithFields(logrus.Fields{
+		"CSID": csid,
+	}).Info("dump contest users")
+	_, resp, err := ej.postRequest("new-master", url.Values{
+		"SID":    {csid},
+		"action": {"132"},
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return resp.Text(), nil
+}
