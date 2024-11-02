@@ -524,7 +524,7 @@ Valeria supports several textable types.
 ### Flags
 - `-i` - problem id (required)
 - `-v` - print valuer.cfg in stderr
-- `-t` - textable type (universal | moscow, default: universal)
+- `-t` - textable type (universal | moscow | kaluga, default: universal)
 - `-c` - variables list, useful for some textables (default: nil)
 
 ### Config
