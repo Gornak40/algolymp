@@ -16,6 +16,7 @@ import (
 const (
 	universalTag = "universal"
 	moscowTag    = "moscow"
+	kalugaTag    = "kaluga"
 )
 
 var (
@@ -35,6 +36,7 @@ func main() {
 	tableTyp := parser.Selector("t", "textable-type", []string{
 		universalTag,
 		moscowTag,
+		kalugaTag,
 	}, &argparse.Options{
 		Required: false,
 		Default:  universalTag,
@@ -60,6 +62,8 @@ func main() {
 		table = new(textables.UniversalTable)
 	case moscowTag:
 		table = textables.NewMoscowTable(*vars)
+	case kalugaTag:
+		table = new(textables.KalugaTable)
 	}
 	if table == nil {
 		logrus.WithError(ErrUnknownTexTable).Fatal("failed to get textable")
