@@ -54,7 +54,11 @@ export PATH=$(pwd)/bin:$PATH
 
 Each tool specifies mandatory config variables. It is not necessary to fill in the others.
 
-Put your config file in `~/.config/algolymp/config.json`. If you are using Windows, put it in `%APPDATA%/algolymp/config.json`.
+Put your config file in OS specific config directory:
+
+- `~/.config/algolymp/config.json` on Linux;
+- `~/Library/Application Support/algolymp/config.json` on Mac OS;
+- `%APPDATA%/algolymp/config.json` on Windows.
 
 Here is an example of a fully filled config:
 
