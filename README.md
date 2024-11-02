@@ -54,7 +54,11 @@ export PATH=$(pwd)/bin:$PATH
 
 Each tool specifies mandatory config variables. It is not necessary to fill in the others.
 
-Put your config file in `~/.config/algolymp/config.json`. If you are using Windows, put it in `%APPDATA%/algolymp/config.json`.
+Put your config file in OS specific config directory:
+
+- `~/.config/algolymp/config.json` on Linux;
+- `~/Library/Application Support/algolymp/config.json` on Mac OS;
+- `%APPDATA%/algolymp/config.json` on Windows.
 
 Here is an example of a fully filled config:
 
@@ -515,11 +519,12 @@ Valeria supports several textable types.
 
 - `universal` - Moscow summer olympiad school format. Works both in PDF and HTML.
 - `moscow` - Moscow olympiads format. Works both in PDF and HTML if no variables are passed, otherwise works only in PDF.
+- `kaluga` - Kaluga town olympiad format. Works both in PDF and HTML.
 
 ### Flags
 - `-i` - problem id (required)
 - `-v` - print valuer.cfg in stderr
-- `-t` - textable type (universal | moscow, default: universal)
+- `-t` - textable type (universal | moscow | kaluga, default: universal)
 - `-c` - variables list, useful for some textables (default: nil)
 
 ### Config
@@ -535,6 +540,7 @@ valeria -i 318511 > scoring.tex
 valeria -i 318882 | bat -l tex
 valeria -i 285375 -t moscow
 valeria -i 285375 -t moscow -c n -c m -c k
+valeria -i 396578 -t kaluga
 ```
 
 ![valeria logo](https://algolymp.ru/static/img/valeria.png)
