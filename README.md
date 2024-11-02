@@ -519,6 +519,7 @@ Valeria supports several textable types.
 
 - `universal` - Moscow summer olympiad school format. Works both in PDF and HTML.
 - `moscow` - Moscow olympiads format. Works both in PDF and HTML if no variables are passed, otherwise works only in PDF.
+- `kaluga` - Kaluga town olympiad format. Works both in PDF and HTML.
 
 ### Flags
 - `-i` - problem id (required)
@@ -539,6 +540,7 @@ valeria -i 318511 > scoring.tex
 valeria -i 318882 | bat -l tex
 valeria -i 285375 -t moscow
 valeria -i 285375 -t moscow -c n -c m -c k
+valeria -i 396578 -t kaluga
 ```
 
 ![valeria logo](https://algolymp.ru/static/img/valeria.png)
