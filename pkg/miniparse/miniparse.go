@@ -23,6 +23,7 @@ var (
 	ErrBadSectionType  = errors.New("bad section type")
 	ErrBadRecordType   = errors.New("bad record type")
 	ErrExpectedArray   = errors.New("expected array")
+	ErrRequiredField   = errors.New("field marked required")
 )
 
 // Decode .mini config file into value using reflect.

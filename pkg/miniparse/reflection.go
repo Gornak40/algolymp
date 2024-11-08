@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	tagName = "mini"
+	tagName     = "mini"
+	tagRequired = "mini-required"
 )
 
 func (m *machine) feed(v any) error {
@@ -32,12 +33,16 @@ func (m *machine) feed(v any) error {
 }
 
 func (m *machine) parseField(f reflect.StructField, v reflect.Value) error {
-	name := f.Tag.Get(tagName)
-	if name == "" {
+	name, ok := f.Tag.Lookup(tagName)
+	if !ok {
 		return nil
 	}
 	r, ok := m.data[name]
 	if !ok {
+		if _, ok := f.Tag.Lookup(tagRequired); ok {
+			return fmt.Errorf("%w: field %s", ErrRequiredField, name)
+		}
+
 		return nil
 	}
 	if f.Type.Kind() != reflect.Slice && len(r) > 1 {
@@ -68,12 +73,16 @@ func writeRecord(r record, v reflect.Value) error {
 	t := v.Type()
 	for i := range v.NumField() {
 		tf := t.Field(i)
-		name := tf.Tag.Get(tagName)
-		if name == "" {
+		name, ok := tf.Tag.Lookup(tagName)
+		if !ok {
 			continue
 		}
 		a, ok := r[name]
 		if !ok {
+			if _, ok := tf.Tag.Lookup(tagRequired); ok {
+				return fmt.Errorf("%w: field %s", ErrRequiredField, name)
+			}
+
 			continue
 		}
 		if tf.Type.Kind() != reflect.Slice && len(a) > 1 {

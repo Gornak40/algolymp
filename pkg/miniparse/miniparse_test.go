@@ -40,7 +40,7 @@ type = acm
 func TestReflect(t *testing.T) {
 	t.Parallel()
 	type core struct {
-		ID        string `mini:"id"`
+		ID        string `mini:"id" mini-required:"true"`
 		Name      string `mini:"name"`
 		NumberID  []int  `mini:"number_id"`
 		Public    bool   `mini:"public"`
@@ -50,7 +50,7 @@ func TestReflect(t *testing.T) {
 		Magic     int      `mini:"magic"`
 	}
 	type standings struct {
-		ID     string `mini:"id"`
+		ID     string `mini:"id" mini-required:"true"`
 		Type   string `mini:"type"`
 		Public bool   `mini:"public"`
 	}
@@ -188,4 +188,24 @@ func TestReflectError(t *testing.T) {
 		HTML []map[string]any `mini:"html"`
 	}
 	require.ErrorIs(t, miniparse.Decode(r, &ss4), miniparse.ErrExpectedStruct)
+
+	r.Reset(htmlMini)
+	var ss5 struct {
+		HTML struct {
+		} `mini:"html"`
+		CSS []struct {
+		} `mini:"css" mini-required:"true"`
+	}
+	require.ErrorIs(t, miniparse.Decode(r, &ss5), miniparse.ErrRequiredField)
+
+	r.Reset(htmlMini)
+	var ss6 struct {
+		HTML struct {
+			Name string `mini:"name" mini-required:"true"`
+			ID   int    `mini:"id" mini-required:"true"`
+		} `mini:"html"`
+		CSS []struct {
+		} `mini:"css"`
+	}
+	require.ErrorIs(t, miniparse.Decode(r, &ss6), miniparse.ErrRequiredField)
 }
