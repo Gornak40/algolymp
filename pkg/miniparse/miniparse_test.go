@@ -77,7 +77,7 @@ func TestCorner(t *testing.T) {
 	}
 }
 
-func TestParseErrors(t *testing.T) {
+func TestParseError(t *testing.T) {
 	t.Parallel()
 	var ss struct{}
 	tt := map[string]error{
@@ -105,8 +105,56 @@ func TestParseErrors(t *testing.T) {
 		"key = value\n":                            miniparse.ErrRootSection,
 	}
 
-	for s, err := range tt {
+	for s, terr := range tt {
 		r := strings.NewReader(s)
-		require.ErrorIs(t, miniparse.Decode(r, &ss), err)
+		require.ErrorIs(t, miniparse.Decode(r, &ss), terr)
 	}
+}
+
+func TestReflectArgError(t *testing.T) {
+	t.Parallel()
+
+	m := make(map[string]any)
+	require.ErrorIs(t, miniparse.Decode(strings.NewReader(""), m), miniparse.ErrExpectedPointer)
+	require.ErrorIs(t, miniparse.Decode(strings.NewReader(""), &m), miniparse.ErrExpectedStruct)
+	require.ErrorIs(t, miniparse.Decode(strings.NewReader(""), nil), miniparse.ErrExpectedPointer)
+
+	x := 4
+	require.ErrorIs(t, miniparse.Decode(strings.NewReader(""), &x), miniparse.ErrExpectedStruct)
+	require.ErrorIs(t, miniparse.Decode(strings.NewReader(""), "gorill"), miniparse.ErrExpectedPointer)
+
+	var ss struct{}
+	require.ErrorIs(t, miniparse.Decode(strings.NewReader(""), ss), miniparse.ErrExpectedPointer)
+}
+
+const htmlMini = `[html]
+page_id = 14141
+preload = true
+# wow! a comment
+page_id = 99119
+name = Bob
+`
+
+func TestReflectError(t *testing.T) {
+	t.Parallel()
+	r := strings.NewReader(htmlMini)
+
+	var ss2 struct {
+		HTML struct {
+			PageID []struct {
+				Key   string `mini:"key"`
+				Value string `mini:"value"`
+			} `mini:"page_id"`
+		} `mini:"html"`
+	}
+	require.ErrorIs(t, miniparse.Decode(r, &ss2), miniparse.ErrBadRecordType)
+
+	var ss3 struct {
+		HTML struct {
+			Name   string `mini:"name"`
+			PageID int    `mini:"page_id"`
+		} `mini:"html"`
+	}
+	r.Reset(htmlMini)
+	require.ErrorIs(t, miniparse.Decode(r, &ss3), miniparse.ErrExpectedArray)
 }
