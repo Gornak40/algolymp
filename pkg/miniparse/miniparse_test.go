@@ -9,8 +9,10 @@ import (
 )
 
 const coreMini = `[core]
+# year is just for fun
 id = avx2024
 name = AVX инструкции с нуля 🦍
+
 number_id = 2812
 number_id = 1233
 `
