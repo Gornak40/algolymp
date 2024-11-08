@@ -30,8 +30,11 @@ func (m *machine) stateInit(c rune) (stateFunc, error) {
 	case c == '#':
 		return m.stateComment, nil
 	case c == '[':
-		return m.stateSection, nil
+		return m.stateSection1, nil
 	case isValidVar(c, true):
+		if m.cur == nil {
+			return nil, fmt.Errorf("%w, got %c", ErrRootSection, c)
+		}
 		m.buf = append(m.buf, c)
 
 		return m.stateKey, nil
@@ -50,6 +53,19 @@ func (m *machine) stateComment(c rune) (stateFunc, error) {
 	}
 
 	return m.stateComment, nil
+}
+
+func (m *machine) stateSection1(c rune) (stateFunc, error) {
+	switch {
+	case isValidVar(c, true):
+		m.buf = append(m.buf, c)
+
+		return m.stateSection, nil
+	case c == ']':
+		return nil, fmt.Errorf("%w: empty", ErrInvalidSection)
+	default:
+		return nil, fmt.Errorf("%w, found: %c", ErrInvalidSection, c)
+	}
 }
 
 func (m *machine) stateSection(c rune) (stateFunc, error) {

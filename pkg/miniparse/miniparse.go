@@ -12,6 +12,7 @@ var (
 	ErrInvalidChar     = errors.New("invalid leading char")
 	ErrExpectedNewLine = errors.New("expected new line")
 	ErrInvalidSection  = errors.New("invalid section name")
+	ErrRootSection     = errors.New("expected root section")
 	ErrInvalidKey      = errors.New("invalid key name")
 	ErrExpectedEqual   = errors.New("expected equal sign")
 	ErrExpectedSpace   = errors.New("expected space")

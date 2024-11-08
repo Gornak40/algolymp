@@ -60,14 +60,30 @@ func TestSimple(t *testing.T) {
 	}, ss)
 }
 
-// TODO: require section first.
-// TODO: section name first letter.
+func TestCorner(t *testing.T) {
+	t.Parallel()
+	var ss struct{}
+	tt := []string{
+		"",
+		"[alone]\n",
+		"\n",
+		"[empty]\n[empty]\n[again]\n",
+		"[rune]\nkey = [section]\n[section]\nkey2 = 0\n",
+	}
+
+	for _, s := range tt {
+		r := strings.NewReader(s)
+		require.NoError(t, miniparse.Decode(r, &ss))
+	}
+}
+
 func TestParseErrors(t *testing.T) {
 	t.Parallel()
 	var ss struct{}
 	tt := map[string]error{
-		"[html page]":                              miniparse.ErrInvalidSection,
-		"[htmlPage]":                               miniparse.ErrInvalidSection,
+		"[html page]\n":                            miniparse.ErrInvalidSection,
+		"[htmlPage]\n":                             miniparse.ErrInvalidSection,
+		"[1html]\n":                                miniparse.ErrInvalidSection,
 		"[html]":                                   miniparse.ErrUnexpectedEOF,
 		"[html":                                    miniparse.ErrUnexpectedEOF,
 		"[html]\n]":                                miniparse.ErrInvalidChar,
@@ -78,12 +94,15 @@ func TestParseErrors(t *testing.T) {
 		"[html]\nkey= value\n":                     miniparse.ErrInvalidKey,
 		"[html]\nkey =value\n":                     miniparse.ErrExpectedSpace,
 		"[html]\nkey = value":                      miniparse.ErrUnexpectedEOF,
+		"[html]\nkey  = value\n":                   miniparse.ErrExpectedEqual,
 		"[html]\nkey = value[html]\n[html]":        miniparse.ErrUnexpectedEOF,
 		"[html] # section\n":                       miniparse.ErrExpectedNewLine,
 		"# section\n[html]\nkey = 1\nkey2\n":       miniparse.ErrInvalidKey,
 		"[html]\nkey = \"bababababayka\nbrrry\"\n": miniparse.ErrInvalidKey,
 		" [html]\n":                                miniparse.ErrLeadingSpace,
 		"[html]\n key = value\n":                   miniparse.ErrLeadingSpace,
+		"[html]\n = value\n":                       miniparse.ErrLeadingSpace,
+		"key = value\n":                            miniparse.ErrRootSection,
 	}
 
 	for s, err := range tt {
