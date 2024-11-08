@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strconv"
+	"time"
 )
 
 const (
@@ -98,6 +99,7 @@ func writeRecord(r record, v reflect.Value) error {
 	return nil
 }
 
+//nolint:cyclop // it's ok, nothing to worry about
 func parseValue(a []string, t reflect.Type) (reflect.Value, error) {
 	switch t {
 	case reflect.TypeOf(""):
@@ -128,6 +130,18 @@ func parseValue(a []string, t reflect.Type) (reflect.Value, error) {
 		}
 
 		return reflect.ValueOf(x), nil
+	case reflect.TypeOf(time.Second):
+		fallthrough
+	case reflect.TypeOf([]time.Duration{}):
+		x, err := toDurations(a)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		if t.Kind() != reflect.Slice {
+			return reflect.ValueOf(x[0]), nil
+		}
+
+		return reflect.ValueOf(x), nil
 	default:
 		return reflect.Value{}, fmt.Errorf("%w: %s", ErrBadRecordType, t.String())
 	}
@@ -150,6 +164,19 @@ func toBools(a []string) ([]bool, error) {
 	ra := make([]bool, 0, len(a))
 	for _, s := range a {
 		x, err := strconv.ParseBool(s)
+		if err != nil {
+			return nil, err
+		}
+		ra = append(ra, x)
+	}
+
+	return ra, nil
+}
+
+func toDurations(a []string) ([]time.Duration, error) {
+	ra := make([]time.Duration, 0, len(a))
+	for _, s := range a {
+		x, err := time.ParseDuration(s)
 		if err != nil {
 			return nil, err
 		}

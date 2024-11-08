@@ -3,6 +3,7 @@ package miniparse_test
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Gornak40/algolymp/pkg/miniparse"
 	"github.com/stretchr/testify/require"
@@ -35,6 +36,12 @@ public = true
 [standings]
 id = avx2024_aesc
 type = acm
+refresh_delay = 60s
+
+[penalty]
+id = avx2024_pen
+ban = 1440m
+ban = 72h
 `
 
 func TestReflect(t *testing.T) {
@@ -50,13 +57,19 @@ func TestReflect(t *testing.T) {
 		Magic     int      `mini:"magic"`
 	}
 	type standings struct {
-		ID     string `mini:"id" mini-required:"true"`
-		Type   string `mini:"type"`
-		Public bool   `mini:"public"`
+		ID           string        `mini:"id" mini-required:"true"`
+		Type         string        `mini:"type"`
+		Public       bool          `mini:"public"`
+		RefreshDelay time.Duration `mini:"refresh_delay"`
+	}
+	type penalty struct {
+		ID  string          `mini:"id" mini-required:"true"`
+		Ban []time.Duration `mini:"ban"`
 	}
 	type config struct {
 		Core      core        `mini:"core"`
 		Standings []standings `mini:"standings"`
+		Penalty   penalty     `mini:"penalty"`
 	}
 	var ss config
 
@@ -79,9 +92,14 @@ func TestReflect(t *testing.T) {
 				Public: true,
 			},
 			{
-				ID:   "avx2024_aesc",
-				Type: "acm",
+				ID:           "avx2024_aesc",
+				Type:         "acm",
+				RefreshDelay: time.Minute,
 			},
+		},
+		Penalty: penalty{
+			ID:  "avx2024_pen",
+			Ban: []time.Duration{24 * time.Hour, 72 * time.Hour},
 		},
 	}, ss)
 }
