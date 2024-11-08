@@ -59,3 +59,35 @@ func TestSimple(t *testing.T) {
 		},
 	}, ss)
 }
+
+// TODO: require section first.
+// TODO: section name first letter.
+func TestParseErrors(t *testing.T) {
+	t.Parallel()
+	var ss struct{}
+	tt := map[string]error{
+		"[html page]":                              miniparse.ErrInvalidSection,
+		"[htmlPage]":                               miniparse.ErrInvalidSection,
+		"[html]":                                   miniparse.ErrUnexpectedEOF,
+		"[html":                                    miniparse.ErrUnexpectedEOF,
+		"[html]\n]":                                miniparse.ErrInvalidChar,
+		"[html]\nkey\n":                            miniparse.ErrInvalidKey,
+		"[html]\nkey=value\n":                      miniparse.ErrInvalidKey,
+		"[html]\nKEY = value\n":                    miniparse.ErrInvalidChar,
+		"[html]\n1key = value\n":                   miniparse.ErrInvalidChar,
+		"[html]\nkey= value\n":                     miniparse.ErrInvalidKey,
+		"[html]\nkey =value\n":                     miniparse.ErrExpectedSpace,
+		"[html]\nkey = value":                      miniparse.ErrUnexpectedEOF,
+		"[html]\nkey = value[html]\n[html]":        miniparse.ErrUnexpectedEOF,
+		"[html] # section\n":                       miniparse.ErrExpectedNewLine,
+		"# section\n[html]\nkey = 1\nkey2\n":       miniparse.ErrInvalidKey,
+		"[html]\nkey = \"bababababayka\nbrrry\"\n": miniparse.ErrInvalidKey,
+		" [html]\n":                                miniparse.ErrLeadingSpace,
+		"[html]\n key = value\n":                   miniparse.ErrLeadingSpace,
+	}
+
+	for s, err := range tt {
+		r := strings.NewReader(s)
+		require.ErrorIs(t, miniparse.Decode(r, &ss), err)
+	}
+}
