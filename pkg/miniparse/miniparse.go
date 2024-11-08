@@ -20,6 +20,7 @@ var (
 
 	ErrExpectedPointer = errors.New("expected not nil pointer")
 	ErrExpectedStruct  = errors.New("expected struct")
+	ErrBadSectionType  = errors.New("bad section type")
 	ErrBadRecordType   = errors.New("bad record type")
 	ErrExpectedArray   = errors.New("expected array")
 )

@@ -40,11 +40,28 @@ func (m *machine) parseField(f reflect.StructField, v reflect.Value) error {
 	if !ok {
 		return nil
 	}
-	if v.Kind() != reflect.Struct { // TODO: support arrays
-		return fmt.Errorf("%w: field %s", ErrExpectedStruct, name)
+	if f.Type.Kind() != reflect.Slice && len(r) > 1 {
+		return fmt.Errorf("%w: field %s", ErrExpectedArray, name)
 	}
+	switch f.Type.Kind() { //nolint:exhaustive // all those cases go to default
+	case reflect.Struct:
+		return writeRecord(r[0], v)
+	case reflect.Slice:
+		if f.Type.Elem().Kind() != reflect.Struct {
+			return fmt.Errorf("%w: field %s", ErrExpectedStruct, name)
+		}
+		v.Set(reflect.MakeSlice(f.Type, len(r), len(r)))
+		for i, rv := range r {
+			elem := v.Index(i)
+			if err := writeRecord(rv, elem); err != nil {
+				return err
+			}
+		}
 
-	return writeRecord(r[0], v) // TODO: fix it
+		return nil
+	default:
+		return fmt.Errorf("%w: field %s", ErrBadSectionType, name)
+	}
 }
 
 func writeRecord(r record, v reflect.Value) error {

@@ -25,6 +25,16 @@ flags = T
 
 contest_id = 12312
 contest_id = 9012
+
+[standings]
+id = avx2024_fall
+type = acm
+# visible names
+public = true
+
+[standings]
+id = avx2024_aesc
+type = acm
 `
 
 func TestReflect(t *testing.T) {
@@ -39,8 +49,14 @@ func TestReflect(t *testing.T) {
 		ContestID []string `mini:"contest_id"`
 		Magic     int      `mini:"magic"`
 	}
+	type standings struct {
+		ID     string `mini:"id"`
+		Type   string `mini:"type"`
+		Public bool   `mini:"public"`
+	}
 	type config struct {
-		Core core `mini:"core"`
+		Core      core        `mini:"core"`
+		Standings []standings `mini:"standings"`
 	}
 	var ss config
 
@@ -52,10 +68,20 @@ func TestReflect(t *testing.T) {
 			Name:      "AVX инструкции с нуля 🦍",
 			NumberID:  []int{2812, 1233},
 			Public:    true,
-			Empty:     "",
 			Flags:     []bool{false, true, true},
 			ContestID: []string{"33", "12312", "9012"},
 			Magic:     -1,
+		},
+		Standings: []standings{
+			{
+				ID:     "avx2024_fall",
+				Type:   "acm",
+				Public: true,
+			},
+			{
+				ID:   "avx2024_aesc",
+				Type: "acm",
+			},
 		},
 	}, ss)
 }
@@ -138,7 +164,6 @@ name = Bob
 func TestReflectError(t *testing.T) {
 	t.Parallel()
 	r := strings.NewReader(htmlMini)
-
 	var ss2 struct {
 		HTML struct {
 			PageID []struct {
@@ -149,12 +174,18 @@ func TestReflectError(t *testing.T) {
 	}
 	require.ErrorIs(t, miniparse.Decode(r, &ss2), miniparse.ErrBadRecordType)
 
+	r.Reset(htmlMini)
 	var ss3 struct {
 		HTML struct {
 			Name   string `mini:"name"`
 			PageID int    `mini:"page_id"`
 		} `mini:"html"`
 	}
-	r.Reset(htmlMini)
 	require.ErrorIs(t, miniparse.Decode(r, &ss3), miniparse.ErrExpectedArray)
+
+	r.Reset(htmlMini)
+	var ss4 struct {
+		HTML []map[string]any `mini:"html"`
+	}
+	require.ErrorIs(t, miniparse.Decode(r, &ss4), miniparse.ErrExpectedStruct)
 }
