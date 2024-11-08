@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"io"
+	"reflect"
 )
 
 var (
@@ -14,17 +15,23 @@ var (
 	ErrInvalidKey      = errors.New("invalid key name")
 	ErrExpectedEqual   = errors.New("expected equal sign")
 	ErrExpectedSpace   = errors.New("expected space")
+	ErrUnexpectedEOF   = errors.New("unexpected end of file")
+
+	ErrExpectedPointer = errors.New("expected not nil pointer")
+	ErrExpectedStruct  = errors.New("expected struct")
+	ErrBadRecordType   = errors.New("bad record type")
+	ErrExpectedArray   = errors.New("expected array")
 )
 
 // Decode .mini config file into value using reflect.
 // The mini format is similar to ini, but very strict.
-func Decode(reader io.Reader, _ any) error {
-	r := bufio.NewReader(reader)
+func Decode(r io.Reader, v any) error {
+	rb := bufio.NewReader(r)
 	m := newMachine()
 	nxt := m.stateInit
 
 	for {
-		c, _, err := r.ReadRune()
+		c, _, err := rb.ReadRune()
 		if errors.Is(err, io.EOF) {
 			break
 		}
@@ -36,6 +43,10 @@ func Decode(reader io.Reader, _ any) error {
 			return err
 		}
 	}
+	// TODO: find more Go-like solution
+	if reflect.ValueOf(nxt).Pointer() != reflect.ValueOf(m.stateInit).Pointer() {
+		return ErrUnexpectedEOF
+	}
 
-	return nil
+	return m.feed(v)
 }

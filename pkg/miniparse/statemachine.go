@@ -7,16 +7,19 @@ import (
 
 const bufSize = 512
 
+type record map[string][]string
+
 type machine struct {
-	buf []rune
-	sec string
-	key string
-	val string
+	buf  []rune
+	data map[string][]record
+	cur  record
+	key  string
 }
 
 func newMachine() *machine {
 	return &machine{
-		buf: make([]rune, 0, bufSize),
+		buf:  make([]rune, 0, bufSize),
+		data: make(map[string][]record),
 	}
 }
 
@@ -66,8 +69,9 @@ func (m *machine) stateSectionEnd(c rune) (stateFunc, error) {
 	if c != '\n' {
 		return nil, fmt.Errorf("%w, found: %c", ErrExpectedNewLine, c)
 	}
-	m.sec = string(m.buf)
-	println("sec:", m.sec) //nolint:forbidigo // ! remove
+	sec := string(m.buf)
+	m.cur = make(record)
+	m.data[sec] = append(m.data[sec], m.cur)
 	m.buf = m.buf[:0]
 
 	return m.stateInit, nil
@@ -81,7 +85,6 @@ func (m *machine) stateKey(c rune) (stateFunc, error) {
 		return m.stateKey, nil
 	case c == ' ':
 		m.key = string(m.buf)
-		println("key:", m.key) //nolint:forbidigo // ! remove
 		m.buf = m.buf[:0]
 
 		return m.stateEqualSign, nil
@@ -108,8 +111,8 @@ func (m *machine) stateSpaceR(c rune) (stateFunc, error) {
 
 func (m *machine) stateValue(c rune) (stateFunc, error) {
 	if c == '\n' {
-		m.val = string(m.buf)
-		println("val:", m.val) //nolint:forbidigo // ! remove
+		val := string(m.buf)
+		m.cur[m.key] = append(m.cur[m.key], val)
 		m.buf = m.buf[:0]
 
 		return m.stateInit, nil
