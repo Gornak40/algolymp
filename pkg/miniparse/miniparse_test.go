@@ -27,7 +27,7 @@ contest_id = 12312
 contest_id = 9012
 `
 
-func TestSimple(t *testing.T) {
+func TestReflect(t *testing.T) {
 	t.Parallel()
 	type core struct {
 		ID        string `mini:"id"`

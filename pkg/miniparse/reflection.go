@@ -79,30 +79,26 @@ func parseValue(a []string, t reflect.Type) (reflect.Value, error) {
 	case reflect.TypeOf([]string{}):
 		return reflect.ValueOf(a), nil
 	case reflect.TypeOf(0):
-		x, err := toInts(a)
-		if err != nil {
-			return reflect.Value{}, err
-		}
-
-		return reflect.ValueOf(x[0]), nil
+		fallthrough
 	case reflect.TypeOf([]int{}):
 		x, err := toInts(a)
 		if err != nil {
 			return reflect.Value{}, err
 		}
+		if t.Kind() != reflect.Slice {
+			return reflect.ValueOf(x[0]), nil
+		}
 
 		return reflect.ValueOf(x), nil
 	case reflect.TypeOf(false):
-		x, err := toBools(a)
-		if err != nil {
-			return reflect.Value{}, err
-		}
-
-		return reflect.ValueOf(x[0]), nil
+		fallthrough
 	case reflect.TypeOf([]bool{}):
 		x, err := toBools(a)
 		if err != nil {
 			return reflect.Value{}, err
+		}
+		if t.Kind() != reflect.Slice {
+			return reflect.ValueOf(x[0]), nil
 		}
 
 		return reflect.ValueOf(x), nil
