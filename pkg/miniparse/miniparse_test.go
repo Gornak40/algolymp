@@ -42,35 +42,44 @@ refresh_delay = 60s
 id = avx2024_pen
 ban = 1440m
 ban = 72h
+
+[penalty]
+id = avx2024_aesc_pen
+value = 100
 `
+
+type core struct {
+	ID        string `mini:"id" mini-required:"true"`
+	Name      string `mini:"name"`
+	NumberID  []int  `mini:"number_id"`
+	Public    bool   `mini:"public"`
+	Empty     string
+	Flags     []bool   `mini:"flags"`
+	ContestID []string `mini:"contest_id"`
+	Magic     int      `mini:"magic"`
+}
+
+type standings struct {
+	ID           string        `mini:"id" mini-required:"true"`
+	Type         string        `mini:"type"`
+	Public       bool          `mini:"public"`
+	RefreshDelay time.Duration `mini:"refresh_delay"`
+}
+
+type penalty struct {
+	ID    string          `mini:"id" mini-required:"true"`
+	Ban   []time.Duration `mini:"ban" mini-default:"3h30m"`
+	Value int             `mini:"value" mini-default:"50"`
+}
+
+type config struct {
+	Core      core        `mini:"core"`
+	Standings []standings `mini:"standings"`
+	Penalty   []penalty   `mini:"penalty"`
+}
 
 func TestReflect(t *testing.T) {
 	t.Parallel()
-	type core struct {
-		ID        string `mini:"id" mini-required:"true"`
-		Name      string `mini:"name"`
-		NumberID  []int  `mini:"number_id"`
-		Public    bool   `mini:"public"`
-		Empty     string
-		Flags     []bool   `mini:"flags"`
-		ContestID []string `mini:"contest_id"`
-		Magic     int      `mini:"magic"`
-	}
-	type standings struct {
-		ID           string        `mini:"id" mini-required:"true"`
-		Type         string        `mini:"type"`
-		Public       bool          `mini:"public"`
-		RefreshDelay time.Duration `mini:"refresh_delay"`
-	}
-	type penalty struct {
-		ID  string          `mini:"id" mini-required:"true"`
-		Ban []time.Duration `mini:"ban"`
-	}
-	type config struct {
-		Core      core        `mini:"core"`
-		Standings []standings `mini:"standings"`
-		Penalty   penalty     `mini:"penalty"`
-	}
 	var ss config
 
 	r := strings.NewReader(coreMini)
@@ -97,9 +106,17 @@ func TestReflect(t *testing.T) {
 				RefreshDelay: time.Minute,
 			},
 		},
-		Penalty: penalty{
-			ID:  "avx2024_pen",
-			Ban: []time.Duration{24 * time.Hour, 72 * time.Hour},
+		Penalty: []penalty{
+			{
+				ID:    "avx2024_pen",
+				Ban:   []time.Duration{24 * time.Hour, 72 * time.Hour},
+				Value: 50,
+			},
+			{
+				ID:    "avx2024_aesc_pen",
+				Ban:   []time.Duration{210 * time.Minute},
+				Value: 100,
+			},
 		},
 	}, ss)
 }

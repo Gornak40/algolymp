@@ -10,6 +10,7 @@ import (
 const (
 	tagName     = "mini"
 	tagRequired = "mini-required"
+	tagDefault  = "mini-default"
 )
 
 func (m *machine) feed(v any) error {
@@ -80,11 +81,13 @@ func writeRecord(r record, v reflect.Value) error {
 		}
 		a, ok := r[name]
 		if !ok {
-			if _, ok := tf.Tag.Lookup(tagRequired); ok {
+			if def, ok := tf.Tag.Lookup(tagDefault); ok {
+				a = []string{def}
+			} else if _, ok := tf.Tag.Lookup(tagRequired); ok {
 				return fmt.Errorf("%w: field %s", ErrRequiredField, name)
+			} else {
+				continue
 			}
-
-			continue
 		}
 		if tf.Type.Kind() != reflect.Slice && len(a) > 1 {
 			return fmt.Errorf("%w: field %s", ErrExpectedArray, name)
