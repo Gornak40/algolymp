@@ -11,6 +11,7 @@ linters:
     - varnamelen
     - godox
     - exportloopref
+    - tagalign # alignment looks awful
 
 linters-settings:
   cyclop:
