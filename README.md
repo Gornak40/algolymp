@@ -483,7 +483,7 @@ scalp -i 330328 -s
 
 Print Ejudges users who registered in the specified contest (CSV format).
 
-You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/xsv.git) or [qsv](https://github.com/jqnatividad/qsv.git) to process the output. But I prefer to use vanilla [awk](https://www.opennet.ru/man.shtml?topic=awk).
+You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/xsv.git) or [qsv](https://github.com/jqnatividad/qsv.git) to process the output. But I prefer to use vanilla [awk](https://manpages.org/awk) or [cut](https://manpages.org/cut).
 
 ### Flags
 - `-i` - contest id (required)
@@ -498,6 +498,7 @@ You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/x
 shoga --help
 shoga -i 55000
 shoga -i 59000 | awk '{split($0,a,";"); print a[2]}'
+shoga -i 60705 | cut -d ';' -f 2 | tail -n +2 | sort
 ```
 
 ![shoga logo](https://algolymp.ru/static/img/shoga.png)
@@ -556,7 +557,7 @@ This tool uses `problem.xml` for uploading all package content.
 
 Useful for migration between `polygon.lksh.ru` and `polygon.codeforces.com`.
 
-Designed designed as an alternative to [polygon-cli](https://github.com/kunyavskiy/polygon-cli).
+Designed as an alternative to [polygon-cli](https://github.com/kunyavskiy/polygon-cli).
 
 **Ensure that the problem you are uploading the package into is empty.**
 
