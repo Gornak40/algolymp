@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"io"
 	"os"
 
 	"github.com/Gornak40/algolymp/config"
@@ -10,11 +10,25 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	modeUsers     = "usr"
+	modeRuns      = "run"
+	modeStandings = "stn"
+	modeProblems  = "prb"
+	modePasswords = "reg"
+	modeIPs       = "ips"
+)
+
 func main() {
-	parser := argparse.NewParser("shoga", "Dump Ejudge contest users.")
+	parser := argparse.NewParser("shoga", "Dump Ejudge contest tables.")
 	cID := parser.Int("i", "cid", &argparse.Options{
 		Required: true,
 		Help:     "Ejudge contest ID",
+	})
+	av := []string{modeUsers, modeRuns, modeStandings, modeProblems, modePasswords, modeIPs}
+	mode := parser.Selector("m", "mode", av, &argparse.Options{
+		Required: true,
+		Help:     "Dump mode",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
@@ -33,11 +47,28 @@ func main() {
 		logrus.WithError(err).Fatal("master login failed")
 	}
 
-	list, err := ejClient.DumpUsers(csid)
-	if err != nil {
-		logrus.WithError(err).Fatal("dump users failed")
+	var call func(csid string) (io.Reader, error)
+	switch *mode {
+	case modeUsers:
+		call = ejClient.DumpUsers
+	case modeRuns:
+		call = ejClient.DumpRuns
+	case modeStandings:
+		call = ejClient.DumpStandings
+	case modeProblems:
+		call = ejClient.DumpProbStats
+	case modePasswords:
+		call = ejClient.DumpRegPasswords
+	case modeIPs:
+		call = ejClient.DumpIPs
 	}
-	fmt.Println(list) //nolint:forbidigo // Basic functionality.
+	r, err := call(csid)
+	if err != nil {
+		logrus.WithError(err).WithField("mode", *mode).Fatal("dump failed")
+	}
+	if _, err := io.Copy(os.Stdout, r); err != nil {
+		logrus.WithError(err).Fatal("write dumped content failed")
+	}
 
 	if err := ejClient.Logout(sid); err != nil {
 		logrus.WithError(err).Fatal("logout failed")

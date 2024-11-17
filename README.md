@@ -18,7 +18,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [pepel](#pepel) | generate hasher solution | | | ✅ |
 | [ripper](#ripper) | change runs status | 🦍 | | ✅ |
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
-| [shoga](#shoga) | dump registered users | 🦍 | | ✅ |
+| [shoga](#shoga) | dump contest tables | 🦍 | | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
 | [vydra](#vydra) | upload package | | 🦍 | 🧪 |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | ✅ |
@@ -477,16 +477,26 @@ scalp -i 330328 -s
 ![scalp logo](https://algolymp.ru/static/img/scalp.png)
 
 ## shoga
-*Dump Ejudge contest users.*
+*Dump Ejudge contest tables.*
 
 ### About
 
-Print Ejudges users who registered in the specified contest (CSV format).
+Print Ejudges contest tables (CSV format). Various modes are supported.
 
-You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/xsv.git) or [qsv](https://github.com/jqnatividad/qsv.git) to process the output. But I prefer to use vanilla [awk](https://www.opennet.ru/man.shtml?topic=awk).
+**Tip:** You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/xsv.git) or [qsv](https://github.com/jqnatividad/qsv.git) to process the output. But I prefer to use vanilla [awk](https://manpages.org/awk) or [cut](https://manpages.org/cut).
+
+#### Supported modes
+
+- `usr` - registered users
+- `run` - contest runs
+- `stn` - contest standings
+- `prb` - contest problems
+- `reg` - registration passwords
+- `ips` - user IPs
 
 ### Flags
 - `-i` - contest id (required)
+- `-m` - dump mode (required, `usr|run|stn|prb|reg|ips`)
 
 ### Config
 - `ejudge.url`
@@ -496,8 +506,16 @@ You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/x
 ### Examples
 ```bash
 shoga --help
-shoga -i 55000
-shoga -i 59000 | awk '{split($0,a,";"); print a[2]}'
+shoga -i 59000 -m usr # registered users
+shoga -i 59000 -m usr | awk '{split($0,a,";"); print a[2]}' # just registered logins
+shoga -i 60705 -m usr | cut -d ';' -f 2 | tail -n +2 | sort # just registered logins
+shoga -i 55000 -m run # contest runs
+shoga -i 436 -m stn # full standings
+shoga -i 436 -m stn | cut -d ";" -f 1,2,9,10 | head -n -3 # 6 problems acm contest standings
+shoga -i 48005 -m prb # contest problems
+shoga -i 51000 -m reg # registration passwords
+shoga -i 51000 -m reg | grep myav | cut -d ';' -f 3,6 # specified password
+shoga -i 434 -m ips # user IPs
 ```
 
 ![shoga logo](https://algolymp.ru/static/img/shoga.png)
@@ -556,7 +574,7 @@ This tool uses `problem.xml` for uploading all package content.
 
 Useful for migration between `polygon.lksh.ru` and `polygon.codeforces.com`.
 
-Designed designed as an alternative to [polygon-cli](https://github.com/kunyavskiy/polygon-cli).
+Designed as an alternative to [polygon-cli](https://github.com/kunyavskiy/polygon-cli).
 
 **Ensure that the problem you are uploading the package into is empty.**
 

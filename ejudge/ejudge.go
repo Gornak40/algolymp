@@ -10,13 +10,17 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/sirupsen/logrus"
 )
 
 const BadSID = "0000000000000000"
+
+const (
+	newMaster    = "new-master"
+	serveControl = "serve-control"
+)
 
 var (
 	ErrParseMasterSID = errors.New("can't parse master SID")
@@ -92,7 +96,7 @@ func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, 
 }
 
 func (ej *Ejudge) Login() (string, error) {
-	req, _, err := ej.postRequest("serve-control", url.Values{
+	req, _, err := ej.postRequest(serveControl, url.Values{
 		"login":    {ej.cfg.Login},
 		"password": {ej.cfg.Password},
 	})
@@ -110,7 +114,7 @@ func (ej *Ejudge) Login() (string, error) {
 
 // not sure it's working.
 func (ej *Ejudge) Logout(sid string) error {
-	_, _, err := ej.postRequest("serve-control", url.Values{
+	_, _, err := ej.postRequest(serveControl, url.Values{
 		"SID":    {sid},
 		"action": {"55"},
 	})
@@ -125,7 +129,7 @@ func (ej *Ejudge) Logout(sid string) error {
 func (ej *Ejudge) Lock(sid string, cid int) error {
 	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).
 		Info("lock contest for editing")
-	_, _, err := ej.postRequest("serve-control", url.Values{
+	_, _, err := ej.postRequest(serveControl, url.Values{
 		"contest_id": {strconv.Itoa(cid)},
 		"SID":        {sid},
 		"action":     {"276"},
@@ -136,7 +140,7 @@ func (ej *Ejudge) Lock(sid string, cid int) error {
 
 func (ej *Ejudge) Commit(sid string) error {
 	logrus.WithFields(logrus.Fields{"SID": sid}).Info("commit changes")
-	_, doc, err := ej.postRequest("serve-control", url.Values{
+	_, doc, err := ej.postRequest(serveControl, url.Values{
 		"SID":    {sid},
 		"action": {"303"},
 	})
@@ -154,7 +158,7 @@ func (ej *Ejudge) ChangeRunStatus(csid string, runID int, status string) error {
 	if !ok {
 		return fmt.Errorf("%w: %s", ErrUnknownVerdict, status)
 	}
-	_, _, err := ej.postRequest("new-master", url.Values{
+	_, _, err := ej.postRequest(newMaster, url.Values{
 		"SID":    {csid},
 		"action": {"67"},
 		"run_id": {strconv.Itoa(runID)},
@@ -172,7 +176,7 @@ func (ej *Ejudge) ChangeRunStatus(csid string, runID int, status string) error {
 func (ej *Ejudge) CheckContest(sid string, cid int, verbose bool) error {
 	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).
 		Info("check contest settings, wait please")
-	_, doc, err := ej.postRequest("serve-control", url.Values{
+	_, doc, err := ej.postRequest(serveControl, url.Values{
 		"contest_id": {strconv.Itoa(cid)},
 		"SID":        {sid},
 		"action":     {"262"},
@@ -191,7 +195,7 @@ func (ej *Ejudge) CheckContest(sid string, cid int, verbose bool) error {
 }
 
 func (ej *Ejudge) MasterLogin(sid string, cid int) (string, error) {
-	req, _, err := ej.postRequest("new-master", url.Values{
+	req, _, err := ej.postRequest(newMaster, url.Values{
 		"contest_id": {strconv.Itoa(cid)},
 		"SID":        {sid},
 		"action":     {"3"},
@@ -210,7 +214,7 @@ func (ej *Ejudge) MasterLogin(sid string, cid int) (string, error) {
 }
 
 func (ej *Ejudge) FilterRuns(csid string, filter string, count int) ([]int, error) {
-	_, doc, err := ej.postRequest("new-master", url.Values{
+	_, doc, err := ej.postRequest(newMaster, url.Values{
 		"SID":              {csid},
 		"filter_view":      {"1"},
 		"filter_expr":      {filter},
@@ -244,7 +248,7 @@ func (ej *Ejudge) FilterRuns(csid string, filter string, count int) ([]int, erro
 }
 
 func (ej *Ejudge) ReloadConfig(csid string) error {
-	_, _, err := ej.postRequest("new-master", url.Values{
+	_, _, err := ej.postRequest(newMaster, url.Values{
 		"SID":    {csid},
 		"action": {"62"},
 	})
@@ -258,7 +262,7 @@ func (ej *Ejudge) ReloadConfig(csid string) error {
 
 func (ej *Ejudge) CreateContest(sid string, cid int, tid int) error {
 	logrus.WithFields(logrus.Fields{"CID": cid, "TID": tid, "SID": sid}).Info("create contest")
-	_, doc, err := ej.postRequest("serve-control", url.Values{
+	_, doc, err := ej.postRequest(serveControl, url.Values{
 		"contest_id": {strconv.Itoa(cid)},
 		"SID":        {sid},
 		"num_mode":   {"1"},
@@ -281,7 +285,7 @@ func (ej *Ejudge) CreateContest(sid string, cid int, tid int) error {
 
 func (ej *Ejudge) MakeInvisible(sid string, cid int) error {
 	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("make invisible")
-	_, _, err := ej.postRequest("serve-control", url.Values{
+	_, _, err := ej.postRequest(serveControl, url.Values{
 		"contest_id": {strconv.Itoa(cid)},
 		"SID":        {sid},
 		"action":     {"6"},
@@ -292,7 +296,7 @@ func (ej *Ejudge) MakeInvisible(sid string, cid int) error {
 
 func (ej *Ejudge) MakeVisible(sid string, cid int) error {
 	logrus.WithFields(logrus.Fields{"CID": cid, "SID": sid}).Info("make visible")
-	_, _, err := ej.postRequest("serve-control", url.Values{
+	_, _, err := ej.postRequest(serveControl, url.Values{
 		"contest_id": {strconv.Itoa(cid)},
 		"SID":        {sid},
 		"action":     {"7"},
@@ -303,7 +307,7 @@ func (ej *Ejudge) MakeVisible(sid string, cid int) error {
 
 func (ej *Ejudge) RegisterUser(csid, login string) error {
 	logrus.WithFields(logrus.Fields{"CSID": csid, "login": login}).Info("register user")
-	_, _, err := ej.postRequest("new-master", url.Values{
+	_, _, err := ej.postRequest(newMaster, url.Values{
 		"SID":       {csid},
 		"action":    {"20"},
 		"add_login": {login},
@@ -316,7 +320,7 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	logrus.WithFields(logrus.Fields{
 		"CSID": csid, "run": runID, "comment": comment,
 	}).Info("send run comment")
-	_, _, err := ej.postRequest("new-master", url.Values{
+	_, _, err := ej.postRequest(newMaster, url.Values{
 		"SID":      {csid},
 		"action":   {"64"},
 		"run_id":   {strconv.Itoa(runID)},
@@ -324,19 +328,4 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	})
 
 	return err
-}
-
-func (ej *Ejudge) DumpUsers(csid string) (string, error) {
-	logrus.WithFields(logrus.Fields{
-		"CSID": csid,
-	}).Info("dump contest users")
-	_, resp, err := ej.postRequest("new-master", url.Values{
-		"SID":    {csid},
-		"action": {"132"},
-	})
-	if err != nil {
-		return "", err
-	}
-
-	return strings.TrimSpace(resp.Text()), nil
 }
