@@ -15,15 +15,16 @@ const (
 	modeRuns      = "run"
 	modeStandings = "stn"
 	modeProblems  = "prb"
+	modePasswords = "reg"
 )
 
 func main() {
-	parser := argparse.NewParser("shoga", "Dump Ejudge contest users.")
+	parser := argparse.NewParser("shoga", "Dump Ejudge contest tables.")
 	cID := parser.Int("i", "cid", &argparse.Options{
 		Required: true,
 		Help:     "Ejudge contest ID",
 	})
-	av := []string{modeUsers, modeRuns, modeStandings, modeProblems}
+	av := []string{modeUsers, modeRuns, modeStandings, modeProblems, modePasswords}
 	mode := parser.Selector("m", "mode", av, &argparse.Options{
 		Required: true,
 		Help:     "Dump mode",
@@ -55,6 +56,8 @@ func main() {
 		call = ejClient.DumpStandings
 	case modeProblems:
 		call = ejClient.DumpProbStats
+	case modePasswords:
+		call = ejClient.DumpRegPasswords
 	}
 	r, err := call(csid)
 	if err != nil {

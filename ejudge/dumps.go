@@ -77,6 +77,22 @@ func (ej *Ejudge) DumpProbStats(csid string) (io.Reader, error) {
 	return walkTable(th)
 }
 
+func (ej *Ejudge) DumpRegPasswords(csid string) (io.Reader, error) {
+	logrus.WithFields(logrus.Fields{
+		"CSID": csid,
+	}).Info("dump registration passwords")
+	_, doc, err := ej.postRequest(newMaster, url.Values{
+		"SID":    {csid},
+		"action": {"120"},
+	})
+	if err != nil {
+		return nil, err
+	}
+	th := doc.Find(".b1 > tbody > tr")
+
+	return walkTable(th)
+}
+
 func walkTable(table *goquery.Selection) (io.Reader, error) {
 	bf := bytes.NewBuffer(make([]byte, 0, defBufSize))
 	w := csv.NewWriter(bf)
