@@ -487,6 +487,7 @@ You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/x
 
 ### Flags
 - `-i` - contest id (required)
+- `-m` - dump mode (required, `usr|run|stn`)
 
 ### Config
 - `ejudge.url`
@@ -496,9 +497,12 @@ You can use some custom CSV toolkits, like [xsv](https://github.com/BurntSushi/x
 ### Examples
 ```bash
 shoga --help
-shoga -i 55000
-shoga -i 59000 | awk '{split($0,a,";"); print a[2]}'
-shoga -i 60705 | cut -d ';' -f 2 | tail -n +2 | sort
+shoga -i 59000 -m usr # all registered users
+shoga -i 59000 -m usr | awk '{split($0,a,";"); print a[2]}' # just registered logins
+shoga -i 60705 -m usr | cut -d ';' -f 2 | tail -n +2 | sort # just registered logins
+shoga -i 55000 -m run # all contest runs
+shoga -i 436 -m stn # full standings
+shoga -i 436 -m stn | cut -d ";" -f 1,2,9,10 | head -n -3 # 6 problems acm contest finals
 ```
 
 ![shoga logo](https://algolymp.ru/static/img/shoga.png)

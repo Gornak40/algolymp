@@ -1,9 +1,7 @@
 package ejudge
 
 import (
-	"bytes"
 	"context"
-	"encoding/csv"
 	"errors"
 	"fmt"
 	"net"
@@ -22,8 +20,6 @@ const BadSID = "0000000000000000"
 const (
 	newMaster    = "new-master"
 	serveControl = "serve-control"
-
-	defBufSize = 1024
 )
 
 var (
@@ -332,61 +328,4 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	})
 
 	return err
-}
-
-func (ej *Ejudge) DumpUsers(csid string) (string, error) {
-	logrus.WithFields(logrus.Fields{
-		"CSID": csid,
-	}).Info("dump contest users")
-	_, doc, err := ej.postRequest(newMaster, url.Values{
-		"SID":    {csid},
-		"action": {"132"},
-	})
-	if err != nil {
-		return "", err
-	}
-
-	return doc.Text(), nil // TODO: remove trim
-}
-
-func (ej *Ejudge) DumpRuns(csid string) (string, error) {
-	logrus.WithFields(logrus.Fields{
-		"CSID": csid,
-	}).Info("dump contest runs")
-	_, doc, err := ej.postRequest(newMaster, url.Values{
-		"SID":    {csid},
-		"action": {"152"},
-	})
-	if err != nil {
-		return "", err
-	}
-
-	return doc.Text(), nil
-}
-
-func (ej *Ejudge) DumpStandings(csid string) (string, error) {
-	logrus.WithFields(logrus.Fields{
-		"CSID": csid,
-	}).Info("dump contest standings")
-	_, doc, err := ej.postRequest(newMaster, url.Values{
-		"SID":    {csid},
-		"action": {"94"},
-	})
-	if err != nil {
-		return "", err
-	}
-	bf := bytes.NewBuffer(make([]byte, 0, defBufSize))
-	w := csv.NewWriter(bf)
-	th := doc.Find(".standings > tbody > tr")
-	th.Each(func(_ int, row *goquery.Selection) {
-		cols := row.Find("th, td")
-		rec := make([]string, 0, cols.Length())
-		cols.Each(func(_ int, s *goquery.Selection) {
-			rec = append(rec, s.Text())
-		})
-		_ = w.Write(rec)
-	})
-	w.Flush()
-
-	return bf.String(), nil
 }

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"io"
 	"os"
 
 	"github.com/Gornak40/algolymp/config"
@@ -13,7 +13,8 @@ import (
 const (
 	modeUsers     = "usr"
 	modeRuns      = "run"
-	modeStandings = "snd"
+	modeStandings = "stn"
+	modeProblems  = "prb"
 )
 
 func main() {
@@ -22,9 +23,9 @@ func main() {
 		Required: true,
 		Help:     "Ejudge contest ID",
 	})
-	mode := parser.Selector("m", "mode", []string{modeUsers, modeRuns, modeStandings}, &argparse.Options{
-		Required: false,
-		Default:  modeUsers,
+	av := []string{modeUsers, modeRuns, modeStandings, modeProblems}
+	mode := parser.Selector("m", "mode", av, &argparse.Options{
+		Required: true,
 		Help:     "Dump mode",
 	})
 	if err := parser.Parse(os.Args); err != nil {
@@ -44,7 +45,7 @@ func main() {
 		logrus.WithError(err).Fatal("master login failed")
 	}
 
-	var call func(csid string) (string, error)
+	var call func(csid string) (io.Reader, error)
 	switch *mode {
 	case modeUsers:
 		call = ejClient.DumpUsers
@@ -52,12 +53,16 @@ func main() {
 		call = ejClient.DumpRuns
 	case modeStandings:
 		call = ejClient.DumpStandings
+	case modeProblems:
+		call = ejClient.DumpProbStats
 	}
-	list, err := call(csid)
+	r, err := call(csid)
 	if err != nil {
 		logrus.WithField("mode", *mode).Fatal("dump failed")
 	}
-	fmt.Print(list) //nolint:forbidigo // Basic functionality.
+	if _, err := io.Copy(os.Stdout, r); err != nil {
+		logrus.WithError(err).Fatal("write dumped content failed")
+	}
 
 	if err := ejClient.Logout(sid); err != nil {
 		logrus.WithError(err).Fatal("logout failed")
