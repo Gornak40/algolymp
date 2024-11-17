@@ -514,7 +514,7 @@ shoga -i 436 -m stn # full standings
 shoga -i 436 -m stn | cut -d ";" -f 1,2,9,10 | head -n -3 # 6 problems acm contest standings
 shoga -i 48005 -m prb # contest problems
 shoga -i 51000 -m reg # registration passwords
-shoga -i 51000 -m reg | grep shkuleva | cut -d ';' -f 3,6 # specified password
+shoga -i 51000 -m reg | grep myav | cut -d ';' -f 3,6 # specified password
 shoga -i 434 -m ips # user IPs
 ```
 
