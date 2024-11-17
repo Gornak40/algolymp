@@ -97,5 +97,5 @@ func walkTable(table *goquery.Selection) (io.Reader, error) {
 	})
 	w.Flush()
 
-	return strings.NewReader(bf.String()), nil
+	return strings.NewReader(bf.String()), err
 }
