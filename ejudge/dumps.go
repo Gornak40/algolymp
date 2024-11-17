@@ -27,7 +27,7 @@ func (ej *Ejudge) DumpUsers(csid string) (io.Reader, error) {
 		return nil, err
 	}
 
-	return strings.NewReader(doc.Text()), nil // TODO: remove trim
+	return strings.NewReader(doc.Text()), nil // TODO: fix trimspace
 }
 
 func (ej *Ejudge) DumpRuns(csid string) (io.Reader, error) {
@@ -56,7 +56,7 @@ func (ej *Ejudge) DumpStandings(csid string) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	th := doc.Find(".standings > tbody > tr")
+	th := doc.Find("table.standings > tbody > tr")
 
 	return walkTable(th)
 }
@@ -72,7 +72,7 @@ func (ej *Ejudge) DumpProbStats(csid string) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	th := doc.Find(".b1 > tbody > tr")
+	th := doc.Find("table.b1 > tbody > tr")
 
 	return walkTable(th)
 }
@@ -88,7 +88,23 @@ func (ej *Ejudge) DumpRegPasswords(csid string) (io.Reader, error) {
 	if err != nil {
 		return nil, err
 	}
-	th := doc.Find(".b1 > tbody > tr")
+	th := doc.Find("table.b1 > tbody > tr")
+
+	return walkTable(th)
+}
+
+func (ej *Ejudge) DumpIPs(csid string) (io.Reader, error) {
+	logrus.WithFields(logrus.Fields{
+		"CSID": csid,
+	}).Info("dump user IPs")
+	_, doc, err := ej.postRequest(newMaster, url.Values{
+		"SID":    {csid},
+		"action": {"235"},
+	})
+	if err != nil {
+		return nil, err
+	}
+	th := doc.Find("table.b1 > tbody > tr")
 
 	return walkTable(th)
 }

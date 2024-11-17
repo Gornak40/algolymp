@@ -492,10 +492,11 @@ Print Ejudges contest tables (CSV format). Various modes are supported.
 - `stn` - contest standings
 - `prb` - contest problems
 - `reg` - registration passwords
+- `ips` - user IPs
 
 ### Flags
 - `-i` - contest id (required)
-- `-m` - dump mode (required, `usr|run|stn|prb|reg`)
+- `-m` - dump mode (required, `usr|run|stn|prb|reg|ips`)
 
 ### Config
 - `ejudge.url`
@@ -514,6 +515,7 @@ shoga -i 436 -m stn | cut -d ";" -f 1,2,9,10 | head -n -3 # 6 problems acm conte
 shoga -i 48005 -m prb # contest problems
 shoga -i 51000 -m reg # registration passwords
 shoga -i 51000 -m reg | grep shkuleva | cut -d ';' -f 3,6 # specified password
+shoga -i 434 -m ips # user IPs
 ```
 
 ![shoga logo](https://algolymp.ru/static/img/shoga.png)
