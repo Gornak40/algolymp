@@ -64,7 +64,7 @@ func main() {
 	}
 	r, err := call(csid)
 	if err != nil {
-		logrus.WithField("mode", *mode).Fatal("dump failed")
+		logrus.WithError(err).WithField("mode", *mode).Fatal("dump failed")
 	}
 	if _, err := io.Copy(os.Stdout, r); err != nil {
 		logrus.WithError(err).Fatal("write dumped content failed")
