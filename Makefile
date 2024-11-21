@@ -14,6 +14,8 @@ else
 	BIN_EXT :=
 endif
 
+.PHONY: $(TOOLS)
+
 all: $(TOOLS)
 
 $(TOOLS):
