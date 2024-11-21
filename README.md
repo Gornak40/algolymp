@@ -381,7 +381,7 @@ Daemon that sends user-requested Ejudge submits to the printer. Useful in team c
 4. Set the `system.printer` config parameter to hardware printer name. Leave it empty if you don't need printing.
 5. Set the `ejudge.uprinter` config parameter to [printer](https://ejudge.ru/wiki/index.php/Userdb:users). Leave it empty if you use only one printer.
 
-You can find out the printer name by using [lsusb](https://www.opennet.ru/man.shtml?topic=lsusb&category=8) on Linux or [Get-Printer](https://learn.microsoft.com/en-us/powershell/module/printmanagement/get-printer) on Windows.
+You can find out the printer name by using [lsusb](https://manpages.org/lsusb/8) on Linux or [Get-Printer](https://learn.microsoft.com/en-us/powershell/module/printmanagement/get-printer) on Windows.
 
 ### Flags
 - `-i` - contest id (required)
@@ -390,6 +390,7 @@ You can find out the printer name by using [lsusb](https://www.opennet.ru/man.sh
 ### Config
 - `ejudge.url`
 - `ejudge.secret1`
+- `ejudge.uprinter`
 - `system.printer`
 
 ### Nginx
