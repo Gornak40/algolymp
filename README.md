@@ -7,7 +7,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 
 | Tool | Description | Ejudge | Polygon | Status |
 | --- | --- | :---: | :---: | :---: |
-| [baron](#baron) | register users to contest | 🦍 | | ✅ |
+| [baron](#baron) | contest users manager | 🦍 | | ✅ |
 | [blanka](#blanka) | create contest | 🦍 | | ✅ |
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
 | [casper](#casper) | change visibility | 🦍 | | ✅ |
@@ -87,16 +87,30 @@ Here is an example of a fully filled config:
 **Tip:** You will probably need different configs. It's good practice to name them `config.json.lksh`, `config.json.tbank`, etc. and create a symlink to `config.json`.
 
 ## baron
-*Register users to Ejudge contest (Pending status).*
+*Ejudge contest users manager.*
 
 ### About
 
-Read user logins from `stdin` and register them to Ejudge contest.
+Read user ids from `stdin` and flip (inverse) their status in Ejudge contest.
 
-Don't forget to set `OK` status manually!
+This tool has two major disadvantages:
+
+- It works with ids, not logins;
+- It does not support *set* operation, only *flip*.
+
+This is a compromise to not use the [Ejudge API](https://ejudge.ru/swagger/index.html) for as long as possible based on the idea of compatibility.
+
+#### Supported modes
+
+- `invis` - flip invisible
+- `ban` - flip ban
+- `lock` - flip lock
+- `incom` - flip incomplete
+- `priv` - flip privilleged
 
 ### Flags
 - `-i` - contest id (required)
+- `-f` - flip mode (required, `invis|ban|lock|incom|priv`)
 
 ### Config
 - `ejudge.url`
@@ -106,8 +120,11 @@ Don't forget to set `OK` status manually!
 ### Examples
 ```bash
 baron --help
-baron -i 48501 # read from stdin
-cat users.csv | baron -i 48600 # read from file
+cat prizewin.csv | baron -i 48501 -f invis
+cat cheaters.csv | baron -i 48600 -f ban
+baron -i 56001 -f lock # read from stdin
+baron -i 46104 -f incom # read from stdin
+baron -i 59000 -f priv <<< admin
 ```
 
 ![baron logo](https://algolymp.ru/static/img/baron.png)
