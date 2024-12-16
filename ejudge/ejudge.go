@@ -305,17 +305,6 @@ func (ej *Ejudge) MakeVisible(sid string, cid int) error {
 	return err
 }
 
-func (ej *Ejudge) RegisterUser(csid, login string) error {
-	logrus.WithFields(logrus.Fields{"CSID": csid, "login": login}).Info("register user")
-	_, _, err := ej.postRequest(newMaster, url.Values{
-		"SID":       {csid},
-		"action":    {"20"},
-		"add_login": {login},
-	})
-
-	return err
-}
-
 func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	logrus.WithFields(logrus.Fields{
 		"CSID": csid, "run": runID, "comment": comment,
