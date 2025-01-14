@@ -10,7 +10,7 @@ Extended release notes can be found at [chat](https://t.me/algolymp).
 | [baron](#baron) | contest users manager | 🦍 | | ✅ |
 | [blanka](#blanka) | create contest | 🦍 | | ✅ |
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
-| [casper](#casper) | change visibility | 🦍 | | ✅ |
+| [casper](#casper) | change contest visibility | 🦍 | | ✅ |
 | [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
 | [gibon](#gibon) | api multitool | | 🦍 | ✅ |
@@ -137,6 +137,7 @@ baron -i 59000 -f priv <<< admin
 1. Create contest with id from template;
 2. Commit changes;
 3. *(Optional)* Open contest xml config for editing.
+4. *(Optional)* Create problems directory symlink.
 
 Useful before running [polygon-to-ejudge](https://github.com/grphil/polygon-to-ejudge).
 
@@ -144,6 +145,7 @@ Useful before running [polygon-to-ejudge](https://github.com/grphil/polygon-to-e
 - `-i` - new contest id (required)
 - `-t` - template contest id (required)
 - `-e` - open contest xml config
+- `-l` - create problems directory symlink
 
 ### Config
 - `ejudge.url`
