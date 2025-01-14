@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func editXML(cID int, cfg *config.Config) {
+func editXML(cID int, cfg *config.Config) error {
 	logrus.WithField("CID", cID).Info("open xml config editor")
 	app := cfg.System.Editor
 	xmlName := fmt.Sprintf("%06d.xml", cID)
@@ -21,9 +21,18 @@ func editXML(cID int, cfg *config.Config) {
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		logrus.WithError(err).Fatalf("bad command: %s %s", app, arg0)
+
+	return cmd.Run()
+}
+
+func linkProblems(cID, tID int, cfg *config.Config) error {
+	logrus.WithFields(logrus.Fields{"CID": cID, "TID": tID}).
+		Info("create problems symlink")
+	probDir := func(id int) string {
+		return path.Join(cfg.Ejudge.JudgesDir, fmt.Sprintf("%06d", id), "problems")
 	}
+
+	return os.Symlink(probDir(tID), probDir(cID))
 }
 
 func main() {
@@ -39,6 +48,10 @@ func main() {
 	editFlag := parser.Flag("e", "edit", &argparse.Options{
 		Required: false,
 		Help:     "Edit contest xml config",
+	})
+	linkFlag := parser.Flag("l", "link", &argparse.Options{
+		Required: false,
+		Help:     "Create problems directory symlink",
 	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
@@ -65,6 +78,13 @@ func main() {
 	}
 
 	if *editFlag {
-		editXML(*cID, cfg)
+		if err := editXML(*cID, cfg); err != nil {
+			logrus.WithError(err).Fatal("edit xml failed")
+		}
+	}
+	if *linkFlag {
+		if err := linkProblems(*cID, *tID, cfg); err != nil {
+			logrus.WithError(err).Fatal("create problems symlink failed")
+		}
 	}
 }
