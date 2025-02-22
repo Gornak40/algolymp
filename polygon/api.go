@@ -246,7 +246,7 @@ func (p *Polygon) GetPackages(pID int) ([]PackageAnswer, error) {
 func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 	link, params := p.buildURL("problem.viewTestGroup", url.Values{
 		"problemId": {strconv.Itoa(pID)},
-		"testset":   {defaultTestset},
+		"testset":   {DefaultTestset},
 	})
 	ansG, err := p.makeQuery(http.MethodGet, link, params)
 	if err != nil {
@@ -282,7 +282,7 @@ func (p *Polygon) GetProblem(pID int) (*ProblemAnswer, error) {
 func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
 	link, params := p.buildURL("problem.tests", url.Values{
 		"problemId": {strconv.Itoa(pID)},
-		"testset":   {defaultTestset},
+		"testset":   {DefaultTestset},
 		"noInputs":  {"true"},
 	})
 	ansT, err := p.makeQuery(http.MethodGet, link, params)
@@ -319,7 +319,7 @@ func (p *Polygon) DownloadPackage(pID, packID int, packType string) ([]byte, err
 func (p *Polygon) EnableGroups(pID int) error {
 	link, params := p.buildURL("problem.enableGroups", url.Values{
 		"problemId": {strconv.Itoa(pID)},
-		"testset":   {defaultTestset},
+		"testset":   {DefaultTestset},
 		"enable":    {"true"},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
@@ -344,7 +344,7 @@ func (p *Polygon) SetTestGroup(pID int, group string, tests []int) error {
 	}
 	link, params := p.buildURL("problem.setTestGroup", url.Values{
 		"problemId":   {strconv.Itoa(pID)},
-		"testset":     {defaultTestset},
+		"testset":     {DefaultTestset},
 		"testGroup":   {group},
 		"testIndices": {strings.Join(st, ",")},
 	})

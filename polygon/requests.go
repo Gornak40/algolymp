@@ -8,7 +8,14 @@ import (
 )
 
 const (
-	defaultTestset = "tests"
+	DefaultTestset = "tests"
+
+	PolicyCompleteGroup = "COMPLETE_GROUP"
+	PolicyEachTest      = "EACH_TEST"
+
+	PolicyPoints   = "POINTS"
+	PolicyICPC     = "ICPC"
+	PolicyComplete = "COMPLETE"
 )
 
 type TestRequest url.Values
@@ -17,7 +24,7 @@ func NewTestRequest(pID int, index int) TestRequest {
 	return TestRequest{
 		"problemId": {strconv.Itoa(pID)},
 		"testIndex": {strconv.Itoa(index)},
-		"testset":   {defaultTestset},
+		"testset":   {DefaultTestset},
 	}
 }
 
