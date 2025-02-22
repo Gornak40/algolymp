@@ -85,9 +85,9 @@ func newScoring(tests []polygon.TestAnswer, groups []polygon.GroupAnswer) (*scor
 			return nil, fmt.Errorf("%w: group %s", polygon.ErrBadTestsOrder, group.Name)
 		}
 		switch group.PointsPolicy {
-		case "COMPLETE_GROUP":
+		case polygon.PolicyCompleteGroup:
 			g.policy = policyCompleteGroup
-		case "EACH_TEST":
+		case polygon.PolicyEachTest:
 			g.policy = policyEachTest
 			if g.minScore != g.maxScore {
 				return nil, fmt.Errorf("%w: group %s", ErrBadTestScore, group.Name)

@@ -1,10 +1,14 @@
 package gibon
 
 import (
+	"encoding/csv"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"slices"
+	"strconv"
+	"strings"
 
 	"github.com/Gornak40/algolymp/polygon"
 	"github.com/sirupsen/logrus"
@@ -14,6 +18,7 @@ const (
 	ModeContest  = "contest"
 	ModeCommit   = "commit"
 	ModeDownload = "download"
+	ModeGroups   = "groups"
 	ModePackage  = "package"
 	ModeUpdate   = "update"
 )
@@ -23,6 +28,7 @@ const packageMode = 0666
 var (
 	ErrNoPackage     = errors.New("no suitable package")
 	ErrUnknownMethod = errors.New("unknown method")
+	ErrBadGroupDesc  = errors.New("bad group description")
 )
 
 type Gibon struct {
@@ -84,6 +90,66 @@ func (g *Gibon) listProblems() error {
 	return nil
 }
 
+func (g *Gibon) markGroups() error {
+	if err := g.client.EnableGroups(g.pID); err != nil {
+		return err
+	}
+	if err := g.client.EnablePoints(g.pID); err != nil {
+		return err
+	}
+	r := csv.NewReader(os.Stdin)
+	r.Comma = ' '
+	logrus.Info("waiting for '{group} {test1}-{testn} {points} {dep1},...,{depn}' input...")
+	for {
+		ln, err := r.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		if len(ln) != 4 { //nolint:mnd // line length
+			return fmt.Errorf("%w: invalid line length", ErrBadGroupDesc)
+		}
+		group := ln[0]
+		var l, r int
+		if _, err := fmt.Sscanf(ln[1], "%d-%d", &l, &r); err != nil {
+			return err
+		}
+		if r < l {
+			return fmt.Errorf("%w: r < l", ErrBadGroupDesc)
+		}
+		points, err := strconv.Atoi(ln[2])
+		if err != nil {
+			return fmt.Errorf("%w: %s", ErrBadGroupDesc, err.Error())
+		}
+		deps := strings.Split(ln[3], ",")
+		logrus.WithFields(logrus.Fields{
+			"group": group, "points": points, "l": l, "r": r, "deps": deps,
+		}).Info("set group")
+		ids := make([]int, 0, r-l+1)
+		for i := l; i <= r; i++ {
+			ids = append(ids, i)
+		}
+		if err := g.client.SetTestGroup(g.pID, group, ids); err != nil {
+			return err
+		}
+		tgr := polygon.NewTestGroupRequest(g.pID, polygon.DefaultTestset, group).
+			PointsPolicy(polygon.PolicyCompleteGroup).
+			FeedbackPolicy(polygon.PolicyICPC).
+			Dependencies(deps)
+		if err := g.client.SaveTestGroup(tgr); err != nil {
+			return err
+		}
+		tr := polygon.NewTestRequest(g.pID, r).Group(group).Points(float32(points))
+		if err := g.client.SaveTest(tr); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (g *Gibon) Resolve(method string) error {
 	switch method {
 	case ModeContest:
@@ -96,6 +162,8 @@ func (g *Gibon) Resolve(method string) error {
 		return g.client.BuildPackage(g.pID, true, true)
 	case ModeUpdate:
 		return g.client.UpdateWorkingCopy(g.pID)
+	case ModeGroups:
+		return g.markGroups()
 	}
 
 	return fmt.Errorf("%w: %s", ErrUnknownMethod, method)
