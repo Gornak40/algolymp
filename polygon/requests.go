@@ -113,6 +113,15 @@ func NewFileRequest(pID int, typ FileType, name, file string) FileRequest {
 	}
 }
 
+// Polygon bug.
+func fixSourceType(typ string) string {
+	if typ == "cpp.g++" {
+		return "cpp.g++17"
+	}
+
+	return typ
+}
+
 func (fr FileRequest) CheckExisting(f bool) FileRequest {
 	fr["checkExisting"] = []string{strconv.FormatBool(f)}
 
@@ -120,7 +129,7 @@ func (fr FileRequest) CheckExisting(f bool) FileRequest {
 }
 
 func (fr FileRequest) SourceType(typ string) FileRequest {
-	fr["sourceType"] = []string{typ}
+	fr["sourceType"] = []string{fixSourceType(typ)}
 
 	return fr
 }
@@ -145,7 +154,7 @@ func (sr SolutionRequest) CheckExisting(f bool) SolutionRequest {
 }
 
 func (sr SolutionRequest) SourceType(typ string) SolutionRequest {
-	sr["sourceType"] = []string{typ}
+	sr["sourceType"] = []string{fixSourceType(typ)}
 
 	return sr
 }
