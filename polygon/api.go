@@ -168,22 +168,22 @@ func (p *Polygon) skipEscape(params url.Values) string {
 func (p *Polygon) buildURL(method string, params url.Values) (string, url.Values) {
 	url, _ := url.JoinPath(p.cfg.URL, "api", method)
 
-	params["apiKey"] = []string{p.cfg.APIKey}
-	params["time"] = []string{strconv.FormatInt(time.Now().Unix(), 10)}
+	params.Set("apiKey", p.cfg.APIKey)
+	params.Set("time", strconv.FormatInt(time.Now().Unix(), 10))
 	sig := fmt.Sprintf("%s/%s?%s#%s", sixSecretSymbols, method, p.skipEscape(params), p.cfg.APISecret)
 
 	b := sha512.Sum512([]byte(sig))
 	hsh := hex.EncodeToString(b[:])
-	params["apiSig"] = []string{sixSecretSymbols + hsh}
+	params.Set("apiSig", sixSecretSymbols+hsh)
 
 	return url, params
 }
 
 func (p *Polygon) BuildPackage(pID int, full, verify bool) error {
 	link, params := p.buildURL("problem.buildPackage", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"full":      []string{strconv.FormatBool(full)},
-		"verify":    []string{strconv.FormatBool(verify)},
+		"problemId": {strconv.Itoa(pID)},
+		"full":      {strconv.FormatBool(full)},
+		"verify":    {strconv.FormatBool(verify)},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -193,7 +193,7 @@ func (p *Polygon) BuildPackage(pID int, full, verify bool) error {
 // Problem Idx (A, B, C) -> Problem.
 func (p *Polygon) ContestProblems(pID int) (map[string]ProblemAnswer, error) {
 	link, params := p.buildURL("contest.problems", url.Values{
-		"contestId": []string{strconv.Itoa(pID)},
+		"contestId": {strconv.Itoa(pID)},
 	})
 	ansC, err := p.makeQuery(http.MethodGet, link, params)
 	if err != nil {
@@ -209,9 +209,9 @@ func (p *Polygon) ContestProblems(pID int) (map[string]ProblemAnswer, error) {
 
 func (p *Polygon) Commit(pID int, minor bool, message string) error {
 	link, params := p.buildURL("problem.commitChanges", url.Values{
-		"problemId":    []string{strconv.Itoa(pID)},
-		"minorChanges": []string{strconv.FormatBool(minor)},
-		"message":      []string{message},
+		"problemId":    {strconv.Itoa(pID)},
+		"minorChanges": {strconv.FormatBool(minor)},
+		"message":      {message},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -220,7 +220,7 @@ func (p *Polygon) Commit(pID int, minor bool, message string) error {
 
 func (p *Polygon) UpdateWorkingCopy(pid int) error {
 	link, params := p.buildURL("problem.updateWorkingCopy", url.Values{
-		"problemId": []string{strconv.Itoa(pid)},
+		"problemId": {strconv.Itoa(pid)},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -229,7 +229,7 @@ func (p *Polygon) UpdateWorkingCopy(pid int) error {
 
 func (p *Polygon) GetPackages(pID int) ([]PackageAnswer, error) {
 	link, params := p.buildURL("problem.packages", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
+		"problemId": {strconv.Itoa(pID)},
 	})
 	ansP, err := p.makeQuery(http.MethodGet, link, params)
 	if err != nil {
@@ -245,8 +245,8 @@ func (p *Polygon) GetPackages(pID int) ([]PackageAnswer, error) {
 
 func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 	link, params := p.buildURL("problem.viewTestGroup", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"testset":   []string{defaultTestset},
+		"problemId": {strconv.Itoa(pID)},
+		"testset":   {defaultTestset},
 	})
 	ansG, err := p.makeQuery(http.MethodGet, link, params)
 	if err != nil {
@@ -262,7 +262,7 @@ func (p *Polygon) GetGroups(pID int) ([]GroupAnswer, error) {
 
 func (p *Polygon) GetProblem(pID int) (*ProblemAnswer, error) {
 	link, params := p.buildURL("problems.list", url.Values{
-		"id": []string{strconv.Itoa(pID)},
+		"id": {strconv.Itoa(pID)},
 	})
 	ansP, err := p.makeQuery(http.MethodGet, link, params)
 	if err != nil {
@@ -281,9 +281,9 @@ func (p *Polygon) GetProblem(pID int) (*ProblemAnswer, error) {
 
 func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
 	link, params := p.buildURL("problem.tests", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"testset":   []string{defaultTestset},
-		"noInputs":  []string{"true"},
+		"problemId": {strconv.Itoa(pID)},
+		"testset":   {defaultTestset},
+		"noInputs":  {"true"},
 	})
 	ansT, err := p.makeQuery(http.MethodGet, link, params)
 	if err != nil {
@@ -299,9 +299,9 @@ func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
 
 func (p *Polygon) DownloadPackage(pID, packID int, packType string) ([]byte, error) {
 	link, params := p.buildURL("problem.package", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"packageId": []string{strconv.Itoa(packID)},
-		"type":      []string{packType},
+		"problemId": {strconv.Itoa(pID)},
+		"packageId": {strconv.Itoa(packID)},
+		"type":      {packType},
 	})
 	req, err := buildRequest(http.MethodPost, link, params)
 	if err != nil {
@@ -318,9 +318,9 @@ func (p *Polygon) DownloadPackage(pID, packID int, packType string) ([]byte, err
 
 func (p *Polygon) EnableGroups(pID int) error {
 	link, params := p.buildURL("problem.enableGroups", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"testset":   []string{defaultTestset},
-		"enable":    []string{"true"},
+		"problemId": {strconv.Itoa(pID)},
+		"testset":   {defaultTestset},
+		"enable":    {"true"},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -329,8 +329,24 @@ func (p *Polygon) EnableGroups(pID int) error {
 
 func (p *Polygon) EnablePoints(pID int) error {
 	link, params := p.buildURL("problem.enablePoints", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"enable":    []string{"true"},
+		"problemId": {strconv.Itoa(pID)},
+		"enable":    {"true"},
+	})
+	_, err := p.makeQuery(http.MethodPost, link, params)
+
+	return err
+}
+
+func (p *Polygon) SetTestGroup(pID int, group string, tests []int) error {
+	st := make([]string, 0, len(tests))
+	for _, v := range tests {
+		st = append(st, strconv.Itoa(v))
+	}
+	link, params := p.buildURL("problem.setTestGroup", url.Values{
+		"problemId":   {strconv.Itoa(pID)},
+		"testset":     {defaultTestset},
+		"testGroup":   {group},
+		"testIndices": {strings.Join(st, ",")},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -353,8 +369,8 @@ func (p *Polygon) SaveTest(tReq TestRequest) error {
 
 func (p *Polygon) SaveTags(pID int, tags string) error {
 	link, params := p.buildURL("problem.saveTags", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"tags":      []string{tags},
+		"problemId": {strconv.Itoa(pID)},
+		"tags":      {tags},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -363,8 +379,8 @@ func (p *Polygon) SaveTags(pID int, tags string) error {
 
 func (p *Polygon) SetValidator(pID int, validator string) error {
 	link, params := p.buildURL("problem.setValidator", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"validator": []string{validator},
+		"problemId": {strconv.Itoa(pID)},
+		"validator": {validator},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -373,8 +389,8 @@ func (p *Polygon) SetValidator(pID int, validator string) error {
 
 func (p *Polygon) SetChecker(pID int, checker string) error {
 	link, params := p.buildURL("problem.setChecker", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"checker":   []string{checker},
+		"problemId": {strconv.Itoa(pID)},
+		"checker":   {checker},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -390,8 +406,8 @@ func (p *Polygon) UpdateInfo(pr ProblemRequest) error {
 
 func (p *Polygon) SetInteractor(pID int, interactor string) error {
 	link, params := p.buildURL("problem.setInteractor", url.Values{
-		"problemId":  []string{strconv.Itoa(pID)},
-		"interactor": []string{interactor},
+		"problemId":  {strconv.Itoa(pID)},
+		"interactor": {interactor},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -400,9 +416,9 @@ func (p *Polygon) SetInteractor(pID int, interactor string) error {
 
 func (p *Polygon) SaveScript(pID int, testset, source string) error {
 	link, params := p.buildURL("problem.saveScript", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"testset":   []string{testset},
-		"source":    []string{source},
+		"problemId": {strconv.Itoa(pID)},
+		"testset":   {testset},
+		"source":    {source},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
@@ -446,9 +462,9 @@ func (p *Polygon) SaveTestGroup(tgr TestGroupRequest) error {
 
 func (p *Polygon) SaveStatementResource(pID int, name, data string) error {
 	link, params := p.buildURL("problem.saveStatementResource", url.Values{
-		"problemId": []string{strconv.Itoa(pID)},
-		"name":      []string{name},
-		"file":      []string{data},
+		"problemId": {strconv.Itoa(pID)},
+		"name":      {name},
+		"file":      {data},
 	})
 	_, err := p.makeQuery(http.MethodPost, link, params)
 

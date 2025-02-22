@@ -15,6 +15,7 @@ func main() {
 		gibon.ModeContest,
 		gibon.ModeCommit,
 		gibon.ModeDownload,
+		gibon.ModeGroups,
 		gibon.ModePackage,
 		gibon.ModeUpdate,
 	}

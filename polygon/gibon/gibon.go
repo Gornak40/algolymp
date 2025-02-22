@@ -1,8 +1,10 @@
 package gibon
 
 import (
+	"encoding/csv"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"slices"
 
@@ -14,6 +16,7 @@ const (
 	ModeContest  = "contest"
 	ModeCommit   = "commit"
 	ModeDownload = "download"
+	ModeGroups   = "groups"
 	ModePackage  = "package"
 	ModeUpdate   = "update"
 )
@@ -23,6 +26,7 @@ const packageMode = 0666
 var (
 	ErrNoPackage     = errors.New("no suitable package")
 	ErrUnknownMethod = errors.New("unknown method")
+	ErrBadGroupDesc  = errors.New("bad group description")
 )
 
 type Gibon struct {
@@ -84,6 +88,46 @@ func (g *Gibon) listProblems() error {
 	return nil
 }
 
+func (g *Gibon) markGroups() error {
+	if err := g.client.EnableGroups(g.pID); err != nil {
+		return err
+	}
+	if err := g.client.EnablePoints(g.pID); err != nil {
+		return err
+	}
+	r := csv.NewReader(os.Stdin)
+	logrus.Info("waiting for TODO input...")
+	for {
+		ln, err := r.Read()
+		if errors.Is(err, io.EOF) {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		if len(ln) != 2 { //nolint:mnd // line length
+			return fmt.Errorf("%w: invalid line length", ErrBadGroupDesc)
+		}
+		var l, r int
+		if _, err := fmt.Sscanf(ln[1], "%d-%d", &l, &r); err != nil {
+			return err
+		}
+		if r < l {
+			return fmt.Errorf("%w: r < l", ErrBadGroupDesc)
+		}
+		logrus.WithFields(logrus.Fields{"group": ln[0], "l": l, "r": r}).Info("set group")
+		ids := make([]int, 0, r-l+1)
+		for i := l; i <= r; i++ {
+			ids = append(ids, i)
+		}
+		if err := g.client.SetTestGroup(g.pID, ln[0], ids); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (g *Gibon) Resolve(method string) error {
 	switch method {
 	case ModeContest:
@@ -96,6 +140,8 @@ func (g *Gibon) Resolve(method string) error {
 		return g.client.BuildPackage(g.pID, true, true)
 	case ModeUpdate:
 		return g.client.UpdateWorkingCopy(g.pID)
+	case ModeGroups:
+		return g.markGroups()
 	}
 
 	return fmt.Errorf("%w: %s", ErrUnknownMethod, method)
