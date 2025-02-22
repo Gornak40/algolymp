@@ -318,7 +318,7 @@ The method `contest` is useful when using [scalp](#scalp) or other [gibon](#gibo
 - `contest` - print problem ids in specified contest
 - `commit` - commit changes with empty message without email notification
 - `download` - download the latest (problem revision) linux package
-- `groups` - mark up test groups from `stdin` (CSV format) `{group},{test1}-{testn},{points}`
+- `groups` - mark up test groups from `stdin` (CSV format) `{group} {test1}-{testn} {points} {dep1},...,{depn}`
 - `package` - build full package with verification
 - `update` - update working copy
 

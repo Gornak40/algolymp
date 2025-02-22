@@ -8,6 +8,7 @@ import (
 	"os"
 	"slices"
 	"strconv"
+	"strings"
 
 	"github.com/Gornak40/algolymp/polygon"
 	"github.com/sirupsen/logrus"
@@ -97,7 +98,8 @@ func (g *Gibon) markGroups() error {
 		return err
 	}
 	r := csv.NewReader(os.Stdin)
-	logrus.Info("waiting for {group},{test1}-{testn},{points} input...")
+	r.Comma = ' '
+	logrus.Info("waiting for '{group} {test1}-{testn} {points} {dep1},...,{depn}' input...")
 	for {
 		ln, err := r.Read()
 		if errors.Is(err, io.EOF) {
@@ -106,7 +108,7 @@ func (g *Gibon) markGroups() error {
 		if err != nil {
 			return err
 		}
-		if len(ln) != 3 { //nolint:mnd // line length
+		if len(ln) != 4 { //nolint:mnd // line length
 			return fmt.Errorf("%w: invalid line length", ErrBadGroupDesc)
 		}
 		group := ln[0]
@@ -121,8 +123,9 @@ func (g *Gibon) markGroups() error {
 		if err != nil {
 			return fmt.Errorf("%w: %s", ErrBadGroupDesc, err.Error())
 		}
+		deps := strings.Split(ln[3], ",")
 		logrus.WithFields(logrus.Fields{
-			"group": group, "points": points, "l": l, "r": r,
+			"group": group, "points": points, "l": l, "r": r, "deps": deps,
 		}).Info("set group")
 		ids := make([]int, 0, r-l+1)
 		for i := l; i <= r; i++ {
@@ -133,7 +136,8 @@ func (g *Gibon) markGroups() error {
 		}
 		tgr := polygon.NewTestGroupRequest(g.pID, polygon.DefaultTestset, group).
 			PointsPolicy(polygon.PolicyCompleteGroup).
-			FeedbackPolicy(polygon.PolicyICPC)
+			FeedbackPolicy(polygon.PolicyICPC).
+			Dependencies(deps)
 		if err := g.client.SaveTestGroup(tgr); err != nil {
 			return err
 		}
