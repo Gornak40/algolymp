@@ -8,16 +8,23 @@ import (
 )
 
 const (
-	defaultTestset = "tests"
+	DefaultTestset = "tests"
+
+	PolicyCompleteGroup = "COMPLETE_GROUP"
+	PolicyEachTest      = "EACH_TEST"
+
+	PolicyPoints   = "POINTS"
+	PolicyICPC     = "ICPC"
+	PolicyComplete = "COMPLETE"
 )
 
 type TestRequest url.Values
 
 func NewTestRequest(pID int, index int) TestRequest {
 	return TestRequest{
-		"problemId": []string{strconv.Itoa(pID)},
-		"testIndex": []string{strconv.Itoa(index)},
-		"testset":   []string{defaultTestset},
+		"problemId": {strconv.Itoa(pID)},
+		"testIndex": {strconv.Itoa(index)},
+		"testset":   {DefaultTestset},
 	}
 }
 
@@ -99,11 +106,20 @@ type FileRequest url.Values
 
 func NewFileRequest(pID int, typ FileType, name, file string) FileRequest {
 	return FileRequest{
-		"problemId": []string{strconv.Itoa(pID)},
-		"type":      []string{string(typ)},
-		"name":      []string{name},
-		"file":      []string{file},
+		"problemId": {strconv.Itoa(pID)},
+		"type":      {string(typ)},
+		"name":      {name},
+		"file":      {file},
 	}
+}
+
+// Polygon bug.
+func fixSourceType(typ string) string {
+	if typ == "cpp.g++" {
+		return "cpp.g++17"
+	}
+
+	return typ
 }
 
 func (fr FileRequest) CheckExisting(f bool) FileRequest {
@@ -113,7 +129,7 @@ func (fr FileRequest) CheckExisting(f bool) FileRequest {
 }
 
 func (fr FileRequest) SourceType(typ string) FileRequest {
-	fr["sourceType"] = []string{typ}
+	fr["sourceType"] = []string{fixSourceType(typ)}
 
 	return fr
 }
@@ -124,10 +140,10 @@ type SolutionRequest url.Values
 
 func NewSolutionRequest(pID int, name, file string, tag SolutionTag) SolutionRequest {
 	return SolutionRequest{
-		"problemId": []string{strconv.Itoa(pID)},
-		"name":      []string{name},
-		"file":      []string{file},
-		"tag":       []string{string(tag)},
+		"problemId": {strconv.Itoa(pID)},
+		"name":      {name},
+		"file":      {file},
+		"tag":       {string(tag)},
 	}
 }
 
@@ -138,7 +154,7 @@ func (sr SolutionRequest) CheckExisting(f bool) SolutionRequest {
 }
 
 func (sr SolutionRequest) SourceType(typ string) SolutionRequest {
-	sr["sourceType"] = []string{typ}
+	sr["sourceType"] = []string{fixSourceType(typ)}
 
 	return sr
 }
@@ -147,8 +163,8 @@ type StatementRequest url.Values
 
 func NewStatementRequest(pID int, lang string) StatementRequest {
 	return StatementRequest{
-		"problemId": []string{strconv.Itoa(pID)},
-		"lang":      []string{lang},
+		"problemId": {strconv.Itoa(pID)},
+		"lang":      {lang},
 	}
 }
 
@@ -210,8 +226,8 @@ type ValidatorTestRequest url.Values
 
 func NewValidatorTestRequest(pID, index int) ValidatorTestRequest {
 	return ValidatorTestRequest{
-		"problemId": []string{strconv.Itoa(pID)},
-		"testIndex": []string{strconv.Itoa(index)},
+		"problemId": {strconv.Itoa(pID)},
+		"testIndex": {strconv.Itoa(index)},
 	}
 }
 
@@ -232,8 +248,8 @@ type CheckerTestRequest url.Values
 
 func NewCheckerTestRequest(pID, index int) CheckerTestRequest {
 	return CheckerTestRequest{
-		"problemId": []string{strconv.Itoa(pID)},
-		"testIndex": []string{strconv.Itoa(index)},
+		"problemId": {strconv.Itoa(pID)},
+		"testIndex": {strconv.Itoa(index)},
 	}
 }
 
@@ -265,9 +281,9 @@ type TestGroupRequest url.Values
 
 func NewTestGroupRequest(pID int, testset, group string) TestGroupRequest {
 	return TestGroupRequest{
-		"problemId": []string{strconv.Itoa(pID)},
-		"testset":   []string{testset},
-		"group":     []string{group},
+		"problemId": {strconv.Itoa(pID)},
+		"testset":   {testset},
+		"group":     {group},
 	}
 }
 
