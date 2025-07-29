@@ -283,7 +283,7 @@ func (p *Polygon) GetTests(pID int) ([]TestAnswer, error) {
 	link, params := p.buildURL("problem.tests", url.Values{
 		"problemId": {strconv.Itoa(pID)},
 		"testset":   {DefaultTestset},
-		"noInputs":  {"true"},
+		// "noInputs":  {"true"},
 	})
 	ansT, err := p.makeQuery(http.MethodGet, link, params)
 	if err != nil {

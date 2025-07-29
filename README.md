@@ -344,7 +344,7 @@ gibon -i 363802 -m groups
 gibon -i 363802 -m package
 gibon -i 363802 -m update
 for i in $(gibon -i 42619 -m contest); do gibon -i $i -m commit && gibon -i $i -m package; done
-echo "0,1-3,0\n1,4-10,37\n2,11-18,63" | gibon -i 363802 -m groups
+echo "0 1-3\n1 4-10 37\n2 11-18 63 0,1" | gibon -i 363802 -m groups
 ```
 
 ![gibon logo](https://algolymp.ru/static/img/gibon.png)
