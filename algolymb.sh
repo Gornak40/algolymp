@@ -7,6 +7,8 @@ set -euo pipefail
 # TODO: remove.
 set -x
 
+################################################################################
+
 readonly POLYGON_URL="https://polygon.codeforces.com/api"
 
 pcurl() {
@@ -31,5 +33,17 @@ pcurl() {
 	curl -fsSL "${curl_params[@]/#/-F}" "${POLYGON_URL}/${method}"
 }
 
+################################################################################
+
+algp() {
+	pcurl "problem.$1" problemId="$2" "${@:3}"
+}
+
+################################################################################
+
 echo -n 436963 > /tmp/test.txt
-pcurl problem.info problemId=@/tmp/test.txt
+algp info @/tmp/test.txt
+
+algp statements 436963
+
+algp validator 436963
