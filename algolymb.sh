@@ -5,7 +5,7 @@
 set -euo pipefail
 
 # TODO: remove.
-set -x
+# set -x
 
 ################################################################################
 
@@ -30,7 +30,18 @@ pcurl() {
 	local sig_hash=$(echo -n "${sig_data}" | sha512sum | awk '{print $1}')
 
 	curl_params+=("apiSig=${sig_rand}${sig_hash}")
-	curl -fsSL "${curl_params[@]/#/-F}" "${POLYGON_URL}/${method}"
+	local response=$(curl -sSL -w "\n%{http_code}" "${curl_params[@]/#/-F}" "${POLYGON_URL}/${method}")
+
+	local http_code=$(tail -n 1 <<< "${response}")
+	local body=$(head -n -1 <<< "${response}")
+	case "${http_code}" in
+		200)
+			jq -r ".result" <<< "${body}" ;;
+		400)
+			jq -r ".comment" <<< "${body}"; exit 1 ;;
+		*)
+			printf "%s" "${body}"; exit 2 ;;
+	esac
 }
 
 ################################################################################
