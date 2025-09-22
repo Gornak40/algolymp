@@ -647,6 +647,7 @@ Matching uses natural order (`test.1.in`, `test.2.in`, ..., `test.10.in`, ...).
 - `incor` - incorrect solution
 - `sample` - sample (append, not replace)
 - `image` - statement resource (likely image)
+- `file` - file resource (testlib.h, etc.)
 
 ### Flags
 - `-i` - problem id (required)
