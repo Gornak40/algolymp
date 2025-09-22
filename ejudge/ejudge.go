@@ -4,12 +4,16 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/cookiejar"
 	"net/url"
+	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/sirupsen/logrus"
@@ -23,10 +27,11 @@ const (
 )
 
 var (
-	ErrParseMasterSID = errors.New("can't parse master SID")
-	ErrBadStatusCode  = errors.New("bad status code")
-	ErrBadFilter      = errors.New("bad filter expression")
-	ErrUnknownVerdict = errors.New("unknown verdict")
+	ErrParseMasterSID    = errors.New("can't parse master SID")
+	ErrBadStatusCode     = errors.New("bad status code")
+	ErrBadFilter         = errors.New("bad filter expression")
+	ErrUnknownVerdict    = errors.New("unknown verdict")
+	ErrCannotGetFileName = errors.New("cannot get filename from content desposition header")
 )
 
 //nolint:gochecknoglobals,mnd // ejudge constants
@@ -74,12 +79,7 @@ func NewEjudge(cfg *Config) *Ejudge {
 }
 
 func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, *goquery.Document, error) {
-	url, err := url.JoinPath(ej.cfg.URL, method)
-	if err != nil {
-		return nil, nil, err
-	}
-	logrus.WithField("url", url).Debug("post query")
-	resp, err := ej.client.PostForm(url, params) //nolint:noctx  // don't need context here.
+	resp, err := ej.getPostRequestResponse(method, params)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -93,6 +93,16 @@ func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, 
 	}
 
 	return resp.Request, doc, nil
+}
+
+func (ej *Ejudge) getPostRequestResponse(method string, params url.Values) (*http.Response, error) {
+	url, err := url.JoinPath(ej.cfg.URL, method)
+	if err != nil {
+		return nil, err
+	}
+	logrus.WithField("url", url).Debug("post query")
+
+	return ej.client.PostForm(url, params) //nolint:noctx  // don't need context here.
 }
 
 func (ej *Ejudge) Login() (string, error) {
@@ -167,7 +177,7 @@ func (ej *Ejudge) ChangeRunStatus(csid string, runID int, status string) error {
 	if err != nil {
 		return err
 	}
-	logrus.WithFields(logrus.Fields{"CSID": csid, "run": runID, "status": idx}).
+	logrus.WithFields(logrus.Fields{"CSID": csid, "run": runID, "status": status}).
 		Info("success set status")
 
 	return nil
@@ -317,4 +327,84 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	})
 
 	return err
+}
+
+type Comment struct {
+	Author  string `json:"author"`
+	Content string `json:"content"`
+}
+
+func extractComments(commentsSelection *goquery.Selection) []Comment {
+	var comments []Comment
+	commentsSelection.Find("tr").Each(func(i int, rowSelection *goquery.Selection) {
+		if i == 0 {
+			return
+		}
+		authorSelection := rowSelection.Find("td.profile b").First()
+		content := rowSelection.Find("td pre").Text()
+		comment := Comment{
+			Author:  authorSelection.Text(),
+			Content: content,
+		}
+		comments = append(comments, comment)
+	})
+	return comments
+}
+
+func (ej *Ejudge) GetAllComments(csid string, runID int) ([]Comment, []Comment, error) {
+	logrus.WithFields(logrus.Fields{
+		"CSID": csid, "run": runID,
+	}).Infof("get comments for run")
+
+	_, doc, err := ej.postRequest("new-master", url.Values{
+		"SID":    {csid},
+		"action": {"36"},
+		"run_id": {strconv.Itoa(runID)},
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("cannot get runs comments: %w", err)
+	}
+
+	tables := doc.Find(".message-table")
+	currentComments := extractComments(tables.First())
+	var previousComments []Comment = nil
+	if !tables.First().IsSelection(tables.Last()) {
+		previousComments = extractComments(tables.Last())
+	}
+	return currentComments, previousComments, err
+}
+
+func (ej *Ejudge) DownloadRunFile(csid string, runID int, dst string) (filename string, err error) {
+	resp, err := ej.getPostRequestResponse("new-master", url.Values{
+		"SID":    {csid},
+		"action": {"91"},
+		"run_id": {strconv.Itoa(runID)},
+	})
+	if err != nil {
+		return "", fmt.Errorf("cannot get run's source code: %w", err)
+	}
+	defer resp.Body.Close()
+
+	contentDisposition := resp.Header.Get("Content-Disposition")
+	if contentDisposition == "" {
+		return "", ErrCannotGetFileName
+	}
+	filename = strings.Trim(strings.Split(contentDisposition, "filename=")[1], "\"")
+	dst = filepath.Join(dst, filename)
+
+	file, err := os.Create(dst)
+	if err != nil {
+		return "", fmt.Errorf("cannot create file for run's source code: %w", err)
+	}
+	defer file.Close()
+	_, err = io.Copy(file, resp.Body)
+	if err != nil {
+		return "", fmt.Errorf("cannot write to source code file: %w", err)
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"CSID": csid, "run": runID,
+	}).Infof("downloaded run as %s", dst)
+
+	return filename, err
 }
