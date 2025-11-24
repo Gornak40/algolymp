@@ -32,6 +32,7 @@ func (v *Vydra) uploadScript(testset *TestSet) error {
 func (v *Vydra) uploadTest(testset string, idx int, test *Test) error {
 	// It's kind of experimental solution.
 	if (*test == Test{Cmd: test.Cmd, FromFile: test.FromFile, Method: "generated"}) {
+		_, _ = v.streamIn.Next() // to skip generated tests while reading files
 		return nil
 	}
 	logrus.WithFields(logrus.Fields{
@@ -55,6 +56,8 @@ func (v *Vydra) uploadTest(testset string, idx int, test *Test) error {
 			return err
 		}
 		tr.Input(input)
+	} else {
+		_, _ = v.streamIn.Next()
 	}
 
 	return v.client.SaveTest(tr)
