@@ -118,7 +118,18 @@ func fixSourceType(typ string) string {
 	if typ == "cpp.g++" {
 		return "cpp.g++17"
 	}
-
+	if typ == "cpp.g++11" {
+		return "cpp.g++17"
+	}
+	if typ == "cpp.gcc11-64-winlibs-g++20" {
+		return "cpp.gcc13-64-winlibs-g++20"
+	}
+	if typ == "cpp.msys2-mingw64-9-g++17" {
+		return "cpp.gcc14-64-msys2-g++23"
+	}
+	if typ == "java11" {
+		return "java21"
+	}
 	return typ
 }
 
