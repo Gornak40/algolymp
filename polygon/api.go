@@ -31,6 +31,7 @@ const (
 	TagCorrect           SolutionTag = "OK"
 	TagIncorrect         SolutionTag = "RJ"
 	TagTimeLimit         SolutionTag = "TL"
+	TagTLorML            SolutionTag = "TM"
 	TagTLorOK            SolutionTag = "TO"
 	TagWrongAnswer       SolutionTag = "WA"
 	TagPresentationError SolutionTag = "PE"

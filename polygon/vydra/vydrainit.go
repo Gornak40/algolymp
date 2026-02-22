@@ -76,6 +76,8 @@ func (v *Vydra) uploadSolution(sol *Solution) error {
 		tag = polygon.TagWrongAnswer
 	case "time-limit-exceeded-or-accepted":
 		tag = polygon.TagTLorOK
+	case "time-limit-exceeded-or-memory-limit-exceeded":
+		tag = polygon.TagTLorML
 	case "presentation-error":
 		tag = polygon.TagPresentationError
 	case "memory-limit-exceeded":
