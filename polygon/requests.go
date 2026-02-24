@@ -130,6 +130,9 @@ func fixSourceType(typ string) string {
 	if typ == "java11" {
 		return "java21"
 	}
+	if typ == "python.pypy3" {
+		return "python.pypy3-64"
+	}
 	return typ
 }
 
