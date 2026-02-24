@@ -26,14 +26,16 @@ func (v *Vydra) initProblem(judge *Judging) error {
 		tl = judge.TestSets[0].TimeLimit
 		ml = judge.TestSets[0].MemoryLimit / megabyte
 	}
+	isIntaractive := (v.prob.Assets.Interactor != nil)
+
 	logrus.WithFields(logrus.Fields{
 		"input": input, "output": output,
-		"tl": tl, "ml": ml,
+		"tl": tl, "ml": ml, "interactive": isIntaractive,
 	}).Info("init problem")
 
 	pr := polygon.NewProblemRequest(v.pID).
 		InputFile(input).OutputFile(output).
-		TimeLimit(tl).MemoryLimit(ml)
+		TimeLimit(tl).MemoryLimit(ml).Interactive(isIntaractive)
 
 	return v.client.UpdateInfo(pr)
 }

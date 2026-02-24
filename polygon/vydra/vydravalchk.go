@@ -27,6 +27,13 @@ func (v *Vydra) initChecker(chk *Checker) error {
 	return v.client.SetChecker(v.pID, path)
 }
 
+func (v *Vydra) initInteractor(inter *Interactor) error {
+	logrus.WithFields(logrus.Fields{
+		"path": inter.Source.Path, "type": inter.Source.Type,
+	}).Info("init interactor")
+	return v.client.SetInteractor(v.pID, filepath.Base(inter.Source.Path))
+}
+
 func (v *Vydra) uploadValidatorTest(idx int, test *Test) error {
 	logrus.WithFields(logrus.Fields{"idx": idx}).Info("upload validator test")
 	input, err := v.streamIn.Next()
@@ -63,6 +70,9 @@ func (v *Vydra) uploadCheckerTest(idx int, test *Test) error {
 }
 
 func (v *Vydra) batchValChk(errs chan error) {
+	if inter := v.prob.Assets.Interactor; inter != nil {
+		errs <- v.initInteractor(inter)
+	}
 	if val := v.prob.Assets.Validators.Validator; val != nil {
 		errs <- v.initValidator(val)
 		if err := v.streamIn.Init("files/tests/validator-tests/*"); err != nil {
