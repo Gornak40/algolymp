@@ -26,22 +26,45 @@ var (
 	ErrBadSolutionTag = errors.New("bad solution tag")
 )
 
+const (
+	StandartPackage = "Standart"
+	LinuxPackage    = "Linux"
+	WindowsPackage  = "Windows"
+)
+
 type Vydra struct {
-	client    *polygon.Polygon
-	pID       int
-	prob      ProblemXML
-	streamIn  *natstream.NatStream
-	streamOut *natstream.NatStream
-	streamAns *natstream.NatStream
+	client      *polygon.Polygon
+	pID         int
+	typePackage string
+	prob        ProblemXML
+	streamIn    *natstream.NatStream
+	streamOut   *natstream.NatStream
+	streamAns   *natstream.NatStream
+}
+
+func getTypePackage() string { // problemxml doesn't contain type package
+	entries, _ := os.ReadDir("./")
+	for _, e := range entries {
+		if e.Name() == "wipe.sh" {
+			return StandartPackage
+		}
+	}
+	for _, e := range entries {
+		if e.Name() == "wipe.bat" {
+			return WindowsPackage
+		}
+	}
+	return LinuxPackage
 }
 
 func NewVydra(client *polygon.Polygon, pID int) *Vydra {
 	return &Vydra{
-		client:    client,
-		pID:       pID,
-		streamIn:  new(natstream.NatStream),
-		streamOut: new(natstream.NatStream),
-		streamAns: new(natstream.NatStream),
+		client:      client,
+		pID:         pID,
+		typePackage: getTypePackage(),
+		streamIn:    new(natstream.NatStream),
+		streamOut:   new(natstream.NatStream),
+		streamAns:   new(natstream.NatStream),
 	}
 }
 

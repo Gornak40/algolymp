@@ -32,6 +32,9 @@ func (v *Vydra) uploadScript(testset *TestSet) error {
 func (v *Vydra) uploadTest(testset string, idx int, test *Test) error {
 	// It's kind of experimental solution.
 	if (*test == Test{Cmd: test.Cmd, FromFile: test.FromFile, Method: "generated"}) {
+		if v.typePackage == LinuxPackage || v.typePackage == WindowsPackage {
+			_, _ = v.streamIn.Next() // skip generated test
+		}
 		return nil
 	}
 	logrus.WithFields(logrus.Fields{
