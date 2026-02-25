@@ -129,6 +129,13 @@ func (p *Polygon) makeQuery(method, link string, params url.Values) (*Answer, er
 	}
 	var ans Answer
 	if err := json.Unmarshal(data, &ans); err != nil {
+		if string(data) == "error code: 502" {
+			logrus.WithFields(logrus.Fields{
+				"method": method,
+				"url":    link,
+			}).Info("retry request")
+			return p.makeQuery(method, link, params)
+		}
 		return nil, err
 	}
 	if ans.Status != "OK" {
