@@ -601,7 +601,6 @@ Designed as an alternative to [polygon-cli](https://github.com/kunyavskiy/polygo
 ### Known issues
 
 - If problem has testsets other than `tests`, you should create them manually, [issue](https://github.com/Codeforces/polygon-issue-tracking/issues/549);
-- If problem is interactive, set `Is problem interactive` checkbox manually;
 - If problem has statement resources, upload them manually;
 - If problem has custom input/output, set it manually;
 - If problem has [FreeMaker](https://freemarker.apache.org) generator, it will expand;
