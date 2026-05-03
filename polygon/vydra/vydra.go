@@ -26,23 +26,25 @@ var (
 	ErrBadSolutionTag = errors.New("bad solution tag")
 )
 
+type PackageType string
+
 const (
-	StandartPackage = "Standart"
-	LinuxPackage    = "Linux"
-	WindowsPackage  = "Windows"
+	StandartPackage PackageType = "Standart"
+	LinuxPackage    PackageType = "Linux"
+	WindowsPackage  PackageType = "Windows"
 )
 
 type Vydra struct {
 	client      *polygon.Polygon
 	pID         int
-	typePackage string
+	typePackage PackageType
 	prob        ProblemXML
 	streamIn    *natstream.NatStream
 	streamOut   *natstream.NatStream
 	streamAns   *natstream.NatStream
 }
 
-func getTypePackage() string { // problemxml doesn't contain type package
+func getTypePackage() PackageType { // problemxml doesn't contain type package
 	entries, _ := os.ReadDir("./")
 	for _, e := range entries {
 		if e.Name() == "wipe.sh" {
