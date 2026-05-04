@@ -134,8 +134,10 @@ func (p *Polygon) makeQuery(method, link string, params url.Values) (*Answer, er
 				"method": method,
 				"url":    link,
 			}).Info("retry request")
+
 			return p.makeQuery(method, link, params)
 		}
+
 		return nil, err
 	}
 	if ans.Status != "OK" {

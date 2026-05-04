@@ -164,6 +164,7 @@ func fixSourceType(typ string, isLegacy bool) string {
 			return "python.pypy3"
 		}
 	}
+
 	return typ
 }
 
