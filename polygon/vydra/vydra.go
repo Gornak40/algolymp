@@ -37,6 +37,7 @@ const (
 type Vydra struct {
 	client      *polygon.Polygon
 	pID         int
+	isLegacy    bool
 	typePackage PackageType
 	prob        ProblemXML
 	streamIn    *natstream.NatStream
@@ -59,10 +60,11 @@ func getTypePackage() PackageType { // problemxml doesn't contain type package
 	return LinuxPackage
 }
 
-func NewVydra(client *polygon.Polygon, pID int) *Vydra {
+func NewVydra(client *polygon.Polygon, pID int, isLegacy bool) *Vydra {
 	return &Vydra{
 		client:      client,
 		pID:         pID,
+		isLegacy:    isLegacy,
 		typePackage: getTypePackage(),
 		streamIn:    new(natstream.NatStream),
 		streamOut:   new(natstream.NatStream),

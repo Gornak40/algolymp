@@ -50,7 +50,7 @@ func (v *Vydra) uploadExecutable(exe *Executable) error {
 	}
 
 	fr := polygon.NewFileRequest(v.pID, polygon.TypeSource, filepath.Base(exe.Source.Path), string(data)).
-		SourceType(exe.Source.Type)
+		SourceType(exe.Source.Type, v.isLegacy)
 
 	return v.client.SaveFile(fr)
 }
@@ -89,7 +89,7 @@ func (v *Vydra) uploadSolution(sol *Solution) error {
 	}
 
 	sr := polygon.NewSolutionRequest(v.pID, filepath.Base(sol.Source.Path), string(data), tag).
-		SourceType(sol.Source.Type)
+		SourceType(sol.Source.Type, v.isLegacy)
 
 	return v.client.SaveSolution(sr)
 }
