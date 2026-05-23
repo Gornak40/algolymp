@@ -114,7 +114,7 @@ func NewFileRequest(pID int, typ FileType, name, file string) FileRequest {
 }
 
 // Polygon bug.
-func fixSourceType(typ string, isLegacy bool) string {
+func fixSourceType(typ string, isLegacy bool) string { //nolint:cyclop,nestif,goconst
 	if !isLegacy {
 		if typ == "cpp.g++" {
 			return "cpp.g++17"

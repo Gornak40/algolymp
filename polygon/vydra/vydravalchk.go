@@ -31,6 +31,7 @@ func (v *Vydra) initInteractor(inter *Interactor) error {
 	logrus.WithFields(logrus.Fields{
 		"path": inter.Source.Path, "type": inter.Source.Type,
 	}).Info("init interactor")
+
 	return v.client.SetInteractor(v.pID, filepath.Base(inter.Source.Path))
 }
 
