@@ -610,7 +610,7 @@ Designed as an alternative to [polygon-cli](https://github.com/kunyavskiy/polygo
 ### Flags
 - `-i` - problem id (required)
 - `-p` - problem directory (default: `.`)
-- `-l` - legacy mode for polygon.lksh.ru
+- `-l` - legacy mode for `polygon.lksh.ru`
 
 ### Config
 - `polygon.url`
