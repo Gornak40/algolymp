@@ -12,6 +12,7 @@ linters:
     - wsl
     - wsl_v5
     - godoclint
+    - noinlineerr
   settings:
     cyclop:
       max-complexity: 15

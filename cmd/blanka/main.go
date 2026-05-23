@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -17,7 +18,7 @@ func editXML(cID int, cfg *config.Config) error {
 	app := cfg.System.Editor
 	xmlName := fmt.Sprintf("%06d.xml", cID)
 	arg0 := path.Join(cfg.Ejudge.JudgesDir, "data", "contests", xmlName)
-	cmd := exec.Command(app, arg0)
+	cmd := exec.CommandContext(context.TODO(), app, arg0)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

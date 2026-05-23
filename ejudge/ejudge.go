@@ -60,7 +60,7 @@ func NewEjudge(cfg *Config) *Ejudge {
 	jar, _ := cookiejar.New(nil)
 	trans := &http.Transport{
 		DialContext: func(_ context.Context, _, addr string) (net.Conn, error) {
-			return net.Dial("tcp4", addr)
+			return net.Dial("tcp4", addr) //nolint:noctx
 		},
 	}
 

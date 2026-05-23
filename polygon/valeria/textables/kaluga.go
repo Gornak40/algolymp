@@ -30,7 +30,7 @@ func (t *KalugaTable) AddGroup(info GroupInfo) {
 }
 
 func (t *KalugaTable) String() string {
-	table := []string{
+	table := []string{ //nolint:prealloc
 		"\\begin{center}",
 		"\\begin{tabular}{|c|c|c|}",
 		"\\hline",

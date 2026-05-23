@@ -31,7 +31,7 @@ func (t *UniversalTable) AddGroup(info GroupInfo) {
 }
 
 func (t *UniversalTable) String() string {
-	table := []string{
+	table := []string{ //nolint:prealloc
 		"\\begin{center}",
 		"\\begin{tabular}{|c|c|c|c|}",
 		"\\hline",

@@ -103,7 +103,7 @@ func newScoring(tests []polygon.TestAnswer, groups []polygon.GroupAnswer) (*scor
 }
 
 func (s *scoring) buildValuer() string {
-	res := []string{}
+	res := make([]string, 0, len(s.groups))
 	for _, g := range s.groups {
 		cur := fmt.Sprintf("group %s {\n\ttests %d-%d;\n\t",
 			g.name, g.firstIdx, g.lastIdx)

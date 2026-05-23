@@ -124,7 +124,7 @@ func (v *Vydra) uploadStatement(stat *Statement) error {
 		if d.IsDir() {
 			return nil
 		}
-		data, err := os.ReadFile(path)
+		data, err := os.ReadFile(path) //nolint:gosec
 		if err != nil {
 			return err
 		}
