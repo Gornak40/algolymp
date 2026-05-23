@@ -38,14 +38,14 @@ type Vydra struct {
 	client      *polygon.Polygon
 	pID         int
 	isLegacy    bool
-	typePackage PackageType
+	packageType PackageType
 	prob        ProblemXML
 	streamIn    *natstream.NatStream
 	streamOut   *natstream.NatStream
 	streamAns   *natstream.NatStream
 }
 
-func gettypePackage() PackageType { // problemxml doesn't contain type package
+func getpackageType() PackageType { // problemxml doesn't contain type package
 	entries, _ := os.ReadDir("./")
 	for _, e := range entries {
 		if e.Name() == "wipe.sh" {
@@ -66,7 +66,7 @@ func NewVydra(client *polygon.Polygon, pID int, isLegacy bool) *Vydra {
 		client:      client,
 		pID:         pID,
 		isLegacy:    isLegacy,
-		typePackage: gettypePackage(),
+		packageType: getpackageType(),
 		streamIn:    new(natstream.NatStream),
 		streamOut:   new(natstream.NatStream),
 		streamAns:   new(natstream.NatStream),
