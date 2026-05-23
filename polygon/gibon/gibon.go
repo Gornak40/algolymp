@@ -37,6 +37,23 @@ func NewGibon(client *polygon.Polygon, pID int) *Gibon {
 	}
 }
 
+func (g *Gibon) Resolve(method string) error {
+	switch method {
+	case ModeContest:
+		return g.listProblems()
+	case ModeCommit:
+		return g.client.Commit(g.pID, true, "")
+	case ModeDownload:
+		return g.resolveDownload()
+	case ModePackage:
+		return g.client.BuildPackage(g.pID, true, true)
+	case ModeUpdate:
+		return g.client.UpdateWorkingCopy(g.pID)
+	}
+
+	return fmt.Errorf("%w: %s", ErrUnknownMethod, method)
+}
+
 func (g *Gibon) resolveDownload() error {
 	prob, err := g.client.GetProblem(g.pID) // it's for zip naming
 	if err != nil {
@@ -82,21 +99,4 @@ func (g *Gibon) listProblems() error {
 	}
 
 	return nil
-}
-
-func (g *Gibon) Resolve(method string) error {
-	switch method {
-	case ModeContest:
-		return g.listProblems()
-	case ModeCommit:
-		return g.client.Commit(g.pID, true, "")
-	case ModeDownload:
-		return g.resolveDownload()
-	case ModePackage:
-		return g.client.BuildPackage(g.pID, true, true)
-	case ModeUpdate:
-		return g.client.UpdateWorkingCopy(g.pID)
-	}
-
-	return fmt.Errorf("%w: %s", ErrUnknownMethod, method)
 }

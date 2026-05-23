@@ -3,6 +3,8 @@
 
 Extended release notes can be found at [chat](https://t.me/algolymp).
 
+This project follows and has always followed the strict **NO AI POLICY**.
+
 ## Workflow
 
 | Tool | Description | Ejudge | Polygon | Status |

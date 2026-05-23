@@ -60,7 +60,7 @@ func NewEjudge(cfg *Config) *Ejudge {
 	jar, _ := cookiejar.New(nil)
 	trans := &http.Transport{
 		DialContext: func(_ context.Context, _, addr string) (net.Conn, error) {
-			return net.Dial("tcp4", addr)
+			return net.Dial("tcp4", addr) //nolint:noctx
 		},
 	}
 
@@ -71,28 +71,6 @@ func NewEjudge(cfg *Config) *Ejudge {
 			Transport: trans,
 		},
 	}
-}
-
-func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, *goquery.Document, error) {
-	url, err := url.JoinPath(ej.cfg.URL, method)
-	if err != nil {
-		return nil, nil, err
-	}
-	logrus.WithField("url", url).Debug("post query")
-	resp, err := ej.client.PostForm(url, params) //nolint:noctx  // don't need context here.
-	if err != nil {
-		return nil, nil, err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return nil, nil, fmt.Errorf("%w: %d", ErrBadStatusCode, resp.StatusCode)
-	}
-	doc, err := goquery.NewDocumentFromReader(resp.Body)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return resp.Request, doc, nil
 }
 
 func (ej *Ejudge) Login() (string, error) {
@@ -317,4 +295,26 @@ func (ej *Ejudge) SendRunComment(csid string, runID int, comment string) error {
 	})
 
 	return err
+}
+
+func (ej *Ejudge) postRequest(method string, params url.Values) (*http.Request, *goquery.Document, error) {
+	url, err := url.JoinPath(ej.cfg.URL, method)
+	if err != nil {
+		return nil, nil, err
+	}
+	logrus.WithField("url", url).Debug("post query")
+	resp, err := ej.client.PostForm(url, params) //nolint:noctx  // don't need context here.
+	if err != nil {
+		return nil, nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, nil, fmt.Errorf("%w: %d", ErrBadStatusCode, resp.StatusCode)
+	}
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return resp.Request, doc, nil
 }

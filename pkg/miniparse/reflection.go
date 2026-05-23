@@ -105,13 +105,13 @@ func writeRecord(r record, v reflect.Value) error {
 //nolint:cyclop // it's ok, nothing to worry about
 func parseValue(a []string, t reflect.Type) (reflect.Value, error) {
 	switch t {
-	case reflect.TypeOf(""):
+	case reflect.TypeFor[string]():
 		return reflect.ValueOf(a[0]), nil
-	case reflect.TypeOf([]string{}):
+	case reflect.TypeFor[[]string]():
 		return reflect.ValueOf(a), nil
-	case reflect.TypeOf(0):
+	case reflect.TypeFor[int]():
 		fallthrough
-	case reflect.TypeOf([]int{}):
+	case reflect.TypeFor[[]int]():
 		x, err := toInts(a)
 		if err != nil {
 			return reflect.Value{}, err
@@ -121,9 +121,9 @@ func parseValue(a []string, t reflect.Type) (reflect.Value, error) {
 		}
 
 		return reflect.ValueOf(x), nil
-	case reflect.TypeOf(false):
+	case reflect.TypeFor[bool]():
 		fallthrough
-	case reflect.TypeOf([]bool{}):
+	case reflect.TypeFor[[]bool]():
 		x, err := toBools(a)
 		if err != nil {
 			return reflect.Value{}, err
@@ -133,9 +133,9 @@ func parseValue(a []string, t reflect.Type) (reflect.Value, error) {
 		}
 
 		return reflect.ValueOf(x), nil
-	case reflect.TypeOf(time.Second):
+	case reflect.TypeFor[time.Duration]():
 		fallthrough
-	case reflect.TypeOf([]time.Duration{}):
+	case reflect.TypeFor[[]time.Duration]():
 		x, err := toDurations(a)
 		if err != nil {
 			return reflect.Value{}, err
