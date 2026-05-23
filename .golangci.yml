@@ -1,18 +1,39 @@
+version: "2"
 linters:
-  enable-all: true
+  default: all
   disable:
-    - gofumpt
     - depguard
-    - wsl
-    - wrapcheck
     - exhaustruct
-    - execinquery
-    - gomnd
-    - varnamelen
     - godox
-    - exportloopref
-    - tagalign # alignment looks awful
-
-linters-settings:
-  cyclop:
-    max-complexity: 15
+    - mnd
+    - tagalign
+    - varnamelen
+    - wrapcheck
+    - wsl
+    - wsl_v5
+    - godoclint
+  settings:
+    cyclop:
+      max-complexity: 15
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - goimports
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$

@@ -78,6 +78,18 @@ func convertString(s string) string {
 	return strings.ToUpper(strings.ReplaceAll(s, "-", "_")) // oh my God
 }
 
+func (v *Vydra) Upload(errs chan error) error {
+	defer close(errs)
+	if err := v.readXML("problem.xml"); err != nil {
+		return err
+	}
+	v.batchInitial(errs)
+	v.batchValChk(errs)
+	v.batchJudging(errs)
+
+	return nil
+}
+
 func (v *Vydra) readXML(path string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -89,18 +101,6 @@ func (v *Vydra) readXML(path string) error {
 	logrus.WithFields(logrus.Fields{
 		"revision": v.prob.Revision, "short-name": v.prob.ShortName,
 	}).Info("load problem.xml")
-
-	return nil
-}
-
-func (v *Vydra) Upload(errs chan error) error {
-	defer close(errs)
-	if err := v.readXML("problem.xml"); err != nil {
-		return err
-	}
-	v.batchInitial(errs)
-	v.batchValChk(errs)
-	v.batchJudging(errs)
 
 	return nil
 }

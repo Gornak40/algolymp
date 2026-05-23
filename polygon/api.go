@@ -113,74 +113,6 @@ func buildRequest(method, link string, params url.Values) (*http.Request, error)
 	}
 }
 
-func (p *Polygon) makeQuery(method, link string, params url.Values) (*Answer, error) {
-	req, err := buildRequest(method, link, params)
-	if err != nil {
-		return nil, err
-	}
-	resp, err := p.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-	var ans Answer
-	if err := json.Unmarshal(data, &ans); err != nil {
-		// TODO: add retry with exponential backoff.
-		return nil, err
-	}
-	if ans.Status != "OK" {
-		return nil, fmt.Errorf("%w: %s", ErrBadPolygonStatus, ans.Comment)
-	}
-
-	return &ans, nil
-}
-
-func (p *Polygon) skipEscape(params url.Values) string {
-	type pair struct {
-		key   string
-		value string
-	}
-
-	var pairs []pair
-	for k, vals := range params {
-		for _, v := range vals {
-			pairs = append(pairs, pair{key: k, value: v})
-		}
-	}
-	sort.Slice(pairs, func(i, j int) bool {
-		if pairs[i].key != pairs[j].key {
-			return pairs[i].key < pairs[j].key
-		}
-
-		return pairs[i].value < pairs[j].value
-	})
-
-	pairs2 := make([]string, 0, len(pairs))
-	for _, p := range pairs {
-		pairs2 = append(pairs2, fmt.Sprintf("%s=%s", p.key, p.value))
-	}
-
-	return strings.Join(pairs2, "&")
-}
-
-func (p *Polygon) buildURL(method string, params url.Values) (string, url.Values) {
-	url, _ := url.JoinPath(p.cfg.URL, "api", method)
-
-	params.Set("apiKey", p.cfg.APIKey)
-	params.Set("time", strconv.FormatInt(time.Now().Unix(), 10))
-	sig := fmt.Sprintf("%s/%s?%s#%s", sixSecretSymbols, method, p.skipEscape(params), p.cfg.APISecret)
-
-	b := sha512.Sum512([]byte(sig))
-	hsh := hex.EncodeToString(b[:])
-	params.Set("apiSig", sixSecretSymbols+hsh)
-
-	return url, params
-}
-
 func (p *Polygon) BuildPackage(pID int, full, verify bool) error {
 	link, params := p.buildURL("problem.buildPackage", url.Values{
 		"problemId": {strconv.Itoa(pID)},
@@ -471,4 +403,72 @@ func (p *Polygon) SaveStatementResource(pID int, name, data string) error {
 	_, err := p.makeQuery(http.MethodPost, link, params)
 
 	return err
+}
+
+func (p *Polygon) makeQuery(method, link string, params url.Values) (*Answer, error) {
+	req, err := buildRequest(method, link, params)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := p.client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var ans Answer
+	if err := json.Unmarshal(data, &ans); err != nil {
+		// TODO: add retry with exponential backoff.
+		return nil, err
+	}
+	if ans.Status != "OK" {
+		return nil, fmt.Errorf("%w: %s", ErrBadPolygonStatus, ans.Comment)
+	}
+
+	return &ans, nil
+}
+
+func (p *Polygon) skipEscape(params url.Values) string {
+	type pair struct {
+		key   string
+		value string
+	}
+
+	var pairs []pair
+	for k, vals := range params {
+		for _, v := range vals {
+			pairs = append(pairs, pair{key: k, value: v})
+		}
+	}
+	sort.Slice(pairs, func(i, j int) bool {
+		if pairs[i].key != pairs[j].key {
+			return pairs[i].key < pairs[j].key
+		}
+
+		return pairs[i].value < pairs[j].value
+	})
+
+	pairs2 := make([]string, 0, len(pairs))
+	for _, p := range pairs {
+		pairs2 = append(pairs2, fmt.Sprintf("%s=%s", p.key, p.value))
+	}
+
+	return strings.Join(pairs2, "&")
+}
+
+func (p *Polygon) buildURL(method string, params url.Values) (string, url.Values) {
+	url, _ := url.JoinPath(p.cfg.URL, "api", method)
+
+	params.Set("apiKey", p.cfg.APIKey)
+	params.Set("time", strconv.FormatInt(time.Now().Unix(), 10))
+	sig := fmt.Sprintf("%s/%s?%s#%s", sixSecretSymbols, method, p.skipEscape(params), p.cfg.APISecret)
+
+	b := sha512.Sum512([]byte(sig))
+	hsh := hex.EncodeToString(b[:])
+	params.Set("apiSig", sixSecretSymbols+hsh)
+
+	return url, params
 }
