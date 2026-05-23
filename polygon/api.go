@@ -31,6 +31,7 @@ const (
 	TagCorrect           SolutionTag = "OK"
 	TagIncorrect         SolutionTag = "RJ"
 	TagTimeLimit         SolutionTag = "TL"
+	TagTLorML            SolutionTag = "TM"
 	TagTLorOK            SolutionTag = "TO"
 	TagWrongAnswer       SolutionTag = "WA"
 	TagPresentationError SolutionTag = "PE"
@@ -128,6 +129,7 @@ func (p *Polygon) makeQuery(method, link string, params url.Values) (*Answer, er
 	}
 	var ans Answer
 	if err := json.Unmarshal(data, &ans); err != nil {
+		// TODO: add retry with exponential backoff.
 		return nil, err
 	}
 	if ans.Status != "OK" {

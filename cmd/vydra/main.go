@@ -21,7 +21,11 @@ func main() {
 		Default:  ".",
 		Help:     "Problem directory (with problem.xml)",
 	})
-
+	isLegacy := parser.Flag("l", "legacy", &argparse.Options{
+		Required: false,
+		Default:  false,
+		Help:     "Use legacy languages (for polygon lksh)",
+	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
 	}
@@ -32,7 +36,7 @@ func main() {
 	cfg := config.NewConfig()
 	pClient := polygon.NewPolygon(&cfg.Polygon)
 
-	vyd := vydra.NewVydra(pClient, *pID)
+	vyd := vydra.NewVydra(pClient, *pID, *isLegacy)
 	errs := make(chan error)
 	go func() {
 		for err := range errs {

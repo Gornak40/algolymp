@@ -26,14 +26,16 @@ func (v *Vydra) initProblem(judge *Judging) error {
 		tl = judge.TestSets[0].TimeLimit
 		ml = judge.TestSets[0].MemoryLimit / megabyte
 	}
+	isIntaractive := (v.prob.Assets.Interactor != nil)
+
 	logrus.WithFields(logrus.Fields{
 		"input": input, "output": output,
-		"tl": tl, "ml": ml,
+		"tl": tl, "ml": ml, "interactive": isIntaractive,
 	}).Info("init problem")
 
 	pr := polygon.NewProblemRequest(v.pID).
 		InputFile(input).OutputFile(output).
-		TimeLimit(tl).MemoryLimit(ml)
+		TimeLimit(tl).MemoryLimit(ml).Interactive(isIntaractive)
 
 	return v.client.UpdateInfo(pr)
 }
@@ -48,7 +50,7 @@ func (v *Vydra) uploadExecutable(exe *Executable) error {
 	}
 
 	fr := polygon.NewFileRequest(v.pID, polygon.TypeSource, filepath.Base(exe.Source.Path), string(data)).
-		SourceType(exe.Source.Type)
+		SourceType(exe.Source.Type, v.isLegacy)
 
 	return v.client.SaveFile(fr)
 }
@@ -76,6 +78,8 @@ func (v *Vydra) uploadSolution(sol *Solution) error {
 		tag = polygon.TagWrongAnswer
 	case "time-limit-exceeded-or-accepted":
 		tag = polygon.TagTLorOK
+	case "time-limit-exceeded-or-memory-limit-exceeded":
+		tag = polygon.TagTLorML
 	case "presentation-error":
 		tag = polygon.TagPresentationError
 	case "memory-limit-exceeded":
@@ -85,7 +89,7 @@ func (v *Vydra) uploadSolution(sol *Solution) error {
 	}
 
 	sr := polygon.NewSolutionRequest(v.pID, filepath.Base(sol.Source.Path), string(data), tag).
-		SourceType(sol.Source.Type)
+		SourceType(sol.Source.Type, v.isLegacy)
 
 	return v.client.SaveSolution(sr)
 }

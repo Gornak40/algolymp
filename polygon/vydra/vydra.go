@@ -26,22 +26,50 @@ var (
 	ErrBadSolutionTag = errors.New("bad solution tag")
 )
 
+type PackageType string
+
+const (
+	StandartPackage PackageType = "Standart"
+	LinuxPackage    PackageType = "Linux"
+	WindowsPackage  PackageType = "Windows"
+)
+
 type Vydra struct {
-	client    *polygon.Polygon
-	pID       int
-	prob      ProblemXML
-	streamIn  *natstream.NatStream
-	streamOut *natstream.NatStream
-	streamAns *natstream.NatStream
+	client      *polygon.Polygon
+	pID         int
+	isLegacy    bool
+	packageType PackageType
+	prob        ProblemXML
+	streamIn    *natstream.NatStream
+	streamOut   *natstream.NatStream
+	streamAns   *natstream.NatStream
 }
 
-func NewVydra(client *polygon.Polygon, pID int) *Vydra {
+func getpackageType() PackageType { // problemxml doesn't contain type package
+	entries, _ := os.ReadDir("./")
+	for _, e := range entries {
+		if e.Name() == "wipe.sh" {
+			return StandartPackage
+		}
+	}
+	for _, e := range entries {
+		if e.Name() == "wipe.bat" {
+			return WindowsPackage
+		}
+	}
+
+	return LinuxPackage
+}
+
+func NewVydra(client *polygon.Polygon, pID int, isLegacy bool) *Vydra {
 	return &Vydra{
-		client:    client,
-		pID:       pID,
-		streamIn:  new(natstream.NatStream),
-		streamOut: new(natstream.NatStream),
-		streamAns: new(natstream.NatStream),
+		client:      client,
+		pID:         pID,
+		isLegacy:    isLegacy,
+		packageType: getpackageType(),
+		streamIn:    new(natstream.NatStream),
+		streamOut:   new(natstream.NatStream),
+		streamAns:   new(natstream.NatStream),
 	}
 }
 

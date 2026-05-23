@@ -114,9 +114,57 @@ func NewFileRequest(pID int, typ FileType, name, file string) FileRequest {
 }
 
 // Polygon bug.
-func fixSourceType(typ string) string {
-	if typ == "cpp.g++" {
-		return "cpp.g++17"
+//
+//nolint:cyclop,nestif,goconst
+func fixSourceType(typ string, isLegacy bool) string {
+	if !isLegacy {
+		if typ == "cpp.g++" {
+			return "cpp.g++17"
+		}
+		if typ == "cpp.g++11" {
+			return "cpp.g++17"
+		}
+		if typ == "cpp.gcc11-64-winlibs-g++20" {
+			return "cpp.gcc13-64-winlibs-g++20"
+		}
+		if typ == "cpp.msys2-mingw64-9-g++17" {
+			return "cpp.gcc14-64-msys2-g++23"
+		}
+		if typ == "java11" {
+			return "java21"
+		}
+		if typ == "java7" {
+			return "java8"
+		}
+		if typ == "python.pypy3" {
+			return "python.pypy3-64"
+		}
+	} else {
+		// can doesn't compille(
+		if typ == "cpp.gcc11-64-winlibs-g++20" {
+			return "cpp.g++17"
+		}
+		if typ == "cpp.gcc13-64-winlibs-g++20" {
+			return "cpp.g++17"
+		}
+		if typ == "cpp.gcc14-64-msys2-g++23" {
+			return "cpp.g++17"
+		}
+		if typ == "java21" {
+			return "java11"
+		}
+		if typ == "kotlin16" {
+			return "kotlin"
+		}
+		if typ == "kotlin17" {
+			return "kotlin"
+		}
+		if typ == "kotlin19" {
+			return "kotlin"
+		}
+		if typ == "python.pypy3-64" {
+			return "python.pypy3"
+		}
 	}
 
 	return typ
@@ -128,8 +176,8 @@ func (fr FileRequest) CheckExisting(f bool) FileRequest {
 	return fr
 }
 
-func (fr FileRequest) SourceType(typ string) FileRequest {
-	fr["sourceType"] = []string{fixSourceType(typ)}
+func (fr FileRequest) SourceType(typ string, isLegacy bool) FileRequest {
+	fr["sourceType"] = []string{fixSourceType(typ, isLegacy)}
 
 	return fr
 }
@@ -153,8 +201,8 @@ func (sr SolutionRequest) CheckExisting(f bool) SolutionRequest {
 	return sr
 }
 
-func (sr SolutionRequest) SourceType(typ string) SolutionRequest {
-	sr["sourceType"] = []string{fixSourceType(typ)}
+func (sr SolutionRequest) SourceType(typ string, isLegacy bool) SolutionRequest {
+	sr["sourceType"] = []string{fixSourceType(typ, isLegacy)}
 
 	return sr
 }

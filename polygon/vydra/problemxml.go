@@ -77,6 +77,11 @@ type Checker struct {
 	TestSet TestSet `xml:"testset"`
 }
 
+type Interactor struct {
+	Type   string `xml:"type,attr"`
+	Source Source `xml:"source"`
+}
+
 type Assets struct {
 	Solutions struct {
 		Solutions []Solution `xml:"solution"`
@@ -84,7 +89,8 @@ type Assets struct {
 	Validators struct {
 		Validator *Validator `xml:"validator"`
 	} `xml:"validators"`
-	Checker *Checker `xml:"checker"`
+	Checker    *Checker    `xml:"checker"`
+	Interactor *Interactor `xml:"interactor"`
 }
 
 type Files struct {
