@@ -17,6 +17,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/sirupsen/logrus"
 )
 
@@ -67,9 +68,12 @@ type Polygon struct {
 func NewPolygon(cfg *Config) *Polygon {
 	logrus.WithField("url", cfg.URL).Info("init polygon engine")
 
+	client := retryablehttp.NewClient()
+	client.Logger = nil
+
 	return &Polygon{
 		cfg:    cfg,
-		client: http.DefaultClient,
+		client: client.StandardClient(),
 	}
 }
 
