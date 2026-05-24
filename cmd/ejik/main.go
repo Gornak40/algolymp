@@ -19,6 +19,10 @@ func main() {
 		Required: false,
 		Help:     "Show full output of check contest settings",
 	})
+	update := parser.Flag("u", "update", &argparse.Options{
+		Required: false,
+		Help:     "Update problems from Polygon",
+	})
 	if err := parser.Parse(os.Args); err != nil {
 		logrus.WithError(err).Fatal("bad arguments")
 	}
@@ -37,6 +41,12 @@ func main() {
 
 	if err := ejClient.Commit(sid); err != nil {
 		logrus.WithError(err).Fatal("commit failed")
+	}
+
+	if *update {
+		if err := ejClient.UpdateFromPolygon(sid, cfg.Polygon, *verbose); err != nil {
+			logrus.WithError(err).Fatal("update failed")
+		}
 	}
 
 	if err := ejClient.CheckContest(sid, *cID, *verbose); err != nil {
