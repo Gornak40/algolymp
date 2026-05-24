@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/Gornak40/algolymp/polygon"
 	"github.com/PuerkitoBio/goquery"
 	"github.com/sirupsen/logrus"
 )
@@ -111,6 +112,21 @@ func (ej *Ejudge) Lock(sid string, cid int) error {
 		"contest_id": {strconv.Itoa(cid)},
 		"SID":        {sid},
 		"action":     {"276"},
+	})
+
+	return err
+}
+
+func (ej *Ejudge) UpdateFromPolygon(sid string, polygon polygon.Config, _ bool) error {
+	logrus.WithFields(logrus.Fields{"SID": sid}).Info("update from polygon")
+	_, _, err := ej.postRequest(serveControl, url.Values{
+		"SID":                    {sid},
+		"enable_api":             {"1"},
+		"polygon_key":            {polygon.APIKey},
+		"polygon_secret":         {polygon.APISecret},
+		"polygon_url":            {polygon.URL},
+		"fetch_latest_available": {"1"},
+		"action":                 {"249"},
 	})
 
 	return err
