@@ -22,9 +22,10 @@ This project follows and has always followed the strict **NO AI POLICY**.
 | [scalp](#scalp) | incremental scoring | | 🦍 | ✅ |
 | [shoga](#shoga) | dump contest tables | 🦍 | | ✅ |
 | [valeria](#valeria) | valuer.cfg + tex scoring | | 🦍 | ✅ |
-| [vydra](#vydra) | upload package | | 🦍 | 🧪 |
+| [vydra](#vydra) | upload package | | 🦍 | ✅ |
 | [wooda](#wooda) | glob problem files upload | | 🦍 | ✅ |
 | ⚙️ | move json config to ini | | | 🤔 |
+| 👻 | build polygon package locally | | | 🤔 |
 | 👻 | set good random group scores | | 🦍 | 🤔 |
 | 👻 | algolymp config manager | | | 🤔 |
 | 👻 | import polygon problem | 🦍 | 🦍 | 🤔 |
