@@ -13,7 +13,7 @@ This project follows and has always followed the strict **NO AI POLICY**.
 | [blanka](#blanka) | create contest | 🦍 | | ✅ |
 | [boban](#boban) | filter runs | 🦍 | | ✅ |
 | [casper](#casper) | change contest visibility | 🦍 | | ✅ |
-| [ejik](#ejik) | commit + check + reload | 🦍 | | ✅ |
+| [ejik](#ejik) | update contest | 🦍 | | ✅ |
 | [fara](#fara) | powerful serve.cfg explorer | 🦍 | | ✅ |
 | [gibon](#gibon) | api multitool | | 🦍 | ✅ |
 | [postyk](#postyk) | print submits 🖨️ | 🦍 | | ✅ |
@@ -226,16 +226,20 @@ casper -m hide # read from stdin
 ### About
 
 1. Commit changes;
-2. Check contest settings;
-3. Reload config files.
+2. Update problems from Polygon (optional);
+3. Check contest settings;
+4. Reload config files.
 
-Useful after running [polygon-to-ejudge](https://github.com/grphil/polygon-to-ejudge).
+Useful after running [polygon2ejudge](https://github.com/grphil/polygon2ejudge).
 
-Feel free to use it after every change
+Feel free to use it after every change.
+
+Problems update flag **does not** modify `serve.cfg`, which is convenient when updating tests.
 
 ### Flags
 - `-i` - contest id (required)
 - `-v` - extended output from Ejudge responses
+- `-u` - update problems from Polygon
 
 ### Config
 - `ejudge.url`
