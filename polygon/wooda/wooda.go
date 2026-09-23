@@ -176,7 +176,8 @@ func (w *Wooda) resolveImage(path, data string) error {
 }
 
 func (w *Wooda) resolveFile(path, data string) error {
-		name := filepath.Base(path)
+	name := filepath.Base(path)
 	fr := polygon.NewFileRequest(w.pID, polygon.TypeResource, name, data)
-	return w.client.SaveFile(fr);
+
+	return w.client.SaveFile(fr)
 }

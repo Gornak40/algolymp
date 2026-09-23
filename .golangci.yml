@@ -13,6 +13,8 @@ linters:
     - wsl_v5
     - godoclint
     - noinlineerr
+    - goconst
+    - gomodguard
   settings:
     cyclop:
       max-complexity: 15
