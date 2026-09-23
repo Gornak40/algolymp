@@ -24,6 +24,7 @@ func main() {
 		wooda.ModeSolutionIncorrect,
 		wooda.ModeSample,
 		wooda.ModeImage,
+		wooda.ModeFile,
 	}
 
 	parser := argparse.NewParser("wooda", "Upload problem files filtered by glob to Polygon.")
