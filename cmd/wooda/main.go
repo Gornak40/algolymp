@@ -12,6 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+//nolint:funlen
 func main() {
 	woodaModes := []string{
 		wooda.ModeTest,
