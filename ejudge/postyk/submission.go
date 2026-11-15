@@ -1,6 +1,8 @@
 package postyk
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"strconv"
 	"strings"
@@ -23,6 +25,12 @@ type Submission struct {
 	Location string
 	RunID    int
 	Name     string
+}
+
+func (s *Submission) SanitizeName() string {
+	sha := sha256.Sum256([]byte(s.raw))
+
+	return hex.EncodeToString(sha[:])
 }
 
 func parseSubmission(sub string) (*Submission, error) {
