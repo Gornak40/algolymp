@@ -13,7 +13,7 @@ import (
 func PrintFile(name, device string) error {
 	logrus.WithFields(logrus.Fields{"file": filepath.Base(name), "printer": device}).Info("print file")
 
-	command := fmt.Sprintf("Get-Content -Path %q | Out-Printer -Name %q", name, device)
+	command := fmt.Sprintf("Get-Content -Path %q -Encoding UTF8 | Out-Printer -Name %q", name, device)
 	cmd := exec.Command("powershell", "-Command", command)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
