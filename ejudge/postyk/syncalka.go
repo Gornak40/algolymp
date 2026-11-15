@@ -35,12 +35,17 @@ func (i *Indexer) Sync() error {
 		return err
 	}
 	for _, s := range shared {
-		if _, ok := synMapa[s.raw]; !ok {
+		// TODO: remove backward compatibility.
+		if _, ok := synMapa[s.raw]; ok {
+			continue
+		}
+		sn := s.SanitizeName()
+		if _, ok := synMapa[sn]; !ok {
 			data, err := i.GetFile(s.raw)
 			if err != nil {
 				return err
 			}
-			fname := path.Join(i.cachePath, s.raw)
+			fname := path.Join(i.cachePath, sn)
 			if err := os.WriteFile(fname, data, cacheFilePerm); err != nil {
 				return err
 			}
